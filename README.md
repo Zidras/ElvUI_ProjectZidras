@@ -4,6 +4,9 @@
 # ElvUI-ProjectZidras for WOTLK (3.3.5a)
 Plugin for ElvUI that aims to add and improve features of the addon. Here is a list of the most relevant changes:
 1. Nameplates castbars: this will only work with HD client (http://forum.warmane.com/showthread.php?t=437071&p=3116959#post3116959). Client's default nameplates castbars appear on all the casting nameplates, and this plugin converts them to ElvUI standards.
+![image](https://user-images.githubusercontent.com/10605951/133909506-869f6315-da9e-4851-9132-0aa70e48bb17.png)
+![image](https://user-images.githubusercontent.com/10605951/133909514-541f70b0-a569-48df-9776-16351992600c.png)
+
   
 ## How to install and update the addon
 1. Download the addon from the **main** repository (https://github.com/Zidras/ElvUI_ProjectZidras/archive/refs/heads/main.zip).
