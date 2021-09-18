@@ -1,0 +1,26 @@
+local L = ElvUI[1].Libs.ACL:NewLocale("ElvUI", "enUS", true, true)
+
+L["About/Help"] = true
+L["Donators"] = true
+L["ELVUI_PZ_CREDITS"] = "I would like to point out the following people for helping me create this addon by testing, coding, and other stuff."
+L["ELVUI_PZ_DONORS"] = "Inmortalz"
+L["ELVUI_PZ_DONORS_TITLE"] = "Thanks to these awesome people for supporting my work via donations:"
+L["FAQ_DESC"] = "This section contains some questions about ElvUI and Project Zidras."
+L["FAQ_Elv_1"] = "|cff30ee30Q: Where can I get ElvUI support?|r\n|cff9482c9A:|r The best way would be the ElvUI - Backport discord - https://discord.gg/UXSc7nt\nTo report a bug, you can use the issue tracker located at https://github.com/ElvUI-WotLK/ElvUI/issues.\nEnglish should be the chosen language, however, if you are Russian, it is highly recommended that you (also) write it in Russian to better convey your message to our russian Developers."
+L["FAQ_Elv_2"] = "|cff30ee30Q: Do I need to have good English in order to do so?|r\n|cff9482c9A:|r English should be the language of choice, as it can be read by every English speaker.\nThis doesn't mean it's the only language used there though. \nAs long as you can follow some simple rules of common sense, like stating said language in the topic's title, everyone will be ok with you posting in your native language.\nKeep in mind that you may still get an answer in English as the person answering you may not be able to speak your language."
+L["FAQ_Elv_3"] = "|cff30ee30Q: What information do I need to provide report a bug?|r\n|cff9482c9A:|r First you need to ensure the error really comes from ElvUI.\nTo do so you need to disable all other addons except of ElvUI and ElvUI_OptionsUI.\nYou can do this by typing \"/luaerror on\" (without quotes).\nIf error didn't disappear, then you should send us a bug report.\nIn the report, you'll need to provide the ElvUI version (\"latest\" is not a valid version number), the text of the error, screenshot is possible.\nThe more info you give us on how to reproduce the error, the faster it is to possibly get it fixed."
+L["FAQ_Elv_4"] = "|cff30ee30Q: Why are some options not applied on other characters while using the same profile?|r\n|cff9482c9A:|r ElvUI has three kinds of options.  First (profile) is stored in your profile, second (private) is stored on a character basis, third (global) are applied across all character regardless of profile used.\nIn this case you most likely came across the option of type two which is private and those options are based per character."
+L["FAQ_Elv_5"] = "|cff30ee30Q: What are ElvUI slash (chat) commands?|r\n|cff9482c9A:|r ElvUI has a lot of different chat commands used for different purposes. They are:\n/ec or /elvui - Opening config window\n/bgstats - Shows battleground specific datatexts if you are on battleground and closed those\n/hellokitty - Want a pink kawaii UI? We got you covered!\n/harlemshake - Need a shake? Just do it!\n/luaerror - loads you UI in testing mode that is designed for making a proper bug report (see Q #3)\n/egrid - Sets the size of a grid in toggle anchors mode\n/moveui - Allows to move stuff around\n/resetui - Resets your entire UI"
+L["FAQ_pz_1"] = "|cff30ee30Q: What do I do if I encounter an error in Project Zidras?|r\n|cff9482c9A:|r Pretty much the same as for ElvUI (see it's FAQ section) but you'll have to provide PZ version too."
+L["FAQ_pz_2"] = "|cff30ee30Q: Does Project Zidras have the same language policy as ElvUI?|r\n|cff9482c9A:|r Yes, English shall be the only language of choice."
+L["FAQ_pz_3"] = "|cff30ee30Q: Why are the layout's screenshots on download page different from what I see in the game?|r\n|cff9482c9A:|r Because I just forgot to update those."
+L["FAQ_pz_4"] = "|cff30ee30Q: Why do I see some weird icons near some people's names in chat?|r\n|cff9482c9A:|r Those icons are provided by PZ and are associated with people I'd like to highlight in any way.\nFor example: |TInterface\\AddOns\\ElvUI_ProjectZidras\\Media\\Textures\\Chat\\Chat_ZidrasLogo:20:20|t is the main icon for development team of Project Zidras."
+L["FAQ_pz_5"] = "|cff30ee30Q: How can I get in touch with you guys?|r\n|cff9482c9A:|r For obvious reasons, I am not giving out my contact details freely. So your best bet is using my Discord."
+L["HD-Client"] = "|cffFF0000Warning:|r This requires HD client to work as intended."
+L["HD-Nameplates"] = true
+L["HD-Nameplates_DESC"] = "Applies ElvUI castbars to default Blizzard nameplate castbars for all units and cached GUID nameplates."
+L["LINK_DESC"] = "Following links will direct you to the Project Zidras's pages on various sites."
+L["Plugin for |cff1784d1ElvUI|r by Zidras."] = true
+L["PZ_DESC"] = "|cff00BFFFProject Zidras|r is an extension of ElvUI. It adds:\n- a lot of improvements for nameplates, specific for HD client.\n- (more to come...)\n\n|cff3cbf27Note:|r Addon structure based on retail Shadow & Light."
+L["PZ_LOGIN_MSG"] = "%s version %s%s|r for %sElvUI|r has loaded."
+L["Submodules and Coding:"] = true
