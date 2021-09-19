@@ -142,42 +142,46 @@ function NP:CacheGroupPetUnits()
 	if numMembers > 0 then
 		for i = 1, numMembers do
 			local unit = "raidpet"..i
-			local name = UnitName(unit)
-			local guid = UnitGUID(unit)
-			local unitType = NP:GetUnitTypeFromUnit(unit)
+			if UnitExists(unit) then
+				local name = UnitName(unit)
+				local guid = UnitGUID(unit)
+				local unitType = NP:GetUnitTypeFromUnit(unit)
 
-			self.FRIENDLY_NPC[name] = unit
+				self.FRIENDLY_NPC[name] = unit
 
-			if not self.GUIDList[guid] then
-				self.GUIDList[guid] = {name, unitType}
-			end
+				if not self.GUIDList[guid] then
+					self.GUIDList[guid] = {name, unitType}
+				end
 
-			for frame in pairs(self.VisiblePlates) do
-				if frame.UnitName == name and frame.UnitType == unitType then
-					frame.guid = guid
-					frame.unit = unit
-					break
+				for frame in pairs(self.VisiblePlates) do
+					if frame.UnitName == name and frame.UnitType == unitType then
+						frame.guid = guid
+						frame.unit = unit
+						break
+					end
 				end
 			end
 		end
 	else
 		for i = 1, GetNumPartyMembers() do
 			local unit = "partypet"..i
-			local name = UnitName(unit)
-			local guid = UnitGUID(unit)
-			local unitType = NP:GetUnitTypeFromUnit(unit)
+			if UnitExists(unit) then
+				local name = UnitName(unit)
+				local guid = UnitGUID(unit)
+				local unitType = NP:GetUnitTypeFromUnit(unit)
 
-			self.FRIENDLY_NPC[name] = unit
+				self.FRIENDLY_NPC[name] = unit
 
-			if not self.GUIDList[guid] then
-				self.GUIDList[guid] = {name, unitType}
-			end
+				if not self.GUIDList[guid] then
+					self.GUIDList[guid] = {name, unitType}
+				end
 
-			for frame in pairs(self.VisiblePlates) do
-				if frame.UnitName == name and frame.UnitType == unitType then
-					frame.guid = guid
-					frame.unit = unit
-					break
+				for frame in pairs(self.VisiblePlates) do
+					if frame.UnitName == name and frame.UnitType == unitType then
+						frame.guid = guid
+						frame.unit = unit
+						break
+					end
 				end
 			end
 		end
