@@ -1,7 +1,7 @@
 ## Interface: 30300
 ## Author: Zidras
 ## Version: 1.0
-## Title: |cff00BFFFProject Zidras|r
+## Title: |cff1784d1E|r|cffe5e3e3lvUI|r |cff00BFFFProject Zidras|r
 ## Notes: |cff00BFFFProject Zidras|r is an |cff1784d1E|r|cffe5e3e3lvUI|r plugin that adds new features to the core addon.
 ## SavedVariables: ProjectZidrasDB
 ## RequiredDeps: ElvUI

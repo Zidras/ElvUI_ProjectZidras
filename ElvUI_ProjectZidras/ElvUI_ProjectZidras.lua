@@ -8,11 +8,11 @@ local AddOnName = ...
 local print = print
 local strconcat, format = strconcat, string.format
 
-PZ.Title 		= GetAddOnMetadata(AddOnName, "Title")
+PZ.BrandHex		= "|cFF00BFFF" -- DeepSkyBlue
+PZ.Title 		= format("%sProject Zidras|r", PZ.BrandHex)
 PZ.Version		= GetAddOnMetadata(AddOnName, "Version")
 PZ.Authors		= GetAddOnMetadata(AddOnName, "Author")
 PZ.Credits		= GetAddOnMetadata(AddOnName, "X-Credits")
-PZ.BrandHex		= "|cFF00BFFF" -- DeepSkyBlue
 
 do
 	local color = strconcat(PZ.BrandHex, "%s|r")
