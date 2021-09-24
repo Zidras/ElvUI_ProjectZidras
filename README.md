@@ -1,6 +1,6 @@
 [![Game Version](https://img.shields.io/badge/wow-3.3.5-blue.svg)](https://github.com/Zidras/ElvUI_ProjectZidras)
 [![Twitch](https://img.shields.io/twitch/status/the_zidras?style=social)](https://www.twitch.tv/the_zidras)
-[![Discord](https://img.shields.io/discord/591914197219016707.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/CyVWDWS)
+[![Discord](https://img.shields.io/discord/598993375479463946.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/CyVWDWS)
 [![PayPal](https://img.shields.io/endpoint?url=https://www.stormfx.com/img/svg/paypal.json)](https://paypal.me/zidras)
 
 
