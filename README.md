@@ -11,9 +11,9 @@ Plugin for ElvUI that aims to add and improve features of the addon. Here is a l
 ![image](https://user-images.githubusercontent.com/10605951/133909514-541f70b0-a569-48df-9776-16351992600c.png)
 
 ## Support
-If you would like to show your apprecation for my work (**which is by no means required**), you can donate in two ways:
-- **Streamelements**: your twitch name will show on my stream at the time of the donation, and in the widget as the latest donation!
-- **PayPal**.
+If you would like to show your appreciation for my work (**which is by no means required**), you can donate in two ways:
+- [**Streamelements**](https://streamelements.com/the_zidras/tip): your Twitch name will show on my stream at the time of the donation, and in the widget as the latest donation!
+- [**PayPal**](https://paypal.me/zidras).
 
 If you donate over 5EUR I will add your name into the Donators tab inside the addon!
 
