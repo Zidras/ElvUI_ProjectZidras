@@ -1,7 +1,9 @@
 local L = ElvUI[1].Libs.ACL:NewLocale("ElvUI", "deDE")
 
-L["About/Help"] = true
-L["Donators"] = true
+L["About/Help"] = "Über/Hilfe"
+L["Displays an icon near your Guild Master in chat.\n\n|cffFF0000Note:|r Some messages in chat history may disappear on login."] = "Zeigt ein Symbol vor dem Gildenmeister Namen im Chat.\n\n|cffFF0000Hinweis:|r Einige Nachrichten im Chatverlauf könnten verschwinden beim Login."
+L["Display LFG Icons in chat."] = "LFG Symbole im chat anzeigen"
+L["Donators"] = "Spender"
 L["ELVUI_PZ_CREDITS"] = "Ich möchte die folgenden Leute hervorheben, die mir beim Erstellen dieses Addons durch Testen, Codieren und andere Dinge geholfen haben."
 L["ELVUI_PZ_DONORS"] = "Inmortalz"
 L["ELVUI_PZ_DONORS_TITLE"] = "Danke an diese tollen Menschen, die meine Arbeit durch Spenden unterstützen:"
@@ -16,11 +18,12 @@ L["FAQ_pz_2"] = "|cff30ee30Q: Hat Project Zidras die gleiche Sprachrichtlinie wi
 L["FAQ_pz_3"] = "|cff30ee30Q: Warum unterscheiden sich die Screenshots des Layouts auf der Download-Seite von denen, die ich im Spiel sehe?|r\n|cff9482c9A:|r Weil ich nur vergessen habe, diese zu aktualisieren."
 L["FAQ_pz_4"] = "|cff30ee30Q: Warum sehe ich einige seltsame Symbole neben den Namen einiger Leute im Chat?|r\n|cff9482c9A:|r Diese Symbole werden von PZ bereitgestellt und sind mit Personen verbunden, die ich auf irgendeine Weise hervorheben möchte.\nZum Beispiel: |TInterface\\AddOns\\ElvUI_ProjectZidras\\Media\\Textures\\Chat\\Chat_ZidrasLogo:20:20|t ist das Hauptsymbol für das Entwicklungsteam von Project Zidras."
 L["FAQ_pz_5"] = "|cff30ee30Q: Wie kann ich dich kontaktieren?|r\n|cff9482c9A:|r Auf meinem Discord-Server gibt es dedizierte Kanäle für Support: https://discord.gg/CyVWDWS."
+L["Guild Master Icon"] = "Gildenmeister Symbol"
 L["HD-Client"] = "|cffFF0000Warnung:|r Dies erfordert, dass der HD-Client wie vorgesehen funktioniert."
 L["HD-Nameplates"] = true
 L["HD-Nameplates_DESC"] = "Wendet ElvUI-Castbars auf standardmäßige Blizzard-Namensschild-Castbars für alle Einheiten und zwischengespeicherte GUID-Namensschilder an."
 L["LINK_DESC"] = "Die folgenden Links führen Sie zu den Seiten von Project Zidras auf verschiedenen Websites."
-L["Plugin for |cff1784d1ElvUI|r by Zidras."] = true
+L["Plugin for |cff1784d1ElvUI|r by Zidras."] = "Plugin für |cff1784d1ElvUI|r von Zidras."
 L["PZ_DESC"] = "|cff00BFFFProject Zidras|r ist eine Erweiterung von ElvUI. Es fügt hinzu:\n- viele Verbesserungen für Namensschilder, speziell für HD-Clients.\n- (weitere folgen...)\n\n|cff3cbf27Hinweis:|r Addon-Struktur basierend auf Shadow & Light im Einzelhandel."
 L["PZ_LOGIN_MSG"] = "%s version %s%s|r für %sElvUI|r wurde geladen."
-L["Submodules and Coding:"] = true
+L["Submodules and Coding:"] = "Submodule und Codierung:"

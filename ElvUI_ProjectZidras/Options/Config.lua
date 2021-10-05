@@ -1,5 +1,6 @@
 local E, L, V, P, G = unpack(ElvUI)
 local PZ = E:GetModule("ProjectZidras")
+local ZCH = E:GetModule("ProjectZidras_Chat")
 
 --GLOBALS: unpack, format
 local format = string.format
@@ -10,6 +11,41 @@ Loaal
 Inmortalz
 Empress
 Kader]]
+
+local function ChatOptions()
+	return {
+		type = "group",
+		name = L["Chat"],
+		get = function(info) return E.db.pz.chat[info[#info]] end,
+		args = {
+			header = {
+				order = 0,
+				type = "header",
+				name = L["Chat"]
+			},
+			guildmaster = {
+				order = 1,
+				type = "toggle",
+				name = L["Guild Master Icon"],
+				desc = L["Displays an icon near your Guild Master in chat.\n\n|cffFF0000Note:|r Some messages in chat history may disappear on login."],
+				set = function(self, value)
+					E.db.pz.chat.guildmaster = value
+					ZCH:GMIconUpdate()
+				end,
+			},
+			lfgIcons = {
+				order = 2,
+				type = 'toggle',
+				name = L["Role Icon"],
+				desc = L["Display LFG Icons in chat."],
+				set = function(self, value)
+					E.db.pz.chat.lfgIcons = value
+					ZCH:CheckLFGRoles()
+				end,
+			},
+		}
+	}
+end
 
 local function NamePlatesOptions()
 	return {
@@ -79,6 +115,7 @@ function PZ:InsertOptions()
 				name = L["Modules"],
 				args = {
 					--* Modules are added here
+					chatGroup = ChatOptions(),
 					namePlatesGroup = NamePlatesOptions(),
 				},
 			},

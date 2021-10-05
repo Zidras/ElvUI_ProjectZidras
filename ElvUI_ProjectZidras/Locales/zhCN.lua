@@ -1,7 +1,9 @@
 local L = ElvUI[1].Libs.ACL:NewLocale("ElvUI", "zhCN")
 
-L["About/Help"] = true
-L["Donators"] = true
+L["About/Help"] = "关于/帮助"
+L["Displays an icon near your Guild Master in chat.\n\n|cffFF0000Note:|r Some messages in chat history may disappear on login."] = "在聊天中在您的公会会长附近显示一个图标。\n\n|cffFF0000注意：|r 聊天记录中的某些消息可能会在登录时消失。"
+L["Display LFG Icons in chat."] = "在小队聊天中显示随机队列图标"
+L["Donators"] = "捐赠者"
 L["ELVUI_PZ_CREDITS"] = "我想指出以下人员通过测试、编码和其他东西帮助我创建这个插件。"
 L["ELVUI_PZ_DONORS"] = "Inmortalz"
 L["ELVUI_PZ_DONORS_TITLE"] = "感谢这些了不起的人通过捐款支持我的工作："
@@ -16,11 +18,12 @@ L["FAQ_pz_2"] = "|cff30ee30Q: Project Zidras 是否与 ElvUI 具有相同的语�
 L["FAQ_pz_3"] = "|cff30ee30Q: 为什么下载页面的布局截图和我在游戏中看到的不一样？|r\n|cff9482c9A:|r 因为我忘记更新了。"
 L["FAQ_pz_4"] = "|cff30ee30Q: 为什么我在聊天中看到某些人的名字附近有一些奇怪的图标？|r\n|cff9482c9A:|r 这些图标由 PZ 提供，并且与我想以任何方式突出显示的人相关联。\n例如：|TInterface\\AddOns\\ElvUI_ProjectZidras\\Media\\Textures\\Chat\\Chat_ZidrasLogo:20:20|t 是 Project Zidras 开发团队的主要图标。"
 L["FAQ_pz_5"] = "|cff30ee30Q: 我如何与您取得联系？|r\n|cff9482c9A:|r 在我的 Discord 服务器中有专门的支持渠道：https://discord.gg/CyVWDWS。"
+L["Guild Master Icon"] = "公会大师图标"
 L["HD-Client"] = "|cffFF0000警告：|r 这需要 HD 客户端按预期工作。"
 L["HD-Nameplates"] = true
 L["HD-Nameplates_DESC"] = "将 ElvUI castbars 应用于所有单位的默认暴雪铭牌 castbars 和缓存的 GUID 铭牌。"
 L["LINK_DESC"] = "以下链接会将您引导至各个站点上的 Project Zidras 页面。"
-L["Plugin for |cff1784d1ElvUI|r by Zidras."] = true
+L["Plugin for |cff1784d1ElvUI|r by Zidras."] = "插件 |cff1784d1ElvUI|r 由 Zidras 提供。"
 L["PZ_DESC"] = "|cff00BFFFProject Zidras|r 是 ElvUI 的扩展。 它增加了：\n- 对铭牌进行了大量改进，专门针对 HD 客户端。\n-（更多内容......）\n\n|cff3cbf27注意：|r 基于零售 Shadow & Light 的插件结构。"
 L["PZ_LOGIN_MSG"] = "%s version %s%s|r for %sElvUI|r has loaded." -- Needs translation
-L["Submodules and Coding:"] = true
+L["Submodules and Coding:"] = "子模块和编码："

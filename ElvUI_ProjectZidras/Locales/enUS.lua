@@ -1,6 +1,8 @@
 local L = ElvUI[1].Libs.ACL:NewLocale("ElvUI", "enUS", true, true)
 
 L["About/Help"] = true
+L["Displays an icon near your Guild Master in chat.\n\n|cffFF0000Note:|r Some messages in chat history may disappear on login."] = true
+L["Display LFG Icons in chat."] = true
 L["Donators"] = true
 L["ELVUI_PZ_CREDITS"] = "I would like to point out the following people for helping me create this addon by testing, coding, and other stuff."
 L["ELVUI_PZ_DONORS"] = "Inmortalz"
@@ -16,6 +18,7 @@ L["FAQ_pz_2"] = "|cff30ee30Q: Does Project Zidras have the same language policy 
 L["FAQ_pz_3"] = "|cff30ee30Q: Why are the layout's screenshots on download page different from what I see in the game?|r\n|cff9482c9A:|r Because I just forgot to update those."
 L["FAQ_pz_4"] = "|cff30ee30Q: Why do I see some weird icons near some people's names in chat?|r\n|cff9482c9A:|r Those icons are provided by PZ and are associated with people I'd like to highlight in any way.\nFor example: |TInterface\\AddOns\\ElvUI_ProjectZidras\\Media\\Textures\\Chat\\Chat_ZidrasLogo:20:20|t is the main icon for development team of Project Zidras."
 L["FAQ_pz_5"] = "|cff30ee30Q: How can I get in touch with you?|r\n|cff9482c9A:|r There are dedicated channels for support in my Discord server: https://discord.gg/CyVWDWS."
+L["Guild Master Icon"] = true
 L["HD-Client"] = "|cffFF0000Warning:|r This requires HD client to work as intended."
 L["HD-Nameplates"] = true
 L["HD-Nameplates_DESC"] = "Applies ElvUI castbars to default Blizzard nameplate castbars for all units and cached GUID nameplates."

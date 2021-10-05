@@ -1,3 +1,4 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Include file="Chat\Load_Chat.xml"/>
 	<Include file="Nameplates\Load_Nameplates.xml"/>
 </Ui>

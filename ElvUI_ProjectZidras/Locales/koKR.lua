@@ -1,7 +1,9 @@
 local L = ElvUI[1].Libs.ACL:NewLocale("ElvUI", "koKR")
 
-L["About/Help"] = true
-L["Donators"] = true
+L["About/Help"] = "정보/도움말"
+L["Displays an icon near your Guild Master in chat.\n\n|cffFF0000Note:|r Some messages in chat history may disappear on login."] = "대화창에서 길드장 근처에 아이콘을 표시합니다. \n\n|cffFF0000Note:|r 일부 대화 기록은 접속시 사라질 수 있습니다."
+L["Display LFG Icons in chat."] = "말한 사람에게 역할 아이콘이 설정되어 있는 경우 이름에 같이 표시할지 여부를 결정합니다."
+L["Donators"] = "기부자"
 L["ELVUI_PZ_CREDITS"] = "테스트, 코딩 및 기타 작업을 통해 이 애드온을 만드는 데 도움을 준 다음 사람들을 지적하고 싶습니다."
 L["ELVUI_PZ_DONORS"] = "Inmortalz"
 L["ELVUI_PZ_DONORS_TITLE"] = "기부를 통해 제 작업을 지원해 주신 멋진 분들에게 감사드립니다."
@@ -16,11 +18,12 @@ L["FAQ_pz_2"] = "|cff30ee30Q: Project Zidras는 ElvUI와 동일한 언어 정책
 L["FAQ_pz_3"] = "|cff30ee30Q: 다운로드 페이지의 레이아웃 스크린샷이 게임에서 보는 것과 다른 이유는 무엇입니까?|r\n|cff9482c9A:|r 방금 업데이트하는 것을 잊었기 때문입니다."
 L["FAQ_pz_4"] = "|cff30ee30Q: 채팅에서 일부 사람들의 이름 근처에 이상한 아이콘이 표시되는 이유는 무엇입니까?|r\n|cff9482c9A:|r 이러한 아이콘은 PZ에서 제공하며 어떤 식으로든 강조하고 싶은 사람들과 연결되어 있습니다.\n예: |TInterface\\AddOns\\ElvUI_ProjectZidras\\Media\\Textures\\Chat\\Chat_ZidrasLogo:20:20|t는 Project Zidras 개발 팀의 기본 아이콘입니다."
 L["FAQ_pz_5"] = "|cff30ee30Q: 어떻게 연락할 수 있나요?|r\n|cff9482c9A:|r 내 Discord 서버에 지원을 위한 전용 채널이 있습니다: https://discord.gg/CyVWDWS."
+L["Guild Master Icon"] = "길드장 아이콘"
 L["HD-Client"] = "|cffFF0000경고:|r 이렇게 하려면 HD 클라이언트가 의도한 대로 작동해야 합니다."
 L["HD-Nameplates"] = true
 L["HD-Nameplates_DESC"] = "ElvUI 캐스트바를 모든 유닛 및 캐시된 GUID 명판에 대한 기본 Blizzard 명판 캐스트바에 적용합니다."
 L["LINK_DESC"] = "다음 링크는 다양한 사이트의 Project Zidras 페이지로 연결됩니다."
-L["Plugin for |cff1784d1ElvUI|r by Zidras."] = true
+L["Plugin for |cff1784d1ElvUI|r by Zidras."] = "Zidras의 |cff1784d1ElvUI|r용 플러그인입니다."
 L["PZ_DESC"] = "|cff00BFFFProject Zidras|r은 ElvUI의 확장입니다. 추가 사항:\n- 명판에 대한 많은 개선 사항, HD 클라이언트 전용.\n- (추가 예정...)\n\n|cff3cbf27참고:|r 정품 Shadow & Light를 기반으로 한 애드온 구조입니다."
 L["PZ_LOGIN_MSG"] = "%s 버전 %s%s|r(%sElvUI|r)이 로드되었습니다."
-L["Submodules and Coding:"] = true
+L["Submodules and Coding:"] = "하위 모듈 및 코딩:"
