@@ -1,6 +1,6 @@
 local E, L, V, P, G = unpack(ElvUI); --Import: Engine, Locales, PrivateDB, ProfileDB, GlobalDB
 
-local PZ = E:NewModule("ProjectZidras")
+local PZ = E:NewModule("ProjectZidras", "LibCompat-1.0")
 local EP = E.Libs.EP
 
 local AddOnName = ...

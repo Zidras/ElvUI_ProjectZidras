@@ -1,7 +1,9 @@
 local E, L, V, P, G = unpack(ElvUI)
 
-local ZNP = E:NewModule("ProjectZidras_NamePlates", "AceEvent-3.0")
+local PZ = E:GetModule("ProjectZidras")
 local NP = E:GetModule("NamePlates")
+
+local ZNP = E:NewModule("ProjectZidras_NamePlates", "AceEvent-3.0")
 
 local pairs = pairs
 local twipe = table.wipe
@@ -65,51 +67,23 @@ end
 function NP:CacheGroupUnits()
 	twipe(self.FRIENDLY_PLAYER)
 
-	local numMembers = GetNumRaidMembers()
+	for unit, owner in PZ.UnitIterator() do
+		if owner == nil then -- ignore pets
+			local name = UnitName(unit)
+			local guid = UnitGUID(unit)
+			local unitType = NP:GetUnitTypeFromUnit(unit)
 
-	if numMembers > 0 then
-		for i = 1, numMembers do
-			local unit = "raid"..i
-			if UnitExists(unit) then
-				local name = UnitName(unit)
-				local guid = UnitGUID(unit)
-				local unitType = NP:GetUnitTypeFromUnit(unit)
+			self.FRIENDLY_PLAYER[name] = unit
 
-				self.FRIENDLY_PLAYER[name] = unit
-
-				if not self.GUIDList[guid] then
-					self.GUIDList[guid] = {name, unitType}
-				end
-
-				for frame in pairs(self.VisiblePlates) do
-					if frame.UnitName == name and frame.UnitType == unitType then
-						frame.guid = guid
-						frame.unit = unit
-						break
-					end
-				end
+			if not self.GUIDList[guid] then
+				self.GUIDList[guid] = {name, unitType}
 			end
-		end
-	else
-		for i = 1, GetNumPartyMembers() do
-			local unit = "party"..i
-			if UnitExists(unit) then
-				local name = UnitName(unit)
-				local guid = UnitGUID(unit)
-				local unitType = NP:GetUnitTypeFromUnit(unit)
 
-				self.FRIENDLY_PLAYER[name] = unit
-
-				if not self.GUIDList[guid] then
-					self.GUIDList[guid] = {name, unitType}
-				end
-
-				for frame in pairs(self.VisiblePlates) do
-					if frame.UnitName == name and frame.UnitType == unitType then
-						frame.guid = guid
-						frame.unit = unit
-						break
-					end
+			for frame in pairs(self.VisiblePlates) do
+				if frame.UnitName == name and frame.UnitType == unitType then
+					frame.guid = guid
+					frame.unit = unit
+					break
 				end
 			end
 		end
@@ -142,50 +116,23 @@ function NP:CacheGroupPetUnits()
 		end
 	end
 
-	local numMembers = GetNumRaidMembers()
-	if numMembers > 0 then
-		for i = 1, numMembers do
-			local unit = "raidpet"..i
-			if UnitExists(unit) then
-				local name = UnitName(unit)
-				local guid = UnitGUID(unit)
-				local unitType = NP:GetUnitTypeFromUnit(unit)
+	for unit, owner in PZ.UnitIterator() do
+		if owner ~= nil then -- ignore players
+			local name = UnitName(unit)
+			local guid = UnitGUID(unit)
+			local unitType = NP:GetUnitTypeFromUnit(unit)
 
-				self.FRIENDLY_NPC[name] = unit
+			self.FRIENDLY_NPC[name] = unit
 
-				if not self.GUIDList[guid] then
-					self.GUIDList[guid] = {name, unitType}
-				end
-
-				for frame in pairs(self.VisiblePlates) do
-					if frame.UnitName == name and frame.UnitType == unitType then
-						frame.guid = guid
-						frame.unit = unit
-						break
-					end
-				end
+			if not self.GUIDList[guid] then
+				self.GUIDList[guid] = {name, unitType}
 			end
-		end
-	else
-		for i = 1, GetNumPartyMembers() do
-			local unit = "partypet"..i
-			if UnitExists(unit) then
-				local name = UnitName(unit)
-				local guid = UnitGUID(unit)
-				local unitType = NP:GetUnitTypeFromUnit(unit)
 
-				self.FRIENDLY_NPC[name] = unit
-
-				if not self.GUIDList[guid] then
-					self.GUIDList[guid] = {name, unitType}
-				end
-
-				for frame in pairs(self.VisiblePlates) do
-					if frame.UnitName == name and frame.UnitType == unitType then
-						frame.guid = guid
-						frame.unit = unit
-						break
-					end
+			for frame in pairs(self.VisiblePlates) do
+				if frame.UnitName == name and frame.UnitType == unitType then
+					frame.guid = guid
+					frame.unit = unit
+					break
 				end
 			end
 		end
