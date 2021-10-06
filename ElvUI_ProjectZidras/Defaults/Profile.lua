@@ -6,6 +6,6 @@ P.pz = {
 		lfgIcons = true,
 	},
 	nameplates = {
-		hdNameplates = true,
+		hdNameplates = false,
 	},
 }
