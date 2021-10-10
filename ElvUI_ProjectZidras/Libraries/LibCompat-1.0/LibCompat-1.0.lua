@@ -4,7 +4,7 @@
 -- @author: Kader B (https://github.com/bkader)
 --
 
-local MAJOR, MINOR = "LibCompat-1.0", 21
+local MAJOR, MINOR = "LibCompat-1.0", 23
 local LibCompat, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 if not LibCompat then return end
 
@@ -431,38 +431,35 @@ end
 -------------------------------------------------------------------------------
 
 do
-	local IsRaidLeader, GetPartyLeaderIndex = IsRaidLeader, GetPartyLeaderIndex
-	local GetRealNumRaidMembers, GetRaidRosterInfo = GetRealNumRaidMembers, GetRaidRosterInfo
+	local IsRaidLeader, IsPartyLeader = IsRaidLeader, IsPartyLeader
+	local GetPartyLeaderIndex, GetRaidRosterInfo = GetPartyLeaderIndex, GetRaidRosterInfo
 
 	local function UnitIsGroupLeader(unit)
-		if LibCompat.IsInRaid() then
-			if unit == "player" then
-				return IsRaidLeader()
-			end
+		if not LibCompat.IsInGroup() then
+			return false
+		elseif unit == "player" then
+			return (LibCompat.IsInRaid() and IsRaidLeader() or IsPartyLeader())
+		else
 			local index = unit:match("%d+")
-			if not index then
+			if not index then -- to allow other units to be checked
 				unit = LibCompat.GetUnitIdFromGUID(UnitGUID(unit), "group")
 				index = unit and unit:match("%d+")
 			end
-			local rank = index and select(2, GetRaidRosterInfo(index))
-			return (rank and rank == 2)
+			return (index and GetPartyLeaderIndex() == tonumber(index))
 		end
-
-		if unit == "player" then
-			return (GetPartyLeaderIndex() == 0)
-		end
-		local index = unit:match("%d+")
-		return (index and index == GetPartyLeaderIndex())
 	end
 
 	local function UnitIsGroupAssistant(unit)
-		for i = 1, GetRealNumRaidMembers() do
-			local name, rank = GetRaidRosterInfo(i)
-			if name == UnitName(unit) then
-				return (rank == 1)
+		if not LibCompat.IsInRaid() then
+			return false
+		else
+			local index = unit:match("%d+")
+			if not index then -- to allow other units to be checked
+				unit = LibCompat.GetUnitIdFromGUID(UnitGUID(unit), "group")
+				index = unit and unit:match("%d+")
 			end
+			return (index and select(2, GetRaidRosterInfo(index)) == 1)
 		end
-		return false
 	end
 
 	LibCompat.UnitIsGroupLeader = UnitIsGroupLeader
@@ -689,13 +686,8 @@ do
 		end
 	end
 
-	local function IsPlayerSpell(spellid)
-		return spellid and GetSpellInfo((GetSpellInfo(spellid))) ~= nil
-	end
-
 	LibCompat.GetSpellInfo = _GetSpellInfo
 	LibCompat.GetSpellLink = _GetSpellLink
-	LibCompat.IsPlayerSpell = IsPlayerSpell
 end
 
 -------------------------------------------------------------------------------
@@ -853,11 +845,26 @@ do
 		return id, name, nil, icon, background, role
 	end
 
-	local function UnitGroupRolesAssigned(unit)
-		return LGTRoleTable[LGT:GetUnitRole(unit or "player")] or "NONE"
-	end
+	local UnitGroupRolesAssigned = UnitGroupRolesAssigned
+	local function _UnitGroupRolesAssigned(unit)
+		unit = unit or "player" -- always fallback to player
 
-	local function GetUnitRole(unit)
+		-- For LFG using "UnitGroupRolesAssigned" is enough.
+		local isTank, isHealer, isDamager = UnitGroupRolesAssigned(unit)
+		if isTank then
+			return "TANK"
+		elseif isHealer then
+			return "HEALER"
+		elseif isDamager then
+			return "DAMAGER"
+		end
+
+		-- speedup things using classes.
+		local class = select(2, UnitClass(unit))
+		if class == "HUNTER" or class == "MAGE" or class == "ROGUE" or class == "WARLOCK" then
+			return "DAMAGER"
+		end
+
 		return LGTRoleTable[LGT:GetUnitRole(unit or "player")] or "NONE"
 	end
 
@@ -870,8 +877,8 @@ do
 	LibCompat.GetSpecializationRole = GetSpecializationRole
 	LibCompat.GetSpecializationInfo = GetSpecializationInfo
 
-	LibCompat.UnitGroupRolesAssigned = UnitGroupRolesAssigned
-	LibCompat.GetUnitRole = UnitGroupRolesAssigned
+	LibCompat.UnitGroupRolesAssigned = _UnitGroupRolesAssigned
+	LibCompat.GetUnitRole = _UnitGroupRolesAssigned
 	LibCompat.GetGUIDRole = GetGUIDRole
 	LibCompat.GetUnitSpec = GetInspectSpecialization
 
@@ -1161,14 +1168,14 @@ do
 	local StatusBarPrototype = {
 		minValue = 0.0,
 		maxValue = 1.0,
-		value = 0.5,
+		value = 1,
 		rotate = true,
 		reverse = false,
 		orientation = "HORIZONTAL",
+		fill = "STANDARD",
 		-- [[ API ]]--
 		Update = function(self, OnSizeChanged)
-			self.value = LibCompat.Clamp(self.value, self.minValue, self.maxValue)
-			self.progress = LibCompat.Clamp((self.value - self.minValue) / (self.maxValue - self.minValue), self.minValue, self.maxValue)
+			self.progress = (self.value - self.minValue) / (self.maxValue - self.minValue)
 
 			local align1, align2
 			local TLx, TLy, BLx, BLy, TRx, TRy, BRx, BRy
@@ -1177,18 +1184,18 @@ do
 
 			if self.orientation == "HORIZONTAL" then
 				self.xProgress = width * self.progress -- progress horizontally
-				if self.fillStyle == "CENTER" then
+				if self.fill == "CENTER" then
 					align1, align2 = "TOP", "BOTTOM"
-				elseif self.reverse or self.fillStyle == "REVERSE" then
+				elseif self.reverse or self.fill == "REVERSE" then
 					align1, align2 = "TOPRIGHT", "BOTTOMRIGHT"
 				else
 					align1, align2 = "TOPLEFT", "BOTTOMLEFT"
 				end
 			elseif self.orientation == "VERTICAL" then
 				self.yProgress = height * self.progress -- progress vertically
-				if self.fillStyle == "CENTER" then
+				if self.fill == "CENTER" then
 					align1, align2 = "LEFT", "RIGHT"
-				elseif self.reverse or self.fillStyle == "REVERSE" then
+				elseif self.reverse or self.fill == "REVERSE" then
 					align1, align2 = "TOPLEFT", "TOPRIGHT"
 				else
 					align1, align2 = "BOTTOMLEFT", "BOTTOMRIGHT"
@@ -1237,25 +1244,30 @@ do
 			self:Update(true)
 		end,
 		SetMinMaxValues = function(self, minValue, maxValue)
-			local update = false
-			if type(minValue) == "number" then
+			assert((type(minValue) == "number" and type(maxValue) == "number"), "Usage: StatusBar:SetMinMaxValues(number, number)")
+
+			if maxValue > minValue then
 				self.minValue = minValue
-				update = true
-			end
-			if type(maxValue) == "number" then
 				self.maxValue = maxValue
-				update = true
+			else
+				self.minValue = 0
+				self.maxValue = 1
 			end
 
-			if update then
-				-- self:Update()
+			if not self.value or self.value > self.maxValue then
+				self.value = self.maxValue
+			elseif not self.value or self.value < self.minValue then
+				self.value = self.minValue
 			end
+
+			self:Update()
 		end,
 		GetMinMaxValues = function(self)
 			return self.minValue, self.maxValue
 		end,
 		SetValue = function(self, value)
-			if value and type(value) == "number" then
+			assert(type(value) == "number", "Usage: StatusBar:SetValue(number)")
+			if value >= self.minValue and value <= self.maxValue then
 				self.value = value
 				self:Update()
 			end
@@ -1290,14 +1302,15 @@ do
 		end,
 		SetFillStyle = function(self, style)
 			if type(style) == "string" and style:upper() == "CENTER" or style:upper() == "REVERSE" then
-				self.fillStyle = style:upper()
+				self.fill = style:upper()
+				self:Update()
 			else
-				self.fillStyle = "STANDARD"
+				self.fill = "STANDARD"
+				self:Update()
 			end
-			-- self:Update()
 		end,
 		GetFillStyle = function(self)
-			return self.fillStyle
+			return self.fill
 		end,
 		SetStatusBarTexture = function(self, texture)
 			self.fg:SetTexture(texture)
@@ -1333,8 +1346,20 @@ do
 		GetVertexColor = function(self)
 			return self.fg:GetVertexColor()
 		end,
+		SetStatusBarGradient = function(self, r1, g1, b1, a1, r2, g2, b2, a2)
+			self.fg:SetGradientAlpha(self.orientation, r1, g1, b1, a1, r2, g2, b2, a2)
+		end,
+		SetStatusBarGradientAuto = function(self, r, g, b, a)
+			self.fg:SetGradientAlpha(self.orientation, 0.5 + (r * 1.1), g * 0.7, b * 0.7, a, r * 0.7, g * 0.7, 0.5 + (b * 1.1), a)
+		end,
+		SetStatusBarSmartGradient = function(self, r1, g1, b1, r2, g2, b2)
+			self.fg:SetGradientAlpha(self.orientation, r1, g1, b1, 1, r2 or r1, g2 or g1, b2 or b1, 1)
+		end,
 		GetObjectType = function(self)
 			return "StatusBar"
+		end,
+		IsObjectType = function(self, otype)
+			return (otype == self:GetObjectType()) and 1 or nil
 		end
 	}
 
@@ -1345,6 +1370,7 @@ do
 		for k, v in pairs(StatusBarPrototype) do bar[k] = v end
 		bar:SetRotatesTexture(false)
 		bar:HookScript("OnSizeChanged", bar.OnSizeChanged)
+		bar:Update()
 		bar.bg:Hide()
 		return bar
 	end})
@@ -1429,7 +1455,6 @@ local mixins = {
 	-- spell util
 	"GetSpellInfo",
 	"GetSpellLink",
-	"IsPlayerSpell",
 	-- misc util
 	"HexEncode",
 	"HexDecode",
