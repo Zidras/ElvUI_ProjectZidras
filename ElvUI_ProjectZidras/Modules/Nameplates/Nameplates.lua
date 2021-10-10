@@ -8,8 +8,6 @@ local ZNP = E:NewModule("ProjectZidras_NamePlates", "AceEvent-3.0")
 local pairs = pairs
 local twipe = table.wipe
 
-local GetNumPartyMembers = GetNumPartyMembers
-local GetNumRaidMembers = GetNumRaidMembers
 local SetCVar = SetCVar
 local UnitExists = UnitExists
 local UnitGUID = UnitGUID
