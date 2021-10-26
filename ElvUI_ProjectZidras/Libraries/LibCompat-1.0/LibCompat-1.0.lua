@@ -4,21 +4,33 @@
 -- @author: Kader B (https://github.com/bkader)
 --
 
-local MAJOR, MINOR = "LibCompat-1.0", 23
-local LibCompat, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
-if not LibCompat then return end
+local MAJOR, MINOR = "LibCompat-1.0", 24
+local lib, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
+if not lib then return end
 
-LibCompat.embeds = LibCompat.embeds or {}
+lib.embeds = lib.embeds or {}
+lib.callbacks = lib.callbacks or LibStub("CallbackHandler-1.0"):New(lib)
 
 local pairs, ipairs, select, type = pairs, ipairs, select, type
 local tinsert, tremove, tconcat, wipe = table.insert, table.remove, table.concat, wipe
 local floor, ceil, max, min = math.floor, math.ceil, math.max, math.min
-local setmetatable, format = setmetatable, string.format
+local format = format or string.format
+local strlen = strlen or string.len
+local strmatch = strmatch or string.match
+local setmetatable = setmetatable
 local tostring, tonumber = tostring, tonumber
 local CreateFrame = CreateFrame
 
 local GAME_LOCALE = GetLocale()
 GAME_LOCALE = (GAME_LOCALE == "enGB") and "enUS" or GAME_LOCALE
+
+local QuickDispatch
+local IsInGroup, IsInRaid
+local GetUnitIdFromGUID
+local tLength
+local _GetSpellInfo
+
+local NOOP = function() end
 
 -------------------------------------------------------------------------------
 
@@ -26,7 +38,7 @@ do
 	local tmp = {}
 	local function Print(self, frame, ...)
 		local n = 0
-		if self ~= LibCompat then
+		if self ~= lib then
 			n = n + 1
 			tmp[n] = "|cff33ff99" .. tostring(self) .. "|r:"
 		end
@@ -37,7 +49,7 @@ do
 		frame:AddMessage(tconcat(tmp, " ", 1, n))
 	end
 
-	function LibCompat:Print(...)
+	function lib:Print(...)
 		local frame = ...
 		if type(frame) == "table" and frame.AddMessage then
 			return Print(self, frame, select(2, ...))
@@ -45,7 +57,7 @@ do
 		return Print(self, DEFAULT_CHAT_FRAME, ...)
 	end
 
-	function LibCompat:Printf(...)
+	function lib:Printf(...)
 		local frame = ...
 		if type(frame) == "table" and frame.AddMessage then
 			return Print(self, frame, format(select(2, ...)))
@@ -64,10 +76,8 @@ do
 		print("|cffff9900Error|r:" .. (err or "<no error given>"))
 	end
 
-	function LibCompat.QuickDispatch(func, ...)
-		if type(func) ~= "function" then
-			return
-		end
+	function QuickDispatch(func, ...)
+		if type(func) ~= "function" then return end
 		local ok, err = pcall(func, ...)
 		if not ok then
 			DispatchError(err)
@@ -75,6 +85,8 @@ do
 		end
 		return true
 	end
+
+	lib.QuickDispatch = QuickDispatch
 end
 
 -------------------------------------------------------------------------------
@@ -90,7 +102,7 @@ do
 		return unpack(tbl, 1, tbl.n)
 	end
 
-	local function tLength(tbl)
+	function tLength(tbl)
 		local len = 0
 		for _ in pairs(tbl) do
 			len = len + 1
@@ -103,7 +115,7 @@ do
 		for k, v in pairs(from) do
 			local skip = false
 			if ... then
-				for i, j in ipairs(...) do
+				for _, j in ipairs(...) do
 					if j == k then
 						skip = true
 						break
@@ -119,6 +131,27 @@ do
 				end
 			end
 		end
+	end
+
+	local function tInvert(tbl)
+		local inverted = {}
+		for k, v in pairs(tbl) do
+			inverted[v] = k
+		end
+		return inverted
+	end
+
+	local function tIndexOf(tbl, item)
+		for i, v in ipairs(tbl) do
+			if item == v then
+				return i
+			end
+		end
+	end
+
+	-- replace the global function
+	_G.tContains = function(tbl, item)
+		return (tIndexOf(tbl, item) ~= nil)
 	end
 
 	local function tAppendAll(tbl, elems)
@@ -146,7 +179,10 @@ do
 	-- delete table and return to pool
 	local function delTable(t)
 		if type(t) == "table" then
-			for k, _ in pairs(t) do
+			for k, v in pairs(t) do
+				if type(v) == "table" then
+					delTable(v)
+				end
 				t[k] = nil
 			end
 			t[true] = true
@@ -156,14 +192,16 @@ do
 		return nil
 	end
 
-	LibCompat.SafePack = SafePack
-	LibCompat.SafeUnpack = SafeUnpack
-	LibCompat.tLength = tLength
-	LibCompat.tCopy = tCopy
-	LibCompat.tAppendAll = tAppendAll
-	LibCompat.WeakTable = WeakTable
-	LibCompat.newTable = newTable
-	LibCompat.delTable = delTable
+	lib.SafePack = SafePack
+	lib.SafeUnpack = SafeUnpack
+	lib.tLength = tLength
+	lib.tCopy = tCopy
+	lib.tInvert = tInvert
+	lib.tIndexOf = tIndexOf
+	lib.tAppendAll = tAppendAll
+	lib.WeakTable = WeakTable
+	lib.newTable = newTable
+	lib.delTable = delTable
 end
 
 -------------------------------------------------------------------------------
@@ -189,11 +227,11 @@ do
 		return val > minval and val < maxval
 	end
 
-	LibCompat.Round = Round
-	LibCompat.Square = Square
-	LibCompat.Clamp = Clamp
-	LibCompat.WithinRange = WithinRange
-	LibCompat.WithinRangeExclusive = WithinRangeExclusive
+	lib.Round = Round
+	lib.Square = Square
+	lib.Clamp = Clamp
+	lib.WithinRange = WithinRange
+	lib.WithinRangeExclusive = WithinRangeExclusive
 end
 
 -------------------------------------------------------------------------------
@@ -204,11 +242,11 @@ do
 	local UnitHealth, UnitHealthMax = UnitHealth, UnitHealthMax
 	local UnitPower, UnitPowerMax = UnitPower, UnitPowerMax
 
-	local function IsInRaid()
+	function IsInRaid()
 		return (GetNumRaidMembers() > 0)
 	end
 
-	local function IsInGroup()
+	function IsInGroup()
 		return (GetNumRaidMembers() > 0 or GetNumPartyMembers() > 0)
 	end
 
@@ -318,20 +356,23 @@ do
 
 	local function GroupIterator(func, ...)
 		for unit, owner in UnitIterator() do
-			LibCompat.QuickDispatch(func, unit, owner, ...)
+			QuickDispatch(func, unit, owner, ...)
 		end
 	end
 
-	local function GetUnitIdFromGUID(guid, specific)
-		if specific == nil or specific == "boss" then
-			for i = 1, 4 do
+	local MAX_BOSS_FRAMES = MAX_BOSS_FRAMES or 5
+
+	function GetUnitIdFromGUID(guid, filter)
+		if filter == nil or filter == "boss" then
+			for i = 1, MAX_BOSS_FRAMES do
 				if UnitExists("boss" .. i) and UnitGUID("boss" .. i) == guid then
 					return "boss" .. i
 				end
 			end
+			if filter == "boss" then return end
 		end
 
-		if specific == nil or specific == "player" then
+		if filter == nil or filter == "player" then
 			if UnitExists("target") and UnitGUID("target") == guid then
 				return "target"
 			elseif UnitExists("focus") and UnitGUID("focus") == guid then
@@ -342,22 +383,29 @@ do
 				return "focustarget"
 			elseif UnitExists("mouseover") and UnitGUID("mouseover") == guid then
 				return "mouseover"
+			elseif filter == "player" then
+				return
 			end
 		end
 
-		if specific == nil or specific == "group" then
-			for unit in UnitIterator() do
+		if filter == nil or filter == "group" then
+			for unit, owner in UnitIterator() do
 				if UnitGUID(unit) == guid then
 					return unit
 				elseif UnitExists(unit .. "target") and UnitGUID(unit .. "target") == guid then
 					return unit .. "target"
+				elseif owner and UnitGUID(owner) == guid then
+					return owner
+				elseif owner and UnitGUID(owner .. "target") == guid then
+					return owner .. "target"
 				end
 			end
+			if filter == "group" then return end
 		end
 	end
 
-	local function GetClassFromGUID(guid, specific)
-		local unit = GetUnitIdFromGUID(guid, specific)
+	local function GetClassFromGUID(guid, filter)
+		local unit = GetUnitIdFromGUID(guid, filter)
 		local class
 		if unit and unit:find("pet") then
 			class = "PET"
@@ -379,8 +427,8 @@ do
 
 	local unknownUnits = {[UKNOWNBEING] = true, [UNKNOWNOBJECT] = true}
 
-	local function UnitHealthInfo(unit, guid, specific)
-		unit = (unit and not unknownUnits[unit]) and unit or (guid and GetUnitIdFromGUID(guid, specific))
+	local function UnitHealthInfo(unit, guid, filter)
+		unit = (unit and not unknownUnits[unit]) and unit or (guid and GetUnitIdFromGUID(guid, filter))
 		local percent, health, maxhealth
 		if unit and UnitExists(unit) then
 			health, maxhealth = UnitHealth(unit), UnitHealthMax(unit)
@@ -391,8 +439,8 @@ do
 		return percent, health, maxhealth
 	end
 
-	local function UnitPowerInfo(unit, guid, powerType, specific)
-		unit = (unit and not unknownUnits[unit]) and unit or (guid and GetUnitIdFromGUID(guid, specific))
+	local function UnitPowerInfo(unit, guid, powerType, filter)
+		unit = (unit and not unknownUnits[unit]) and unit or (guid and GetUnitIdFromGUID(guid, filter))
 		local percent, power, maxpower
 		if unit and UnitExists(unit) then
 			power, maxpower = UnitPower(unit, powerType), UnitPowerMax(unit, powerType)
@@ -409,23 +457,23 @@ do
 		return namerealm
 	end
 
-	LibCompat.IsInRaid = IsInRaid
-	LibCompat.IsInGroup = IsInGroup
-	LibCompat.GetNumGroupMembers = GetNumGroupMembers
-	LibCompat.GetNumSubgroupMembers = GetNumSubgroupMembers
-	LibCompat.GetGroupTypeAndCount = GetGroupTypeAndCount
-	LibCompat.IsGroupDead = IsGroupDead
-	LibCompat.IsGroupInCombat = IsGroupInCombat
-	LibCompat.GroupIterator = GroupIterator
-	LibCompat.UnitIterator = UnitIterator
-	LibCompat.GetUnitIdFromGUID = GetUnitIdFromGUID
-	LibCompat.GetClassFromGUID = GetClassFromGUID
-	LibCompat.GetCreatureId = GetCreatureId
-	LibCompat.GetUnitCreatureId = GetUnitCreatureId
-	LibCompat.UnitHealthInfo = UnitHealthInfo
-	LibCompat.UnitHealthPercent = UnitHealthInfo -- backward compatibility
-	LibCompat.UnitPowerInfo = UnitPowerInfo
-	LibCompat.UnitFullName = UnitFullName
+	lib.IsInRaid = IsInRaid
+	lib.IsInGroup = IsInGroup
+	lib.GetNumGroupMembers = GetNumGroupMembers
+	lib.GetNumSubgroupMembers = GetNumSubgroupMembers
+	lib.GetGroupTypeAndCount = GetGroupTypeAndCount
+	lib.IsGroupDead = IsGroupDead
+	lib.IsGroupInCombat = IsGroupInCombat
+	lib.GroupIterator = GroupIterator
+	lib.UnitIterator = UnitIterator
+	lib.GetUnitIdFromGUID = GetUnitIdFromGUID
+	lib.GetClassFromGUID = GetClassFromGUID
+	lib.GetCreatureId = GetCreatureId
+	lib.GetUnitCreatureId = GetUnitCreatureId
+	lib.UnitHealthInfo = UnitHealthInfo
+	lib.UnitHealthPercent = UnitHealthInfo -- backward compatibility
+	lib.UnitPowerInfo = UnitPowerInfo
+	lib.UnitFullName = UnitFullName
 end
 
 -------------------------------------------------------------------------------
@@ -435,14 +483,14 @@ do
 	local GetPartyLeaderIndex, GetRaidRosterInfo = GetPartyLeaderIndex, GetRaidRosterInfo
 
 	local function UnitIsGroupLeader(unit)
-		if not LibCompat.IsInGroup() then
+		if not IsInGroup() then
 			return false
 		elseif unit == "player" then
-			return (LibCompat.IsInRaid() and IsRaidLeader() or IsPartyLeader())
+			return (IsInRaid() and IsRaidLeader() or IsPartyLeader())
 		else
 			local index = unit:match("%d+")
 			if not index then -- to allow other units to be checked
-				unit = LibCompat.GetUnitIdFromGUID(UnitGUID(unit), "group")
+				unit = GetUnitIdFromGUID(UnitGUID(unit), "group")
 				index = unit and unit:match("%d+")
 			end
 			return (index and GetPartyLeaderIndex() == tonumber(index))
@@ -450,72 +498,138 @@ do
 	end
 
 	local function UnitIsGroupAssistant(unit)
-		if not LibCompat.IsInRaid() then
+		if not IsInRaid() then
 			return false
 		else
 			local index = unit:match("%d+")
 			if not index then -- to allow other units to be checked
-				unit = LibCompat.GetUnitIdFromGUID(UnitGUID(unit), "group")
+				unit = GetUnitIdFromGUID(UnitGUID(unit), "group")
 				index = unit and unit:match("%d+")
 			end
 			return (index and select(2, GetRaidRosterInfo(index)) == 1)
 		end
 	end
 
-	LibCompat.UnitIsGroupLeader = UnitIsGroupLeader
-	LibCompat.UnitIsGroupAssistant = UnitIsGroupAssistant
+	lib.UnitIsGroupLeader = UnitIsGroupLeader
+	lib.UnitIsGroupAssistant = UnitIsGroupAssistant
 end
 
 -------------------------------------------------------------------------------
--- Class Colors
+-- Color functions
+
+local HexToRGB, RGBToHex
+local HexToRGBPerc, RGBPercToHex
+do
+	function HexToRGB(hex)
+		local rhex, ghex, bhex
+		if strlen(hex) == 6 then
+			rhex, ghex, bhex = strmatch("([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})", hex)
+		elseif strlen(hex) == 3 then
+			rhex, ghex, bhex = strmatch("([a-fA-F0-9])([a-fA-F0-9])([a-fA-F0-9])", hex)
+			if rhex and ghex and bhex then
+				rhex = rhex .. rhex
+				ghex = ghex .. ghex
+				bhex = bhex .. bhex
+			end
+		end
+		if not (rhex and ghex and bhex) then
+			return 0, 0, 0
+		else
+			return tonumber(rhex, 16), tonumber(ghex, 16), tonumber(bhex, 16)
+		end
+	end
+
+	function RGBToHex(r, g, b)
+		r = r <= 255 and r >= 0 and r or 0
+		g = g <= 255 and g >= 0 and g or 0
+		b = b <= 255 and b >= 0 and b or 0
+		return format("%02x%02x%02x", r, g, b)
+	end
+
+	function HexToRGBPerc(hex)
+		local rhex, ghex, bhex, base
+		if strlen(hex) == 6 then
+			rhex, ghex, bhex = strmatch("([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})", hex)
+			base = 255
+		elseif strlen(hex) == 3 then
+			rhex, ghex, bhex = strmatch("([a-fA-F0-9])([a-fA-F0-9])([a-fA-F0-9])", hex)
+			base = 16
+		end
+		if not (rhex and ghex and bhex) then
+			return 0, 0, 0
+		else
+			return tonumber(rhex, 16) / base, tonumber(ghex, 16) / base, tonumber(bhex, 16) / base
+		end
+	end
+
+	function RGBPercToHex(r, g, b)
+		r = r <= 1 and r >= 0 and r or 0
+		g = g <= 1 and g >= 0 and g or 0
+		b = b <= 1 and b >= 0 and b or 0
+		return format("%02x%02x%02x", r * 255, g * 255, b * 255)
+	end
+
+	lib.HexToRGB = HexToRGB
+	lib.RGBToHex = RGBToHex
+	lib.HexToRGBPerc = HexToRGBPerc
+	lib.RGBPercToHex = RGBPercToHex
+end
+
+-------------------------------------------------------------------------------
+-- Classes & Colors
 
 do
-	local classColorsTable
+	local classColorsTable, classInfoTable
 	local colors = CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS
+	local CLASS_SORT_ORDER = CLASS_SORT_ORDER
 
-	local classInfoTable = {
-		WARRIOR = {classFile = "WARRIOR", classID = 1},
-		PALADIN = {classFile = "PALADIN", classID = 2},
-		HUNTER = {classFile = "HUNTER", classID = 3},
-		ROGUE = {classFile = "ROGUE", classID = 4},
-		PRIEST = {classFile = "PRIEST", classID = 5},
-		DEATHKNIGHT = {classFile = "DEATHKNIGHT", classID = 6},
-		SHAMAN = {classFile = "SHAMAN", classID = 7},
-		MAGE = {classFile = "MAGE", classID = 8},
-		WARLOCK = {classFile = "WARLOCK", classID = 9},
-		DRUID = {classFile = "DRUID", classID = 11}
-	}
+	-- the functions below are for internal usage only
+	local function __fillClassColorsTable()
+		if classColorsTable ~= nil then return end
+		classColorsTable = {}
+		for class, tbl in pairs(colors) do
+			classColorsTable[class] = tbl
+			classColorsTable[class].colorStr = "ff" .. RGBPercToHex(tbl.r, tbl.g, tbl.b)
+		end
+	end
 
-	for k, v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
-		classInfoTable[k].className = v
+	local function __fillClassInfoTable()
+		if classInfoTable ~= nil then return end
+
+		classInfoTable = {
+			WARRIOR = {classFile = "WARRIOR", classID = 1},
+			PALADIN = {classFile = "PALADIN", classID = 2},
+			HUNTER = {classFile = "HUNTER", classID = 3},
+			ROGUE = {classFile = "ROGUE", classID = 4},
+			PRIEST = {classFile = "PRIEST", classID = 5},
+			DEATHKNIGHT = {classFile = "DEATHKNIGHT", classID = 6},
+			SHAMAN = {classFile = "SHAMAN", classID = 7},
+			MAGE = {classFile = "MAGE", classID = 8},
+			WARLOCK = {classFile = "WARLOCK", classID = 9},
+			DRUID = {classFile = "DRUID", classID = 11}
+		}
+
+		-- fill names
+		for k, v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
+			if classInfoTable[k] then
+				classInfoTable[k].className = v
+			end
+		end
 	end
 
 	local function GetClassColorsTable()
-		if not classColorsTable then
-			-- add missing class color strings
-			colors.DEATHKNIGHT.colorStr = "ffc41f3b"
-			colors.DRUID.colorStr = "ffff7d0a"
-			colors.HUNTER.colorStr = "ffabd473"
-			colors.MAGE.colorStr = "ff3fc7eb"
-			colors.PALADIN.colorStr = "fff58cba"
-			colors.PRIEST.colorStr = "ffffffff"
-			colors.ROGUE.colorStr = "fffff569"
-			colors.SHAMAN.colorStr = "ff0070de"
-			colors.WARLOCK.colorStr = "ff8788ee"
-			colors.WARRIOR.colorStr = "ffc79c6e"
-
-			-- cache it once and for all.
-			classColorsTable = {}
-			for class, tbl in pairs(colors) do
-				classColorsTable[class] = tbl
-			end
+		if classColorsTable == nil then
+			__fillClassColorsTable()
 		end
 
 		return classColorsTable
 	end
 
 	local function GetClassColorObj(class)
-		classColorsTable = classColorsTable or GetClassColorsTable()
+		if classColorsTable == nil then
+			__fillClassColorsTable()
+		end
+
 		return class and classColorsTable[class]
 	end
 
@@ -528,15 +642,19 @@ do
 	end
 
 	local function GetNumClasses()
-		return LibCompat.tLength(colors)
+		return CLASS_SORT_ORDER and #CLASS_SORT_ORDER or tLength(colors)
 	end
 
 	local function GetClassInfo(classIndex)
+		if classInfoTable == nil then
+			__fillClassInfoTable()
+		end
+
 		local className, classFile, classID
 		if classIndex then
 			for _, class in pairs(classInfoTable) do
 				if class.classID == classIndex then
-					className = class.className
+					className = class.className or class.classFile
 					classFile = class.classFile
 					classID = class.classID
 					break
@@ -546,46 +664,86 @@ do
 		return className, classFile, classID
 	end
 
-	LibCompat.GetClassColorsTable = GetClassColorsTable
-	LibCompat.GetClassColorObj = GetClassColorObj
-	LibCompat.GetClassColor = GetClassColor
-	LibCompat.GetNumClasses = GetNumClasses
-	LibCompat.GetClassInfo = GetClassInfo
+	lib.GetClassColorsTable = GetClassColorsTable
+	lib.GetClassColorObj = GetClassColorObj
+	lib.GetClassColor = GetClassColor
+	lib.GetNumClasses = GetNumClasses
+	lib.GetClassInfo = GetClassInfo
 end
 
 -------------------------------------------------------------------------------
 -- C_Timer mimic
 
 do
-	local TickerPrototype, waitTable = {}, {}
-	local TickerMetatable = {__index = TickerPrototype, __metatable = true}
+	local Timer = {}
 
+	local TickerPrototype = {}
+	local TickerMetatable = {
+		__index = TickerPrototype,
+		__metatable = true
+	}
+
+	local new, del
+	do
+		Timer.__timers = Timer.__timers or {}
+		Timer.__afters = Timer.__afters or {}
+		local listT = Timer.__timers
+		local listA = Timer.__afters
+
+		function new(temp)
+			if temp then
+				local t = next(listA) or {}
+				listA[t] = nil
+				return t
+			end
+
+			local t = next(listT) or setmetatable({}, TickerMetatable)
+			listT[t] = nil
+			return t
+		end
+
+		function del(t)
+			if t then
+				local temp = t._temp
+				t[true] = true
+				t[true] = nil
+				if temp then
+					listA[t] = true
+				else
+					listT[t] = true
+				end
+			end
+		end
+	end
+
+	local waitTable = {}
 	local waitFrame = LibCompat_TimerFrame or CreateFrame("Frame", "LibCompat_TimerFrame", UIParent)
 	waitFrame:SetScript("OnUpdate", function(self, elapsed)
 		local total = #waitTable
-		for i = 1, total do
+		local i = 1
+
+		while i <= total do
 			local ticker = waitTable[i]
 
-			if ticker then
-				if ticker._cancelled then
-					tremove(waitTable, i)
-				elseif ticker._delay > elapsed then
-					ticker._delay = ticker._delay - elapsed
-					i = i + 1
-				else
-					ticker._callback(ticker)
+			if ticker._cancelled then
+				del(tremove(waitTable, i))
+				total = total - 1
+			elseif ticker._delay > elapsed then
+				ticker._delay = ticker._delay - elapsed
+				i = i + 1
+			else
+				ticker._callback(ticker)
 
-					if ticker._iterations == -1 then
-						ticker._delay = ticker._duration
-						i = i + 1
-					elseif ticker._iterations > 1 then
-						ticker._iterations = ticker._iterations - 1
-						ticker._delay = ticker._duration
-						i = i + 1
-					elseif ticker._iterations == 1 then
-						tremove(waitTable, i)
-						total = total - 1
-					end
+				if ticker._remainingIterations == -1 then
+					ticker._delay = ticker._duration
+					i = i + 1
+				elseif ticker._remainingIterations > 1 then
+					ticker._remainingIterations = ticker._remainingIterations - 1
+					ticker._delay = ticker._duration
+					i = i + 1
+				elseif ticker._remainingIterations == 1 then
+					del(tremove(waitTable, i))
+					total = total - 1
 				end
 			end
 		end
@@ -596,57 +754,58 @@ do
 	end)
 
 	local function AddDelayedCall(ticker, oldTicker)
-		if oldTicker and type(oldTicker) == "table" then
-			ticker = oldTicker
-		end
-
+		ticker = (oldTicker and type(oldTicker) == "table") and oldTicker or ticker
 		tinsert(waitTable, ticker)
 		waitFrame:Show()
 	end
 
-	local function CreateTicker(duration, callback, iterations)
-		local ticker = setmetatable({}, TickerMetatable)
+	function Timer.After(duration, callback)
+		local ticker = new(true)
 
-		ticker._iterations = iterations or -1
-		ticker._duration = duration
-		ticker._delay = duration
+		ticker._remainingIterations = 1
+		ticker._delay = max(0.01, duration)
+		ticker._callback = callback
+		ticker._temp = true
+
+		AddDelayedCall(ticker)
+	end
+
+	function Timer.NewTicker(duration, callback, iterations)
+		local ticker = new()
+
+		ticker._remainingIterations = iterations or -1
+		ticker._delay = max(0.01, duration)
+		ticker._duration = ticker._delay
 		ticker._callback = callback
 
 		AddDelayedCall(ticker)
 		return ticker
 	end
 
-	function TickerPrototype:IsCancelled()
-		return self._cancelled
+	function Timer.NewTimer(duration, callback)
+		return Timer.NewTicker(duration, callback, 1)
+	end
+
+	function Timer.CancelTimer(ticker)
+		if ticker and ticker.Cancel then
+			ticker:Cancel()
+		end
+		return nil
 	end
 
 	function TickerPrototype:Cancel()
 		self._cancelled = true
 	end
-
-	local function After(duration, callback)
-		AddDelayedCall({_iterations = 1, _delay = duration, _callback = callback})
+	function TickerPrototype:IsCancelled()
+		return self._cancelled
 	end
 
-	local function NewTimer(duration, callback)
-		return CreateTicker(duration, callback, 1)
-	end
-
-	local function NewTicker(duration, callback, iterations)
-		return CreateTicker(duration, callback, iterations)
-	end
-
-	local function CancelTimer(ticker)
-		if ticker and type(ticker.Cancel) == "function" then
-			ticker:Cancel()
-		end
-		return nil -- return nil to assign input reference
-	end
-
-	LibCompat.After = After
-	LibCompat.NewTimer = NewTimer
-	LibCompat.NewTicker = NewTicker
-	LibCompat.CancelTimer = CancelTimer
+	lib.C_Timer = Timer
+	-- backwards compatibility
+	lib.After = Timer.After
+	lib.NewTicker = Timer.NewTicker
+	lib.NewTimer = Timer.NewTimer
+	lib.CancelTimer = Timer.CancelTimer
 end
 
 -------------------------------------------------------------------------------
@@ -663,7 +822,7 @@ do
 		[8] = {ACTION_ENVIRONMENTAL_DAMAGE_SLIME, "Interface\\Icons\\inv_misc_slime_01"}
 	}
 
-	local function _GetSpellInfo(spellid)
+	function _GetSpellInfo(spellid)
 		local res1, res2, res3, res4, res5, res6, res7, res8, res9
 		if spellid then
 			if custom[spellid] then
@@ -686,8 +845,8 @@ do
 		end
 	end
 
-	LibCompat.GetSpellInfo = _GetSpellInfo
-	LibCompat.GetSpellLink = _GetSpellLink
+	lib.GetSpellInfo = _GetSpellInfo
+	lib.GetSpellLink = _GetSpellLink
 end
 
 -------------------------------------------------------------------------------
@@ -738,7 +897,7 @@ do
 
 	local function EscapeStr(str)
 		local res = ""
-		for i = 1, str:len() do
+		for i = 1, strlen(str) do
 			local n = str:sub(i, i)
 			res = res .. n
 			if n == "|" then
@@ -748,9 +907,9 @@ do
 		return (res ~= "") and res or str
 	end
 
-	LibCompat.HexEncode = HexEncode
-	LibCompat.HexDecode = HexDecode
-	LibCompat.EscapeStr = EscapeStr
+	lib.HexEncode = HexEncode
+	lib.HexDecode = HexDecode
+	lib.EscapeStr = EscapeStr
 end
 
 -------------------------------------------------------------------------------
@@ -793,7 +952,7 @@ do
 	-- checks if the feral druid is a cat or tank spec
 	local function GetDruidSpec(unit)
 		-- 57881 : Natural Reaction -- used by druid tanks
-		local points = LGT:UnitHasTalent(unit, LibCompat.GetSpellInfo(57881), LGT:GetActiveTalentGroup(unit))
+		local points = LGT:UnitHasTalent(unit, _GetSpellInfo(57881), LGT:GetActiveTalentGroup(unit))
 		return (points and points > 0) and 3 or 2
 	end
 
@@ -846,7 +1005,7 @@ do
 	end
 
 	local UnitGroupRolesAssigned = UnitGroupRolesAssigned
-	local function _UnitGroupRolesAssigned(unit)
+	local function _UnitGroupRolesAssigned(unit, class)
 		unit = unit or "player" -- always fallback to player
 
 		-- For LFG using "UnitGroupRolesAssigned" is enough.
@@ -860,7 +1019,7 @@ do
 		end
 
 		-- speedup things using classes.
-		local class = select(2, UnitClass(unit))
+		class = class or select(2, UnitClass(unit))
 		if class == "HUNTER" or class == "MAGE" or class == "ROGUE" or class == "WARLOCK" then
 			return "DAMAGER"
 		end
@@ -872,22 +1031,22 @@ do
 		return LGTRoleTable[LGT:GetGUIDRole(guid)] or "NONE"
 	end
 
-	LibCompat.GetSpecialization = GetSpecialization
-	LibCompat.GetInspectSpecialization = GetInspectSpecialization
-	LibCompat.GetSpecializationRole = GetSpecializationRole
-	LibCompat.GetSpecializationInfo = GetSpecializationInfo
+	lib.GetSpecialization = GetSpecialization
+	lib.GetInspectSpecialization = GetInspectSpecialization
+	lib.GetSpecializationRole = GetSpecializationRole
+	lib.GetSpecializationInfo = GetSpecializationInfo
 
-	LibCompat.UnitGroupRolesAssigned = _UnitGroupRolesAssigned
-	LibCompat.GetUnitRole = _UnitGroupRolesAssigned
-	LibCompat.GetGUIDRole = GetGUIDRole
-	LibCompat.GetUnitSpec = GetInspectSpecialization
+	lib.UnitGroupRolesAssigned = _UnitGroupRolesAssigned
+	lib.GetUnitRole = _UnitGroupRolesAssigned
+	lib.GetGUIDRole = GetGUIDRole
+	lib.GetUnitSpec = GetInspectSpecialization
 
 	-- functions that simply replaced other api functions
-	LibCompat.GetNumSpecializations = GetNumTalentTabs
-	LibCompat.GetNumSpecGroups = GetNumTalentGroups
-	LibCompat.GetNumUnspentTalents = GetUnspentTalentPoints
-	LibCompat.GetActiveSpecGroup = GetActiveTalentGroup
-	LibCompat.SetActiveSpecGroup = SetActiveTalentGroup
+	lib.GetNumSpecializations = GetNumTalentTabs
+	lib.GetNumSpecGroups = GetNumTalentGroups
+	lib.GetNumUnspentTalents = GetUnspentTalentPoints
+	lib.GetActiveSpecGroup = GetActiveTalentGroup
+	lib.SetActiveSpecGroup = SetActiveTalentGroup
 end
 
 -------------------------------------------------------------------------------
@@ -911,8 +1070,8 @@ do
 		return (instanceType == "arena")
 	end
 
-	LibCompat.IsInPvP = C_PvP.IsPvPMap
-	LibCompat.C_PvP = C_PvP
+	lib.IsInPvP = C_PvP.IsPvPMap
+	lib.C_PvP = C_PvP
 end
 
 -------------------------------------------------------------------------------
@@ -1028,6 +1187,7 @@ do
 		return CreateFrame(framePool.frameType, nil, framePool.parent, framePool.frameTemplate)
 	end
 
+	local CreateForbiddenFrame = CreateForbiddenFrame or NOOP
 	local function ForbiddenFramePoolFactory(framePool)
 		return CreateForbiddenFrame(framePool.frameType, nil, framePool.parent, framePool.frameTemplate)
 	end
@@ -1047,11 +1207,11 @@ do
 		return self.frameTemplate
 	end
 
-	local function FramePool_Hide(framePool, frame)
+	local function FramePool_Hide(_, frame)
 		frame:Hide()
 	end
 
-	local function FramePool_HideAndClearAnchors(framePool, frame)
+	local function FramePool_HideAndClearAnchors(_, frame)
 		frame:Hide()
 		frame:ClearAllPoints()
 	end
@@ -1129,6 +1289,10 @@ do
 		return "|c" .. self:GenerateHexColor()
 	end
 
+	local function WrapTextInColorCode(text, colorHexString)
+		return ("|c%s%s|r"):format(colorHexString, text)
+	end
+
 	function ColorMixin:WrapTextInColorCode(text)
 		return WrapTextInColorCode(text, self:GenerateHexColor())
 	end
@@ -1139,26 +1303,22 @@ do
 		return color
 	end
 
-	local function WrapTextInColorCode(text, colorHexString)
-		return ("|c%s%s|r"):format(colorHexString, text)
-	end
-
-	LibCompat.Mixin = Mixin
-	LibCompat.CreateFromMixins = CreateFromMixins
-	LibCompat.CreateAndInitFromMixin = CreateAndInitFromMixin
-	LibCompat.ObjectPoolMixin = ObjectPoolMixin
-	LibCompat.CreateObjectPool = CreateObjectPool
-	LibCompat.FramePoolMixin = FramePoolMixin
-	LibCompat.FramePool_Hide = FramePool_Hide
-	LibCompat.FramePool_HideAndClearAnchors = FramePool_HideAndClearAnchors
-	LibCompat.CreateFramePool = CreateFramePool
-	LibCompat.TexturePoolMixin = TexturePoolMixin
-	LibCompat.TexturePool_Hide = FramePool_Hide
-	LibCompat.TexturePool_HideAndClearAnchors = FramePool_HideAndClearAnchors
-	LibCompat.CreateTexturePool = CreateTexturePool
-	LibCompat.ColorMixin = ColorMixin
-	LibCompat.CreateColor = CreateColor
-	LibCompat.WrapTextInColorCode = WrapTextInColorCode
+	lib.Mixin = Mixin
+	lib.CreateFromMixins = CreateFromMixins
+	lib.CreateAndInitFromMixin = CreateAndInitFromMixin
+	lib.ObjectPoolMixin = ObjectPoolMixin
+	lib.CreateObjectPool = CreateObjectPool
+	lib.FramePoolMixin = FramePoolMixin
+	lib.FramePool_Hide = FramePool_Hide
+	lib.FramePool_HideAndClearAnchors = FramePool_HideAndClearAnchors
+	lib.CreateFramePool = CreateFramePool
+	lib.TexturePoolMixin = TexturePoolMixin
+	lib.TexturePool_Hide = FramePool_Hide
+	lib.TexturePool_HideAndClearAnchors = FramePool_HideAndClearAnchors
+	lib.CreateTexturePool = CreateTexturePool
+	lib.ColorMixin = ColorMixin
+	lib.CreateColor = CreateColor
+	lib.WrapTextInColorCode = WrapTextInColorCode
 end
 
 -------------------------------------------------------------------------------
@@ -1166,60 +1326,63 @@ end
 
 do
 	local StatusBarPrototype = {
-		minValue = 0.0,
-		maxValue = 1.0,
-		value = 1,
-		rotate = true,
-		reverse = false,
-		orientation = "HORIZONTAL",
-		fill = "STANDARD",
-		-- [[ API ]]--
+		-- [[ PRIVATE ]] --
+		__minval = 0.0,
+		__maxval = 1.0,
+		__val = 1.0,
+		__rotate = true,
+		__reverse = false,
+		__orient = "HORIZONTAL",
+		__fill = "STANDARD",
+
+		-- [[ PUBLIC ]]--
 		Update = function(self, OnSizeChanged)
-			self.progress = (self.value - self.minValue) / (self.maxValue - self.minValue)
+			local __progress = (self.__val - self.__minval) / (self.__maxval - self.__minval)
 
 			local align1, align2
 			local TLx, TLy, BLx, BLy, TRx, TRy, BRx, BRy
 			local TLx_, TLy_, BLx_, BLy_, TRx_, TRy_, BRx_, BRy_
 			local width, height = self:GetSize()
+			local __xprogress, __yprogress
 
-			if self.orientation == "HORIZONTAL" then
-				self.xProgress = width * self.progress -- progress horizontally
-				if self.fill == "CENTER" then
+			if self.__orient == "HORIZONTAL" then
+				__xprogress = width * __progress -- progress horizontally
+				if self.__fill == "CENTER" then
 					align1, align2 = "TOP", "BOTTOM"
-				elseif self.reverse or self.fill == "REVERSE" then
+				elseif self.__reverse or self.__fill == "REVERSE" then
 					align1, align2 = "TOPRIGHT", "BOTTOMRIGHT"
 				else
 					align1, align2 = "TOPLEFT", "BOTTOMLEFT"
 				end
-			elseif self.orientation == "VERTICAL" then
-				self.yProgress = height * self.progress -- progress vertically
-				if self.fill == "CENTER" then
+			elseif self.__orient == "VERTICAL" then
+				__yprogress = height * __progress -- progress vertically
+				if self.__fill == "CENTER" then
 					align1, align2 = "LEFT", "RIGHT"
-				elseif self.reverse or self.fill == "REVERSE" then
+				elseif self.__reverse or self.__fill == "REVERSE" then
 					align1, align2 = "TOPLEFT", "TOPRIGHT"
 				else
 					align1, align2 = "BOTTOMLEFT", "BOTTOMRIGHT"
 				end
 			end
 
-			if self.rotate then
+			if self.__rotate then
 				TLx, TLy = 0.0, 1.0
 				TRx, TRy = 0.0, 0.0
 				BLx, BLy = 1.0, 1.0
 				BRx, BRy = 1.0, 0.0
 				TLx_, TLy_ = TLx, TLy
 				TRx_, TRy_ = TRx, TRy
-				BLx_, BLy_ = BLx * self.progress, BLy
-				BRx_, BRy_ = BRx * self.progress, BRy
+				BLx_, BLy_ = BLx * __progress, BLy
+				BRx_, BRy_ = BRx * __progress, BRy
 			else
 				TLx, TLy = 0.0, 0.0
 				TRx, TRy = 1.0, 0.0
 				BLx, BLy = 0.0, 1.0
 				BRx, BRy = 1.0, 1.0
 				TLx_, TLy_ = TLx, TLy
-				TRx_, TRy_ = TRx * self.progress, TRy
+				TRx_, TRy_ = TRx * __progress, TRy
 				BLx_, BLy_ = BLx, BLy
-				BRx_, BRy_ = BRx * self.progress, BRy
+				BRx_, BRy_ = BRx * __progress, BRy
 			end
 
 			if not OnSizeChanged then
@@ -1233,84 +1396,88 @@ do
 				self.fg:SetTexCoord(TLx_, TLy_, BLx_, BLy_, TRx_, TRy_, BRx_, BRy_)
 			end
 
-			if self.xProgress then
-				self.fg:SetWidth(self.xProgress > 0 and self.xProgress or 0.1)
+			if __xprogress then
+				self.fg:SetWidth(__xprogress > 0 and __xprogress or 0.1)
+				lib.callbacks:Fire("OnValueChanged", self, self.__val)
 			end
-			if self.yProgress then
-				self.fg:SetHeight(self.yProgress > 0 and self.yProgress or 0.1)
+			if __yprogress then
+				self.fg:SetHeight(__yprogress > 0 and __yprogress or 0.1)
+				lib.callbacks:Fire("OnValueChanged", self, self.__val)
 			end
 		end,
 		OnSizeChanged = function(self, width, height)
-			self:Update(true)
+			self:Update(true, width, height)
 		end,
 		SetMinMaxValues = function(self, minValue, maxValue)
 			assert((type(minValue) == "number" and type(maxValue) == "number"), "Usage: StatusBar:SetMinMaxValues(number, number)")
 
 			if maxValue > minValue then
-				self.minValue = minValue
-				self.maxValue = maxValue
+				self.__minval = minValue
+				self.__maxval = maxValue
 			else
-				self.minValue = 0
-				self.maxValue = 1
+				self.__minval = 0
+				self.__maxval = 1
 			end
 
-			if not self.value or self.value > self.maxValue then
-				self.value = self.maxValue
-			elseif not self.value or self.value < self.minValue then
-				self.value = self.minValue
+			if not self.__val or self.__val > self.__maxval then
+				self.__val = self.__maxval
+			elseif not self.__val or self.__val < self.__minval then
+				self.__val = self.__minval
 			end
 
 			self:Update()
 		end,
 		GetMinMaxValues = function(self)
-			return self.minValue, self.maxValue
+			return self.__minval, self.__maxval
 		end,
 		SetValue = function(self, value)
 			assert(type(value) == "number", "Usage: StatusBar:SetValue(number)")
-			if value >= self.minValue and value <= self.maxValue then
-				self.value = value
+			if value >= self.__minval and value <= self.__maxval then
+				self.__val = value
 				self:Update()
 			end
 		end,
 		GetValue = function(self)
-			return self.value
+			return self.__val
 		end,
 		SetOrientation = function(self, orientation)
 			if orientation == "HORIZONTAL" or orientation == "VERTICAL" then
-				self.orientation = orientation
+				self.__orient = orientation
 				self:Update()
 			end
 		end,
 		GetOrientation = function(self)
-			return self.orientation
+			return self.__orient
 		end,
 		SetRotatesTexture = function(self, rotate)
-			if type(rotate) == "boolean" then
-				self.rotate = rotate
-				self:Update()
-			end
+			self.__rotate = (rotate ~= nil and rotate ~= false)
+			self:Update()
 		end,
 		GetRotatesTexture = function(self)
-			return self.rotate
+			return self.__rotate
 		end,
 		SetReverseFill = function(self, reverse)
-			self.reverse = (reverse == true)
+			self.__reverse = (reverse == true)
 			self:Update()
 		end,
 		GetReverseFill = function(self)
-			return self.reverse
+			return self.__reverse
 		end,
 		SetFillStyle = function(self, style)
-			if type(style) == "string" and style:upper() == "CENTER" or style:upper() == "REVERSE" then
-				self.fill = style:upper()
+			assert(type(style) == "string" or style == nil, "Usage: StatusBar:SetFillStyle(string)")
+			if style and style:lower() == "center" then
+				self.__fill = "CENTER"
+				self:Update()
+			elseif style and style:lower() == "reverse" then
+				self.__fill = "REVERSE"
 				self:Update()
 			else
-				self.fill = "STANDARD"
+				self.__fill = "STANDARD"
 				self:Update()
 			end
 		end,
 		GetFillStyle = function(self)
-			return self.fill
+			return self.__fill
 		end,
 		SetStatusBarTexture = function(self, texture)
 			self.fg:SetTexture(texture)
@@ -1340,6 +1507,9 @@ do
 		SetStatusBarColor = function(self, r, g, b, a)
 			self:SetForegroundColor(r, g, b, a)
 		end,
+		GetStatusBarColor = function(self)
+			return self.fg:GetVertexColor()
+		end,
 		SetVertexColor = function(self, r, g, b, a)
 			self:SetForegroundColor(r, g, b, a)
 		end,
@@ -1347,15 +1517,15 @@ do
 			return self.fg:GetVertexColor()
 		end,
 		SetStatusBarGradient = function(self, r1, g1, b1, a1, r2, g2, b2, a2)
-			self.fg:SetGradientAlpha(self.orientation, r1, g1, b1, a1, r2, g2, b2, a2)
+			self.fg:SetGradientAlpha(self.__orient, r1, g1, b1, a1, r2, g2, b2, a2)
 		end,
 		SetStatusBarGradientAuto = function(self, r, g, b, a)
-			self.fg:SetGradientAlpha(self.orientation, 0.5 + (r * 1.1), g * 0.7, b * 0.7, a, r * 0.7, g * 0.7, 0.5 + (b * 1.1), a)
+			self.fg:SetGradientAlpha(self.__orient, 0.5 + (r * 1.1), g * 0.7, b * 0.7, a, r * 0.7, g * 0.7, 0.5 + (b * 1.1), a)
 		end,
 		SetStatusBarSmartGradient = function(self, r1, g1, b1, r2, g2, b2)
-			self.fg:SetGradientAlpha(self.orientation, r1, g1, b1, 1, r2 or r1, g2 or g1, b2 or b1, 1)
+			self.fg:SetGradientAlpha(self.__orient, r1, g1, b1, 1, r2 or r1, g2 or g1, b2 or b1, 1)
 		end,
-		GetObjectType = function(self)
+		GetObjectType = function()
 			return "StatusBar"
 		end,
 		IsObjectType = function(self, otype)
@@ -1363,25 +1533,36 @@ do
 		end
 	}
 
-	setmetatable(StatusBarPrototype, {__call = function(self, name, parent)
+	setmetatable(StatusBarPrototype, {__call = function(_, name, parent)
 		local bar = CreateFrame("Frame", name, parent)
 		bar.fg = bar.fg or bar:CreateTexture(name and "$parent.Texture", "ARTWORK")
 		bar.bg = bar.bg or bar:CreateTexture(name and "$parent.Background", "BACKGROUND")
-		for k, v in pairs(StatusBarPrototype) do bar[k] = v end
-		bar:SetRotatesTexture(false)
+		for k, v in pairs(StatusBarPrototype) do
+			bar[k] = v
+		end
 		bar:HookScript("OnSizeChanged", bar.OnSizeChanged)
-		bar:Update()
 		bar.bg:Hide()
+		bar:SetRotatesTexture(false)
+
+		local Old_SetScript = bar.SetScript
+		bar.SetScript = function(self, event, callback)
+			if event == "OnValueChanged" then
+				assert(type(callback) == "function", 'Usage: StatusBar:SetScript("OnValueChanged", function)')
+				lib.RegisterCallback(self, "OnValueChanged", function() callback(self, self.__val) end)
+			else
+				Old_SetScript(self, event, callback)
+			end
+		end
+
 		return bar
 	end})
 
-	LibCompat.StatusBarPrototype = StatusBarPrototype
+	lib.StatusBarPrototype = StatusBarPrototype
 end
 
 -------------------------------------------------------------------------------
 
 do
-	local strmatch = strmatch
 	local GetScreenResolutions = GetScreenResolutions
 	local GetCurrentResolution = GetCurrentResolution
 
@@ -1389,7 +1570,7 @@ do
 		local width, height = strmatch(({GetScreenResolutions()})[GetCurrentResolution()], "(%d+)x(%d+)")
 		return tonumber(width), tonumber(height)
 	end
-	LibCompat.GetPhysicalScreenSize = GetPhysicalScreenSize
+	lib.GetPhysicalScreenSize = GetPhysicalScreenSize
 end
 
 -------------------------------------------------------------------------------
@@ -1401,6 +1582,8 @@ local mixins = {
 	"SafeUnpack",
 	"tLength",
 	"tCopy",
+	"tInvert",
+	"tIndexOf",
 	"tAppendAll",
 	"WeakTable",
 	"newTable",
@@ -1448,13 +1631,19 @@ local mixins = {
 	"GetUnitRole",
 	"GetGUIDRole",
 	-- timer util
+	"C_Timer",
 	"After",
-	"NewTimer",
 	"NewTicker",
+	"NewTimer",
 	"CancelTimer",
 	-- spell util
 	"GetSpellInfo",
 	"GetSpellLink",
+	-- color conversion
+	"HexToRGB",
+	"RGBToHex",
+	"HexToRGBPerc",
+	"RGBPercToHex",
 	-- misc util
 	"HexEncode",
 	"HexDecode",
@@ -1487,7 +1676,7 @@ local mixins = {
 	"GetPhysicalScreenSize"
 }
 
-function LibCompat:Embed(target)
+function lib:Embed(target)
 	for _, v in pairs(mixins) do
 		target[v] = self[v]
 	end
@@ -1496,6 +1685,6 @@ function LibCompat:Embed(target)
 	return target
 end
 
-for addon in pairs(LibCompat.embeds) do
-	LibCompat:Embed(addon)
+for addon in pairs(lib.embeds) do
+	lib:Embed(addon)
 end
