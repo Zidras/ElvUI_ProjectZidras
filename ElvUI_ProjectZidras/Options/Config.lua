@@ -108,7 +108,7 @@ local function UnitFramesOptions()
 	groupUnits.raid.args.AbsorbPrediction = GetOptionsTable_AbsorbPrediction(UF.CreateAndUpdateHeaderGroup, "raid")
 	groupUnits.raid40 = ACH:Group(L["Raid-40"], nil, 4, nil, function(info) return E.db.unitframe.units.raid40[info[#info]] end, function(info, value) E.db.unitframe.units.raid40[info[#info]] = value UF:CreateAndUpdateHeaderGroup("raid40") end)
 	groupUnits.raid40.args.AbsorbPrediction = GetOptionsTable_AbsorbPrediction(UF.CreateAndUpdateHeaderGroup, "raid40")
-	groupUnits.raidpet = ACH:Group(L["Raidpet"], nil, 5, nil, function(info) return E.db.unitframe.units.raidpet[info[#info]] end, function(info, value) E.db.unitframe.units.raidpet[info[#info]] = value UF:CreateAndUpdateHeaderGroup("raidpet") end)
+	groupUnits.raidpet = ACH:Group(L["Raid Pet"], nil, 5, nil, function(info) return E.db.unitframe.units.raidpet[info[#info]] end, function(info, value) E.db.unitframe.units.raidpet[info[#info]] = value UF:CreateAndUpdateHeaderGroup("raidpet") end)
 	groupUnits.raidpet.args.AbsorbPrediction = GetOptionsTable_AbsorbPrediction(UF.CreateAndUpdateHeaderGroup, "raidpet")
 
 	return config
