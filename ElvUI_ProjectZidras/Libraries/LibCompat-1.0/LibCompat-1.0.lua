@@ -1,10 +1,10 @@
 --
 -- **LibCompat-1.0** provided few handy functions that can be embed to addons.
 -- This library was originally created for Skada as of 1.8.50.
--- @author: Kader B (https://github.com/bkader)
+-- @author: Kader B (https://github.com/bkader/LibCompat-1.0)
 --
 
-local MAJOR, MINOR = "LibCompat-1.0", 24
+local MAJOR, MINOR = "LibCompat-1.0", 25
 local lib, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 if not lib then return end
 
@@ -17,9 +17,10 @@ local floor, ceil, max, min = math.floor, math.ceil, math.max, math.min
 local format = format or string.format
 local strlen = strlen or string.len
 local strmatch = strmatch or string.match
-local setmetatable = setmetatable
 local tostring, tonumber = tostring, tonumber
+local setmetatable = setmetatable
 local CreateFrame = CreateFrame
+local error = error
 
 local GAME_LOCALE = GetLocale()
 GAME_LOCALE = (GAME_LOCALE == "enGB") and "enUS" or GAME_LOCALE
@@ -28,7 +29,7 @@ local QuickDispatch
 local IsInGroup, IsInRaid
 local GetUnitIdFromGUID
 local tLength
-local _GetSpellInfo
+local WithinRange
 
 local NOOP = function() end
 
@@ -36,7 +37,7 @@ local NOOP = function() end
 
 do
 	local tmp = {}
-	local function Print(self, frame, ...)
+	local function _print(self, frame, ...)
 		local n = 0
 		if self ~= lib then
 			n = n + 1
@@ -52,19 +53,90 @@ do
 	function lib:Print(...)
 		local frame = ...
 		if type(frame) == "table" and frame.AddMessage then
-			return Print(self, frame, select(2, ...))
+			return _print(self, frame, select(2, ...))
 		end
-		return Print(self, DEFAULT_CHAT_FRAME, ...)
+		return _print(self, DEFAULT_CHAT_FRAME, ...)
 	end
 
 	function lib:Printf(...)
 		local frame = ...
 		if type(frame) == "table" and frame.AddMessage then
-			return Print(self, frame, format(select(2, ...)))
+			return _print(self, frame, format(select(2, ...)))
 		else
-			return Print(self, DEFAULT_CHAT_FRAME, format(...))
+			return _print(self, DEFAULT_CHAT_FRAME, format(...))
 		end
 	end
+end
+
+-------------------------------------------------------------------------------
+-- Lua Memoize
+
+do
+	local unpack = unpack
+	local getmetatable = getmetatable
+	local memoizedFunc = {}
+
+	local function isCallable(func)
+		-- function or method?
+		if type(func) == "function" then
+			return true
+		end
+		-- maybe a metatable.
+		if type(func) == "table" then
+			local mt = getmetatable(func)
+			return (type(mt) == "table" and isCallable(mt.__call))
+		end
+		return false
+	end
+
+	local function cacheGet(cache, params)
+		local node = cache
+		for i = 1, #params do
+			node = node.children and node.children[params[i]]
+			if not node then
+				return nil
+			end
+		end
+		return node.results
+	end
+
+	local function cachePut(cache, params, results)
+		local node = cache
+		local i = 1
+		local param = params[i]
+		while param do
+			node.children = node.children or {}
+			node.children[param] = node.children[param] or {}
+			node = node.children[param]
+			i = i + 1
+			param = params[i]
+		end
+		node.results = results
+	end
+
+	local function memoize(func, cache)
+		if not isCallable(func) then
+			error(("Only functions and callable tables are memoizable. Received %s (a %s)"):format(tostring(func), type(func)), 2)
+		end
+
+		cache = cache or memoizedFunc[func]
+		if not cache then
+			memoizedFunc[func] = {}
+			cache = memoizedFunc[func]
+		end
+
+		return function(...)
+			local params = {...}
+			local results = cacheGet(cache, params)
+			if not results then
+				results = {func(...)}
+				cachePut(cache, params, results)
+			end
+			return unpack(results)
+		end
+	end
+
+	lib.memoize = memoize
 end
 
 -------------------------------------------------------------------------------
@@ -72,7 +144,7 @@ end
 do
 	local pcall = pcall
 
-	local function DispatchError(err)
+	local function dispatchError(err)
 		print("|cffff9900Error|r:" .. (err or "<no error given>"))
 	end
 
@@ -80,7 +152,7 @@ do
 		if type(func) ~= "function" then return end
 		local ok, err = pcall(func, ...)
 		if not ok then
-			DispatchError(err)
+			dispatchError(err)
 			return
 		end
 		return true
@@ -166,8 +238,8 @@ do
 	end
 
 	-- Shamelessly copied from Omen - thanks!
-	local tablePool = {}
-	setmetatable(tablePool, {__mode = "kv"})
+	local tablePool = lib.tablePool or setmetatable({}, {__mode = "kv"})
+	lib.tablePool = tablePool
 
 	-- get a new table
 	local function newTable()
@@ -207,6 +279,10 @@ end
 -------------------------------------------------------------------------------
 
 do
+	local function Lerp(startValue, endValue, amount)
+		return (1 - amount) * startValue + amount * endValue
+	end
+
 	local function Round(val)
 		return (val < 0.0) and ceil(val - 0.5) or floor(val + 0.5)
 	end
@@ -216,10 +292,10 @@ do
 	end
 
 	local function Clamp(val, minval, maxval)
-		return min(maxval, max(minval, val))
+		return min(maxval or 1, max(minval or 0, val))
 	end
 
-	local function WithinRange(val, minval, maxval)
+	function WithinRange(val, minval, maxval)
 		return val >= minval and val <= maxval
 	end
 
@@ -227,6 +303,7 @@ do
 		return val > minval and val < maxval
 	end
 
+	lib.Lerp = Lerp
 	lib.Round = Round
 	lib.Square = Square
 	lib.Clamp = Clamp
@@ -383,9 +460,7 @@ do
 				return "focustarget"
 			elseif UnitExists("mouseover") and UnitGUID("mouseover") == guid then
 				return "mouseover"
-			elseif filter == "player" then
-				return
-			end
+			elseif filter == "player" then return end
 		end
 
 		if filter == nil or filter == "group" then
@@ -683,6 +758,8 @@ do
 		__metatable = true
 	}
 
+	local WaitTable = {}
+
 	local new, del
 	do
 		Timer.__timers = Timer.__timers or {}
@@ -716,17 +793,15 @@ do
 		end
 	end
 
-	local waitTable = {}
-	local waitFrame = LibCompat_TimerFrame or CreateFrame("Frame", "LibCompat_TimerFrame", UIParent)
-	waitFrame:SetScript("OnUpdate", function(self, elapsed)
-		local total = #waitTable
+	local function WaitFunc(self, elapsed)
+		local total = #WaitTable
 		local i = 1
 
 		while i <= total do
-			local ticker = waitTable[i]
+			local ticker = WaitTable[i]
 
 			if ticker._cancelled then
-				del(tremove(waitTable, i))
+				del(tremove(WaitTable, i))
 				total = total - 1
 			elseif ticker._delay > elapsed then
 				ticker._delay = ticker._delay - elapsed
@@ -742,48 +817,75 @@ do
 					ticker._delay = ticker._duration
 					i = i + 1
 				elseif ticker._remainingIterations == 1 then
-					del(tremove(waitTable, i))
+					del(tremove(WaitTable, i))
 					total = total - 1
 				end
 			end
 		end
 
-		if #waitTable == 0 then
+		if #WaitTable == 0 then
 			self:Hide()
 		end
-	end)
+	end
+
+	local WaitFrame = _G.LibCompat_WaitFrame or CreateFrame("Frame", "LibCompat_WaitFrame", UIParent)
+	WaitFrame:SetScript("OnUpdate", WaitFunc)
 
 	local function AddDelayedCall(ticker, oldTicker)
 		ticker = (oldTicker and type(oldTicker) == "table") and oldTicker or ticker
-		tinsert(waitTable, ticker)
-		waitFrame:Show()
+		tinsert(WaitTable, ticker)
+		WaitFrame:Show()
 	end
 
-	function Timer.After(duration, callback)
+	local function ValidateArguments(duration, callback, callFunc)
+		if type(duration) ~= "number" then
+			error(format(
+				"Bad argument #1 to '" .. callFunc .. "' (number expected, got %s)",
+				duration ~= nil and type(duration) or "no value"
+			), 2)
+		elseif type(callback) ~= "function" then
+			error(format(
+				"Bad argument #2 to '" .. callFunc .. "' (function expected, got %s)",
+				callback ~= nil and type(callback) or "no value"
+			), 2)
+		end
+	end
+
+	function Timer.After(duration, callback, ...)
+		ValidateArguments(duration, callback, "After")
+
 		local ticker = new(true)
 
 		ticker._remainingIterations = 1
 		ticker._delay = max(0.01, duration)
 		ticker._callback = callback
+		ticker._cancelled = nil
 		ticker._temp = true
 
 		AddDelayedCall(ticker)
 	end
 
-	function Timer.NewTicker(duration, callback, iterations)
+	local function CreateTicker(duration, callback, iterations, ...)
 		local ticker = new()
 
 		ticker._remainingIterations = iterations or -1
 		ticker._delay = max(0.01, duration)
 		ticker._duration = ticker._delay
 		ticker._callback = callback
+		ticker._cancelled = nil
 
 		AddDelayedCall(ticker)
 		return ticker
 	end
 
-	function Timer.NewTimer(duration, callback)
-		return Timer.NewTicker(duration, callback, 1)
+	function Timer.NewTicker(duration, callback, iterations, ...)
+		ValidateArguments(duration, callback, "NewTicker")
+		return CreateTicker(duration, callback, iterations, ...)
+	end
+
+	function Timer.NewTimer(duration, callback, ...)
+		ValidateArguments(duration, callback, "NewTimer")
+		return CreateTicker(duration, callback, 1, ...)
 	end
 
 	function Timer.CancelTimer(ticker)
@@ -806,47 +908,6 @@ do
 	lib.NewTicker = Timer.NewTicker
 	lib.NewTimer = Timer.NewTimer
 	lib.CancelTimer = Timer.CancelTimer
-end
-
--------------------------------------------------------------------------------
-
-do
-	local GetSpellInfo, GetSpellLink = GetSpellInfo, GetSpellLink
-
-	local custom = {
-		[3] = {ACTION_ENVIRONMENTAL_DAMAGE_FALLING, "Interface\\Icons\\ability_rogue_quickrecovery"},
-		[4] = {ACTION_ENVIRONMENTAL_DAMAGE_DROWNING, "Interface\\Icons\\spell_shadow_demonbreath"},
-		[5] = {ACTION_ENVIRONMENTAL_DAMAGE_FATIGUE, "Interface\\Icons\\ability_creature_cursed_05"},
-		[6] = {ACTION_ENVIRONMENTAL_DAMAGE_FIRE, "Interface\\Icons\\spell_fire_fire"},
-		[7] = {ACTION_ENVIRONMENTAL_DAMAGE_LAVA, "Interface\\Icons\\spell_shaman_lavaflow"},
-		[8] = {ACTION_ENVIRONMENTAL_DAMAGE_SLIME, "Interface\\Icons\\inv_misc_slime_01"}
-	}
-
-	function _GetSpellInfo(spellid)
-		local res1, res2, res3, res4, res5, res6, res7, res8, res9
-		if spellid then
-			if custom[spellid] then
-				res1, res3 = custom[spellid][1], custom[spellid][2]
-			else
-				res1, res2, res3, res4, res5, res6, res7, res8, res9 = GetSpellInfo(spellid)
-				if spellid == 75 then
-					res3 = "Interface\\Icons\\INV_Weapon_Bow_07"
-				elseif spellid == 6603 then
-					res1, res3 = MELEE, "Interface\\Icons\\INV_Sword_04"
-				end
-			end
-		end
-		return res1, res2, res3, res4, res5, res6, res7, res8, res9
-	end
-
-	local function _GetSpellLink(spellid)
-		if not custom[spellid] then
-			return GetSpellLink(spellid)
-		end
-	end
-
-	lib.GetSpellInfo = _GetSpellInfo
-	lib.GetSpellLink = _GetSpellLink
 end
 
 -------------------------------------------------------------------------------
@@ -916,8 +977,11 @@ end
 
 do
 	local LGT = LibStub("LibGroupTalents-1.0")
-	local UnitClass, MAX_TALENT_TABS = UnitClass, MAX_TALENT_TABS or 3
-	local GetActiveTalentGroup, GetTalentTabInfo = GetActiveTalentGroup, GetTalentTabInfo
+	local UnitClass = UnitClass
+	local GetSpellInfo = GetSpellInfo
+	local MAX_TALENT_TABS = MAX_TALENT_TABS or 3
+	local GetActiveTalentGroup = GetActiveTalentGroup
+	local GetTalentTabInfo = GetTalentTabInfo
 	local LGTRoleTable = {melee = "DAMAGER", caster = "DAMAGER", healer = "HEALER", tank = "TANK"}
 
 	-- list of class to specs
@@ -952,7 +1016,7 @@ do
 	-- checks if the feral druid is a cat or tank spec
 	local function GetDruidSpec(unit)
 		-- 57881 : Natural Reaction -- used by druid tanks
-		local points = LGT:UnitHasTalent(unit, _GetSpellInfo(57881), LGT:GetActiveTalentGroup(unit))
+		local points = LGT:UnitHasTalent(unit, GetSpellInfo(57881), LGT:GetActiveTalentGroup(unit))
 		return (points and points > 0) and 3 or 2
 	end
 
@@ -1303,6 +1367,7 @@ do
 		return color
 	end
 
+	lib.PassClickToParent = PassClickToParent
 	lib.Mixin = Mixin
 	lib.CreateFromMixins = CreateFromMixins
 	lib.CreateAndInitFromMixin = CreateAndInitFromMixin
@@ -1325,237 +1390,270 @@ end
 -- status bar emulation
 
 do
-	local StatusBarPrototype = {
-		-- [[ PRIVATE ]] --
-		__minval = 0.0,
-		__maxval = 1.0,
-		__val = 1.0,
-		__rotate = true,
-		__reverse = false,
-		__orient = "HORIZONTAL",
-		__fill = "STANDARD",
+	local barFrame = CreateFrame("Frame")
+	local barPrototype_SetScript = barFrame.SetScript
 
-		-- [[ PUBLIC ]]--
-		Update = function(self, OnSizeChanged)
-			local __progress = (self.__val - self.__minval) / (self.__maxval - self.__minval)
+	local function barPrototype_Update(self, sizeChanged, width, height)
+		local progress = (self.VALUE - self.MINVALUE) / (self.MAXVALUE - self.MINVALUE)
 
-			local align1, align2
-			local TLx, TLy, BLx, BLy, TRx, TRy, BRx, BRy
-			local TLx_, TLy_, BLx_, BLy_, TRx_, TRy_, BRx_, BRy_
-			local width, height = self:GetSize()
-			local __xprogress, __yprogress
+		local align1, align2
+		local TLx, TLy, BLx, BLy, TRx, TRy, BRx, BRy
+		local TLx_, TLy_, BLx_, BLy_, TRx_, TRy_, BRx_, BRy_
+		local xprogress, yprogress
 
-			if self.__orient == "HORIZONTAL" then
-				__xprogress = width * __progress -- progress horizontally
-				if self.__fill == "CENTER" then
-					align1, align2 = "TOP", "BOTTOM"
-				elseif self.__reverse or self.__fill == "REVERSE" then
-					align1, align2 = "TOPRIGHT", "BOTTOMRIGHT"
-				else
-					align1, align2 = "TOPLEFT", "BOTTOMLEFT"
-				end
-			elseif self.__orient == "VERTICAL" then
-				__yprogress = height * __progress -- progress vertically
-				if self.__fill == "CENTER" then
-					align1, align2 = "LEFT", "RIGHT"
-				elseif self.__reverse or self.__fill == "REVERSE" then
-					align1, align2 = "TOPLEFT", "TOPRIGHT"
-				else
-					align1, align2 = "BOTTOMLEFT", "BOTTOMRIGHT"
-				end
-			end
+		width = width or self:GetWidth()
+		height = height or self:GetHeight()
 
-			if self.__rotate then
-				TLx, TLy = 0.0, 1.0
-				TRx, TRy = 0.0, 0.0
-				BLx, BLy = 1.0, 1.0
-				BRx, BRy = 1.0, 0.0
-				TLx_, TLy_ = TLx, TLy
-				TRx_, TRy_ = TRx, TRy
-				BLx_, BLy_ = BLx * __progress, BLy
-				BRx_, BRy_ = BRx * __progress, BRy
+		if self.ORIENTATION == "HORIZONTAL" then
+			xprogress = width * progress -- progress horizontally
+			if self.FILLSTYLE == "CENTER" then
+				align1, align2 = "TOP", "BOTTOM"
+			elseif self.REVERSE or self.FILLSTYLE == "REVERSE" then
+				align1, align2 = "TOPRIGHT", "BOTTOMRIGHT"
 			else
-				TLx, TLy = 0.0, 0.0
-				TRx, TRy = 1.0, 0.0
-				BLx, BLy = 0.0, 1.0
-				BRx, BRy = 1.0, 1.0
-				TLx_, TLy_ = TLx, TLy
-				TRx_, TRy_ = TRx * __progress, TRy
-				BLx_, BLy_ = BLx, BLy
-				BRx_, BRy_ = BRx * __progress, BRy
+				align1, align2 = "TOPLEFT", "BOTTOMLEFT"
 			end
+		elseif self.ORIENTATION == "VERTICAL" then
+			yprogress = height * progress -- progress vertically
+			if self.FILLSTYLE == "CENTER" then
+				align1, align2 = "LEFT", "RIGHT"
+			elseif self.REVERSE or self.FILLSTYLE == "REVERSE" then
+				align1, align2 = "TOPLEFT", "TOPRIGHT"
+			else
+				align1, align2 = "BOTTOMLEFT", "BOTTOMRIGHT"
+			end
+		end
 
-			if not OnSizeChanged then
-				self.bg:ClearAllPoints()
-				self.bg:SetAllPoints()
-				self.bg:SetTexCoord(TLx, TLy, BLx, BLy, TRx, TRy, BRx, BRy)
+		if self.ROTATE then
+			TLx, TLy = 0.0, 1.0
+			TRx, TRy = 0.0, 0.0
+			BLx, BLy = 1.0, 1.0
+			BRx, BRy = 1.0, 0.0
+			TLx_, TLy_ = TLx, TLy
+			TRx_, TRy_ = TRx, TRy
+			BLx_, BLy_ = BLx * progress, BLy
+			BRx_, BRy_ = BRx * progress, BRy
+		else
+			TLx, TLy = 0.0, 0.0
+			TRx, TRy = 1.0, 0.0
+			BLx, BLy = 0.0, 1.0
+			BRx, BRy = 1.0, 1.0
+			TLx_, TLy_ = TLx, TLy
+			TRx_, TRy_ = TRx * progress, TRy
+			BLx_, BLy_ = BLx, BLy
+			BRx_, BRy_ = BRx * progress, BRy
+		end
 
-				self.fg:ClearAllPoints()
-				self.fg:SetPoint(align1)
-				self.fg:SetPoint(align2)
-				self.fg:SetTexCoord(TLx_, TLy_, BLx_, BLy_, TRx_, TRy_, BRx_, BRy_)
-			end
+		if not sizeChanged then
+			self.bg:ClearAllPoints()
+			self.bg:SetAllPoints()
+			self.bg:SetTexCoord(TLx, TLy, BLx, BLy, TRx, TRy, BRx, BRy)
 
-			if __xprogress then
-				self.fg:SetWidth(__xprogress > 0 and __xprogress or 0.1)
-				lib.callbacks:Fire("OnValueChanged", self, self.__val)
-			end
-			if __yprogress then
-				self.fg:SetHeight(__yprogress > 0 and __yprogress or 0.1)
-				lib.callbacks:Fire("OnValueChanged", self, self.__val)
-			end
-		end,
-		OnSizeChanged = function(self, width, height)
-			self:Update(true, width, height)
-		end,
+			self.fg:ClearAllPoints()
+			self.fg:SetPoint(align1)
+			self.fg:SetPoint(align2)
+			self.fg:SetTexCoord(TLx_, TLy_, BLx_, BLy_, TRx_, TRy_, BRx_, BRy_)
+		end
+
+		if xprogress then
+			self.fg:SetWidth(xprogress > 0 and xprogress or 0.1)
+			lib.callbacks:Fire("OnValueChanged", self, self.VALUE)
+		end
+		if yprogress then
+			self.fg:SetHeight(yprogress > 0 and yprogress or 0.1)
+			lib.callbacks:Fire("OnValueChanged", self, self.VALUE)
+		end
+	end
+
+	local function barPrototype_OnSizeChanged(self, width, height)
+		barPrototype_Update(self, true, width, height)
+	end
+
+	local barPrototype = setmetatable({
+		MINVALUE = 0.0,
+		MAXVALUE = 1.0,
+		VALUE = 1.0,
+		ROTATE = true,
+		REVERSE = false,
+		ORIENTATION = "HORIZONTAL",
+		FILLSTYLE = "STANDARD",
+
 		SetMinMaxValues = function(self, minValue, maxValue)
 			assert((type(minValue) == "number" and type(maxValue) == "number"), "Usage: StatusBar:SetMinMaxValues(number, number)")
 
 			if maxValue > minValue then
-				self.__minval = minValue
-				self.__maxval = maxValue
+				self.MINVALUE = minValue
+				self.MAXVALUE = maxValue
 			else
-				self.__minval = 0
-				self.__maxval = 1
+				self.MINVALUE = 0
+				self.MAXVALUE = 1
 			end
 
-			if not self.__val or self.__val > self.__maxval then
-				self.__val = self.__maxval
-			elseif not self.__val or self.__val < self.__minval then
-				self.__val = self.__minval
+			if not self.VALUE or self.VALUE > self.MAXVALUE then
+				self.VALUE = self.MAXVALUE
+			elseif not self.VALUE or self.VALUE < self.MINVALUE then
+				self.VALUE = self.MINVALUE
 			end
 
-			self:Update()
+			barPrototype_Update(self)
 		end,
+
 		GetMinMaxValues = function(self)
-			return self.__minval, self.__maxval
+			return self.MINVALUE, self.MAXVALUE
 		end,
+
 		SetValue = function(self, value)
 			assert(type(value) == "number", "Usage: StatusBar:SetValue(number)")
-			if value >= self.__minval and value <= self.__maxval then
-				self.__val = value
-				self:Update()
+			if WithinRange(value, self.MINVALUE, self.MAXVALUE) then
+				self.VALUE = value
+				barPrototype_Update(self)
 			end
 		end,
+
 		GetValue = function(self)
-			return self.__val
+			return self.VALUE
 		end,
+
 		SetOrientation = function(self, orientation)
 			if orientation == "HORIZONTAL" or orientation == "VERTICAL" then
-				self.__orient = orientation
-				self:Update()
+				self.ORIENTATION = orientation
+				barPrototype_Update(self)
 			end
 		end,
+
 		GetOrientation = function(self)
-			return self.__orient
+			return self.ORIENTATION
 		end,
+
 		SetRotatesTexture = function(self, rotate)
-			self.__rotate = (rotate ~= nil and rotate ~= false)
-			self:Update()
+			self.ROTATE = (rotate ~= nil and rotate ~= false)
+			barPrototype_Update(self)
 		end,
+
 		GetRotatesTexture = function(self)
-			return self.__rotate
+			return self.ROTATE
 		end,
+
 		SetReverseFill = function(self, reverse)
-			self.__reverse = (reverse == true)
-			self:Update()
+			self.REVERSE = (reverse == true)
+			barPrototype_Update(self)
 		end,
+
 		GetReverseFill = function(self)
-			return self.__reverse
+			return self.REVERSE
 		end,
+
 		SetFillStyle = function(self, style)
 			assert(type(style) == "string" or style == nil, "Usage: StatusBar:SetFillStyle(string)")
 			if style and style:lower() == "center" then
-				self.__fill = "CENTER"
-				self:Update()
+				self.FILLSTYLE = "CENTER"
+				barPrototype_Update(self)
 			elseif style and style:lower() == "reverse" then
-				self.__fill = "REVERSE"
-				self:Update()
+				self.FILLSTYLE = "REVERSE"
+				barPrototype_Update(self)
 			else
-				self.__fill = "STANDARD"
-				self:Update()
+				self.FILLSTYLE = "STANDARD"
+				barPrototype_Update(self)
 			end
 		end,
+
 		GetFillStyle = function(self)
-			return self.__fill
+			return self.FILLSTYLE
 		end,
+
 		SetStatusBarTexture = function(self, texture)
 			self.fg:SetTexture(texture)
 			self.bg:SetTexture(texture)
 		end,
+
 		GetStatusBarTexture = function(self)
 			return self.fg
 		end,
+
 		SetForegroundColor = function(self, r, g, b, a)
 			self.fg:SetVertexColor(r, g, b, a)
 		end,
+
 		GetForegroundColor = function(self)
 			return self.fg
 		end,
+
 		SetBackgroundColor = function(self, r, g, b, a)
 			self.bg:SetVertexColor(r, g, b, a)
 		end,
+
 		GetBackgroundColor = function(self)
 			return self.bg:GetVertexColor()
 		end,
+
 		SetTexture = function(self, texture)
 			self:SetStatusBarTexture(texture)
 		end,
+
 		GetTexture = function(self)
 			return self.fg:GetTexture()
 		end,
+
 		SetStatusBarColor = function(self, r, g, b, a)
 			self:SetForegroundColor(r, g, b, a)
 		end,
+
 		GetStatusBarColor = function(self)
 			return self.fg:GetVertexColor()
 		end,
+
 		SetVertexColor = function(self, r, g, b, a)
 			self:SetForegroundColor(r, g, b, a)
 		end,
+
 		GetVertexColor = function(self)
 			return self.fg:GetVertexColor()
 		end,
+
 		SetStatusBarGradient = function(self, r1, g1, b1, a1, r2, g2, b2, a2)
-			self.fg:SetGradientAlpha(self.__orient, r1, g1, b1, a1, r2, g2, b2, a2)
+			self.fg:SetGradientAlpha(self.ORIENTATION, r1, g1, b1, a1, r2, g2, b2, a2)
 		end,
+
 		SetStatusBarGradientAuto = function(self, r, g, b, a)
-			self.fg:SetGradientAlpha(self.__orient, 0.5 + (r * 1.1), g * 0.7, b * 0.7, a, r * 0.7, g * 0.7, 0.5 + (b * 1.1), a)
+			self.fg:SetGradientAlpha(self.ORIENTATION, 0.5 + (r * 1.1), g * 0.7, b * 0.7, a, r * 0.7, g * 0.7, 0.5 + (b * 1.1), a)
 		end,
+
 		SetStatusBarSmartGradient = function(self, r1, g1, b1, r2, g2, b2)
-			self.fg:SetGradientAlpha(self.__orient, r1, g1, b1, 1, r2 or r1, g2 or g1, b2 or b1, 1)
+			self.fg:SetGradientAlpha(self.ORIENTATION, r1, g1, b1, 1, r2 or r1, g2 or g1, b2 or b1, 1)
 		end,
-		GetObjectType = function()
+
+		GetObjectType = function(self)
 			return "StatusBar"
 		end,
+
 		IsObjectType = function(self, otype)
-			return (otype == self:GetObjectType()) and 1 or nil
-		end
-	}
+			return (otype == "StatusBar") and 1 or nil
+		end,
 
-	setmetatable(StatusBarPrototype, {__call = function(_, name, parent)
-		local bar = CreateFrame("Frame", name, parent)
-		bar.fg = bar.fg or bar:CreateTexture(name and "$parent.Texture", "ARTWORK")
-		bar.bg = bar.bg or bar:CreateTexture(name and "$parent.Background", "BACKGROUND")
-		for k, v in pairs(StatusBarPrototype) do
-			bar[k] = v
-		end
-		bar:HookScript("OnSizeChanged", bar.OnSizeChanged)
-		bar.bg:Hide()
-		bar:SetRotatesTexture(false)
-
-		local Old_SetScript = bar.SetScript
-		bar.SetScript = function(self, event, callback)
+		SetScript = function(self, event, callback)
 			if event == "OnValueChanged" then
 				assert(type(callback) == "function", 'Usage: StatusBar:SetScript("OnValueChanged", function)')
-				lib.RegisterCallback(self, "OnValueChanged", function() callback(self, self.__val) end)
+				lib.RegisterCallback(self, "OnValueChanged", function() callback(self, self.VALUE) end)
 			else
-				Old_SetScript(self, event, callback)
+				barPrototype_SetScript(self, event, callback)
 			end
 		end
+	}, {__index = barFrame})
 
+	local barPrototype_mt = {__index = barPrototype}
+
+	local function StatusBarPrototype(name, parent)
+		-- create the bar and its elements.
+		local bar = setmetatable(CreateFrame("Frame", name, parent), barPrototype_mt)
+		bar.fg = bar.fg or bar:CreateTexture(name and "$parent.Texture", "ARTWORK")
+		bar.bg = bar.bg or bar:CreateTexture(name and "$parent.Background", "BACKGROUND")
+		bar.bg:Hide()
+
+		-- do some stuff then return it.
+		bar:HookScript("OnSizeChanged", barPrototype_OnSizeChanged)
+		bar:SetRotatesTexture(false)
 		return bar
-	end})
+	end
 
 	lib.StatusBarPrototype = StatusBarPrototype
 end
@@ -1588,7 +1686,10 @@ local mixins = {
 	"WeakTable",
 	"newTable",
 	"delTable",
+	-- lua memoize
+	"memoize",
 	-- math util
+	"Lerp",
 	"Round",
 	"Square",
 	"Clamp",
@@ -1637,8 +1738,6 @@ local mixins = {
 	"NewTimer",
 	"CancelTimer",
 	-- spell util
-	"GetSpellInfo",
-	"GetSpellLink",
 	-- color conversion
 	"HexToRGB",
 	"RGBToHex",
