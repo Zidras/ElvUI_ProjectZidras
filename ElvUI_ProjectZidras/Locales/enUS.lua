@@ -3,6 +3,7 @@ local L = ElvUI[1].Libs.ACL:NewLocale("ElvUI", "enUS", true, true)
 L["About/Help"] = true
 L["Absorbs"] = true
 L["Absorbs Prediction"] = true
+L["Absorb StatusBar Texture"] = true
 L["Display LFG Icons in chat."] = true
 L["Displays all incoming heals"] = true
 L["Displays an icon near your Guild Master in chat.\n\n|cffFF0000Note:|r Some messages in chat history may disappear on login."] = true

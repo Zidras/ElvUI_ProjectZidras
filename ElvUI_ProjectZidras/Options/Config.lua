@@ -39,7 +39,8 @@ local function GetOptionsTable_AbsorbPrediction(updateFunc, groupName, numGroup,
 	config.args.colorsButton = ACH:Execute(L["COLORS"], nil, 3, function() E.Libs.AceConfigDialog:SelectGroup("ElvUI", "PZ", "modules", "unitFramesGroup", "colors", "absorbPrediction") end)
 	config.args.anchorPoint = ACH:Select(L["Anchor Point"], nil, 4, { TOP = "TOP", BOTTOM = "BOTTOM", CENTER = "CENTER" })
 	config.args.absorbStyle = ACH:Select(L["Absorb Style"], nil, 5, { NONE = L["NONE"], NORMAL = L["Normal"], REVERSED = L["Reversed"], WRAPPED = L["Wrapped"], OVERFLOW = L["Overflow"], STACKED = L["Stacked"] })
-	config.args.overflowButton = ACH:Execute(L["Max Overflow"], nil, 7, function() E.Libs.AceConfigDialog:SelectGroup("ElvUI", "unitframe", "generalOptionsGroup", "allColorsGroup", "healPrediction") end)
+	config.args.overflowButton = ACH:Execute(L["Max Overflow"], nil, 6, function() E.Libs.AceConfigDialog:SelectGroup("ElvUI", "unitframe", "generalOptionsGroup", "allColorsGroup", "healPrediction") end)
+	config.args.absorbTexture = ACH:SharedMediaStatusbar(L["Absorb StatusBar Texture"], nil, 7)
 	config.args.warning = ACH:Description(function()
 				if UF.db.colors.healPrediction.maxOverflow == 0 then
 					local text = L["Max Overflow is set to zero. Absorb Overflows will be hidden when using Overflow style.\nIf used together Max Overflow at zero and Overflow mode will act like Normal mode without the ending sliver of overflow."]

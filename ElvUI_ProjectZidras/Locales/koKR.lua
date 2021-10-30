@@ -3,6 +3,7 @@ local L = ElvUI[1].Libs.ACL:NewLocale("ElvUI", "koKR")
 L["About/Help"] = "정보/도움말"
 L["Absorbs"] = "보호막"
 L["Absorbs Prediction"] = "보호막예측"
+L["Absorb StatusBar Texture"] = "보호막진행막대 텍스쳐"
 L["Display LFG Icons in chat."] = "말한 사람에게 역할 아이콘이 설정되어 있는 경우 이름에 같이 표시할지 여부를 결정합니다."
 L["Displays all incoming heals"] = "들어오는 모든 치유를 표시합니다."
 L["Displays an icon near your Guild Master in chat.\n\n|cffFF0000Note:|r Some messages in chat history may disappear on login."] = "대화창에서 길드장 근처에 아이콘을 표시합니다. \n\n|cffFF0000Note:|r 일부 대화 기록은 접속시 사라질 수 있습니다."

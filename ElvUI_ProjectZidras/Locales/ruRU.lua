@@ -3,6 +3,7 @@ local L = ElvUI[1].Libs.ACL:NewLocale("ElvUI", "ruRU")
 L["About/Help"] = "Информация"
 L["Absorbs"] = "Поглощения"
 L["Absorbs Prediction"] = "Поглощения исцеление"
+L["Absorb StatusBar Texture"] = "Текстура полос состояния"
 L["Display LFG Icons in chat."] = "Отображать иконки выбранных ролей в чате"
 L["Displays all incoming heals"] = "Отображает все входящие исцеления"
 L["Displays an icon near your Guild Master in chat.\n\n|cffFF0000Note:|r Some messages in chat history may disappear on login."] = "Отображает иконку рядом с сообщениями главы вашей гильдии в чате.\n\n|cffFF0000Предупреждение:|r Некоторые сообщения в истории чата в истории чата могут исчезать при входе в игру."

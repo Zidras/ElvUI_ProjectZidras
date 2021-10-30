@@ -3,6 +3,7 @@ local L = ElvUI[1].Libs.ACL:NewLocale("ElvUI", "zhCN")
 L["About/Help"] = "关于/帮助"
 L["Absorbs"] = "吸收"
 L["Absorbs Prediction"] = "吸收预测"
+L["Absorb StatusBar Texture"] = "吸收状态条材质"
 L["Display LFG Icons in chat."] = "在小队聊天中显示随机队列图标"
 L["Displays all incoming heals"] = "显示所有传入的治疗量"
 L["Displays an icon near your Guild Master in chat.\n\n|cffFF0000Note:|r Some messages in chat history may disappear on login."] = "在聊天中在您的公会会长附近显示一个图标。\n\n|cffFF0000注意：|r 聊天记录中的某些消息可能会在登录时消失。"

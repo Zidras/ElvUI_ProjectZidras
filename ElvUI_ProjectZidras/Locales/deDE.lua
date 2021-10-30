@@ -3,6 +3,7 @@ local L = ElvUI[1].Libs.ACL:NewLocale("ElvUI", "deDE")
 L["About/Help"] = "Über/Hilfe"
 L["Absorbs"] = "Absorbierungen"
 L["Absorbs Prediction"] = "Absorbierungen Vorhersage"
+L["Absorb StatusBar Texture"] = "Absorbierungen Statusleistentextur"
 L["Display LFG Icons in chat."] = "LFG Symbole im chat anzeigen"
 L["Displays all incoming heals"] = "Zeigt alle eingehenden Heilungen an"
 L["Displays an icon near your Guild Master in chat.\n\n|cffFF0000Note:|r Some messages in chat history may disappear on login."] = "Zeigt ein Symbol vor dem Gildenmeister Namen im Chat.\n\n|cffFF0000Hinweis:|r Einige Nachrichten im Chatverlauf könnten verschwinden beim Login."

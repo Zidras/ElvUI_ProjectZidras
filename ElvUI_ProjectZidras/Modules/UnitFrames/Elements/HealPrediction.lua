@@ -3,6 +3,7 @@ local E, L, V, P, G = unpack(ElvUI)
 local ZUF = E:GetModule("ProjectZidras_UnitFrames")
 local PZ = E:GetModule("ProjectZidras")
 local UF = E:GetModule("UnitFrames")
+local LSM = E.Libs.LSM
 
 function ZUF.HealthClipFrame_HealComm(frame)
 	if frame.HealCommBar then
@@ -138,6 +139,9 @@ function ZUF:Configure_HealComm(frame)
 		pred.otherBarTexture = otherBar:GetStatusBarTexture()
 
 		ZUF:SetTexture_HealComm(pred, UF.db.colors.transparentHealth and E.media.blankTex or healthBarTexture:GetTexture())
+
+		local absorbTexture = LSM:Fetch("statusbar", db.absorbTexture)
+		pred.absorbBar:SetStatusBarTexture(absorbTexture)
 
 		myBar:SetReverseFill(reverseFill)
 		otherBar:SetReverseFill(reverseFill)
