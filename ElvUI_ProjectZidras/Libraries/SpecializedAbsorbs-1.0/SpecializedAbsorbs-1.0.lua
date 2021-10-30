@@ -1658,7 +1658,7 @@ local paladin_defaultScaling = {1.0}
 -- The base value is always 500
 local function paladin_SacredShield_Create(srcGUID, srcName, dstGUID, dstName, spellid, destEffects)
 	local _, sp, quality1, sourceScaling, quality2 = UnitStatsAndScaling(srcGUID, 0.1, paladin_defaultScaling, 0.2)
-	return floor((500 + (sp * 0.75)) * sourceScaling[1] * ZONE_MODIFIER), min(quality1, quality2)
+	return floor((500 + (sp * 0.75)) * (sourceScaling[1] or paladin_defaultScaling[1]) * ZONE_MODIFIER), min(quality1, quality2)
 end
 
 local function paladin_OnTalentUpdate()
