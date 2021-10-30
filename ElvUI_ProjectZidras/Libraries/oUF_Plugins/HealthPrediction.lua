@@ -190,6 +190,34 @@ local function Update(self, event, unit, absorb)
 		end
 	end
 
+	-- Tags
+	oUF.Tags.Methods["absorbs"] = function(tagUnit)
+		local abs = SA.UnitTotal(UnitGUID(tagUnit))
+		if abs > 0 then
+			return E:ShortValue(abs)
+		end
+	end
+	oUF.Tags.Methods["incomingheals:personal"] = function(tagUnit)
+		local incHealP = (HealComm:GetHealAmount(UnitGUID(tagUnit), HealComm.ALL_HEALS, GetTime() + (element.lookAhead or 5), UnitGUID("player")) or 0) * (HealComm:GetHealModifier(UnitGUID(tagUnit)) or 1) or 0
+		if incHealP > 0 then
+			return E:ShortValue(incHealP)
+		end
+	end
+	oUF.Tags.Methods["incomingheals:others"] = function(tagUnit)
+		local incHeal = (HealComm:GetHealAmount(UnitGUID(tagUnit), HealComm.ALL_HEALS, GetTime() + (element.lookAhead or 5)) or 0) * (HealComm:GetHealModifier(UnitGUID(tagUnit)) or 1) or 0
+		local incHealP = (HealComm:GetHealAmount(UnitGUID(tagUnit), HealComm.ALL_HEALS, GetTime() + (element.lookAhead or 5), UnitGUID("player")) or 0) * (HealComm:GetHealModifier(UnitGUID(tagUnit)) or 1) or 0
+		local incHealO = incHeal - incHealP
+		if incHealO > 0 then
+			return E:ShortValue(incHealO)
+		end
+	end
+	oUF.Tags.Methods["incomingheals"] = function(tagUnit)
+		local incHeal = (HealComm:GetHealAmount(UnitGUID(tagUnit), HealComm.ALL_HEALS, GetTime() + (element.lookAhead or 5)) or 0) * (HealComm:GetHealModifier(UnitGUID(tagUnit)) or 1) or 0
+		if incHeal > 0 then
+			return E:ShortValue(incHeal)
+		end
+	end
+
 	--[[ Callback: HealthPrediction:PostUpdate(unit, myIncomingHeal, otherIncomingHeal, absorb, healAbsorb, hasOverAbsorb, hasOverHealAbsorb)
 	Called after the element has been updated.
 

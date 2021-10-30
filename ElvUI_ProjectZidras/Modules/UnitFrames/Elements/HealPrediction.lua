@@ -328,3 +328,9 @@ UF.SetAlpha_HealComm = ZUF.SetAlpha_HealComm
 UF.Construct_HealComm = ZUF.Construct_HealComm
 UF.Configure_HealComm = ZUF.Configure_HealComm
 UF.UpdateHealComm = ZUF.UpdateHealComm
+
+-- Add Tags to ElvUI Options
+E:AddTagInfo("incomingheals", PZ:Color("PZ"), L["Displays all incoming heals"])
+E:AddTagInfo("incomingheals:personal", PZ:Color("PZ"), L["Displays only personal incoming heals"])
+E:AddTagInfo("incomingheals:others", PZ:Color("PZ"), L["Displays only incoming heals from other units"])
+E:AddTagInfo("absorbs", PZ:Color("PZ"), L["Displays the amount of absorbs"])
