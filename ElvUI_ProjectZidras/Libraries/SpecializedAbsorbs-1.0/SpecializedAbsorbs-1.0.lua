@@ -7,6 +7,7 @@ local lib, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 if not lib then return end
 local Core
 
+local error = error
 local pairs, select = pairs, select
 local min, max, floor = math.min, math.max, math.floor
 local setmetatable, getmetatable = setmetatable, getmetatable
@@ -17,6 +18,7 @@ local UnitFactionGroup, UnitInBattleground, GetTalentInfo = UnitFactionGroup, Un
 local GetNumRaidMembers, GetNumPartyMembers = GetNumRaidMembers, GetNumPartyMembers
 
 lib.CheckFlags = lib.CheckFlags or true
+lib.NoErrors = lib.NoErrors or true
 
 ---------------------
 -- Install/Upgrade --
@@ -146,6 +148,14 @@ local RemoveActiveEffect
 -- Constants
 local LOW_VALUE_TOLERANCE = 50
 local ZONE_MODIFIER = 1
+
+-- addon comm prefixes
+local COMM_UNITSTATS = "SpecializedAbsorbs_UnitStats"
+local COMM_SCALING = "SpecializedAbsorbs_Scaling"
+
+-- for players using AbsorbsMonitor-1.0
+local COMM_UNITSTATS_ALT = "Absorbs_UnitStats"
+local COMM_SCALING_ALT = "Absorbs_Scaling"
 
 ----------------------
 -- Helper functions --
@@ -347,6 +357,11 @@ end
 -- Core functions --
 --------------------
 
+function Core.Error(...)
+	if lib.NoErrors then return end
+	error(...)
+end
+
 function Core.Enable()
 	playerclass = select(2, UnitClass("player"))
 	playerid = UnitGUID("player")
@@ -426,8 +441,11 @@ function Core.Enable()
 
 	Core:ScheduleRepeatingTimer(Events.OnPeriodicBroadcast, 300)
 
-	Core:RegisterComm("SpecializedAbsorbs_UnitStats", Events.OnUnitStatsReceived)
-	Core:RegisterComm("SpecializedAbsorbs_Scaling", Events.OnScalingReceived)
+	Core:RegisterComm(COMM_UNITSTATS, Events.OnUnitStatsReceived)
+	Core:RegisterComm(COMM_UNITSTATS_ALT, Events.OnUnitStatsReceived)
+
+	Core:RegisterComm(COMM_SCALING, Events.OnScalingReceived)
+	Core:RegisterComm(COMM_SCALING_ALT, Events.OnScalingReceived)
 
 	if not lib.Passive then
 		Core:SetActive()
@@ -564,7 +582,7 @@ function Core.ApplyAreaEffect(timestamp, triggerGUID, triggerName, dstGUID, dstN
 		activeEffectsBySpell[dstGUID] = destEffects
 		activeEffectsByPriority[dstGUID] = {}
 	elseif destEffects[spellid] then
-		error("Called ApplyAreaEffect on refreshed aura")
+		Core.Error("Called ApplyAreaEffect on refreshed aura")
 		return
 	end
 
@@ -592,7 +610,7 @@ end
 
 function Core.CreateAreaTrigger(timestamp, srcGUID, srcName, triggerGUID, triggerName, spellid, spellschool)
 	if activeAreaEffects[triggerGUID] then
-		error("Trying to create new area trigger on existing one, triggerGUID: " .. triggerGUID .. ", existing spellid: " .. activeAreaEffects[triggerGUID][1])
+		Core.Error("Trying to create new area trigger on existing one, triggerGUID: " .. triggerGUID .. ", existing spellid: " .. activeAreaEffects[triggerGUID][1])
 		return
 	end
 
@@ -860,7 +878,9 @@ function Core.SendUnitStats()
 	if curChatChannel then
 		local curAP, curSP = UnitStatsTable[playerid][2], UnitStatsTable[playerid][3]
 		if (curAP ~= lastAP) or (curSP ~= lastSP) then
-			Core:SendCommMessage("SpecializedAbsorbs_UnitStats", Core:Serialize(playerid, playerclass, curAP, curSP), curChatChannel)
+			Core:SendCommMessage(COMM_UNITSTATS, Core:Serialize(playerid, playerclass, curAP, curSP), curChatChannel)
+			Core:SendCommMessage(COMM_UNITSTATS_ALT, Core:Serialize(playerid, playerclass, curAP, curSP), curChatChannel)
+
 			lastAP, lastSP = curAP, curSP
 			CommStatsCooldown = true
 			Core:ScheduleTimer(ClearCommStatsCooldown, 15)
@@ -870,7 +890,9 @@ end
 
 function Core.SendScaling()
 	if curChatChannel then
-		Core:SendCommMessage("SpecializedAbsorbs_Scaling", Core:Serialize(playerid, playerclass, Events.OnScalingEncode()), curChatChannel)
+		Core:SendCommMessage(COMM_SCALING, Core:Serialize(playerid, playerclass, Events.OnScalingEncode()), curChatChannel)
+		Core:SendCommMessage(COMM_SCALING_ALT, Core:Serialize(playerid, playerclass, Events.OnScalingEncode()), curChatChannel)
+
 		CommScalingCooldown = true
 		Core:ScheduleTimer(ClearCommStatsCooldown, 30)
 	end
@@ -1059,6 +1081,7 @@ function Events.GROUPING_CHANGED()
 	end
 
 	Core:ScheduleTimer(Events.STATS_CHANGED, 5)
+	Events.STATS_CHANGED()
 end
 
 function Events.ZONE_CHANGED_NEW_AREA()
@@ -1085,6 +1108,7 @@ function Events.STATS_CHANGED()
 	UnitStatsTable[playerid][3] = GetSpellBonusHealing()
 	if curChatChannel then
 		Core:ScheduleUniqueTimer("comm_stats", Core.SendUnitStats, CommStatsCooldown and 15 or 5)
+		Core:ScheduleUniqueTimer("comm_scaling", Core.SendScaling, CommScalingCooldown and 30 or 5)
 	end
 end
 
@@ -1191,7 +1215,7 @@ function Events.OnAreaTimeout(areaEntry)
 	end
 
 	-- We're only here if we didn't reduce the refcount to zero
-	error("Positive refcount " .. areaEntry[9] .. " remained for area effect " .. areaEntry[1] .. " by trigger " .. areaEntry[8])
+	Core.Error("Positive refcount " .. areaEntry[9] .. " remained for area effect " .. areaEntry[1] .. " by trigger " .. areaEntry[8])
 end
 
 -- Map client events to our callbacks
