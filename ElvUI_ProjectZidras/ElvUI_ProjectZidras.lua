@@ -26,6 +26,9 @@ do
 	end
 end
 
+-- List of Modules
+PZ.ZUF = E:NewModule("ProjectZidras_UnitFrames")
+
 function PZ:Initialize()
 	ProjectZidrasDB = ProjectZidrasDB or {}
 

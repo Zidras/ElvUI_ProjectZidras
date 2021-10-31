@@ -1,6 +1,8 @@
 local E, L, V, P, G = unpack(ElvUI)
 local PZ = E:GetModule("ProjectZidras")
 local ZCH = E:GetModule("ProjectZidras_Chat")
+local UF = E:GetModule("UnitFrames")
+local ACH = LibStub("LibAceConfigHelper")
 
 --GLOBALS: unpack, format
 local format = string.format
@@ -13,68 +15,104 @@ Empress
 Kader]]
 
 local function ChatOptions()
-	return {
-		type = "group",
-		name = L["Chat"],
-		get = function(info) return E.db.pz.chat[info[#info]] end,
-		args = {
-			header = {
-				order = 0,
-				type = "header",
-				name = L["Chat"]
-			},
-			guildmaster = {
-				order = 1,
-				type = "toggle",
-				name = L["Guild Master Icon"],
-				desc = L["Displays an icon near your Guild Master in chat.\n\n|cffFF0000Note:|r Some messages in chat history may disappear on login."],
-				set = function(self, value)
-					E.db.pz.chat.guildmaster = value
-					ZCH:GMIconUpdate()
-				end,
-			},
-			lfgIcons = {
-				order = 2,
-				type = 'toggle',
-				name = L["Role Icon"],
-				desc = L["Display LFG Icons in chat."],
-				set = function(self, value)
-					E.db.pz.chat.lfgIcons = value
-					ZCH:CheckLFGRoles()
-				end,
-			},
-		}
-	}
+	local config = ACH:Group(L["Chat"], nil, 1, nil, function(info) return E.db.pz.chat[info[#info]] end)
+	config.args.header = ACH:Header(L["Chat"], 0)
+	config.args.guildmaster = ACH:Toggle(L["Guild Master Icon"], L["Displays an icon near your Guild Master in chat.\n\n|cffFF0000Note:|r Some messages in chat history may disappear on login."], 1, nil, nil, nil, nil, function(self, value)	E.db.pz.chat.guildmaster = value ZCH:GMIconUpdate()	end)
+	config.args.lfgIcons = ACH:Toggle(L["Role Icon"], L["Display LFG Icons in chat."], 2, nil, nil, nil, nil, function(self, value)	E.db.pz.chat.lfgIcons = value ZCH:CheckLFGRoles() end)
+
+	return config
 end
 
 local function NamePlatesOptions()
-	return {
-		type = "group",
-		name = L["NamePlates"],
-		get = function(info) return E.db.pz.nameplates[info[#info]] end,
-		args = {
-			header = {
-				order = 0,
-				type = "header",
-				name = L["NamePlates"]
-			},
-			hdClient = {
-				order = 1,
-				type = "description",
-				name = L["HD-Client"]
-			},
-			hdNameplates = {
-				order = 2,
-				type = "toggle",
-				name = L["HD-Nameplates"],
-				desc = L["HD-Nameplates_DESC"],
-				set = function(info, value)
-					E.db.pz.nameplates[info[#info]] = value
-					E:StaticPopup_Show("PRIVATE_RL")
+	local config = ACH:Group(L["NamePlates"], nil, 2, nil, function(info) return E.db.pz.nameplates[info[#info]] end)
+	config.args.header = ACH:Header(L["NamePlates"], 0)
+	config.args.hdClient = ACH:Description(L["HD-Client"], 1)
+	config.args.hdNameplates = ACH:Toggle(L["HD-Nameplates"], L["HD-Nameplates_DESC"], 2, nil, nil, nil, nil, function(info, value) E.db.pz.nameplates[info[#info]] = value E:StaticPopup_Show("PRIVATE_RL") end)
+
+	return config
+end
+
+local function GetOptionsTable_AbsorbPrediction(updateFunc, groupName, numGroup, subGroup)
+	local config = ACH:Group(L["Absorbs Prediction"], L["Show a prediction bar with all absorbs on the unitframe. Also displays a slightly different colored bar for heal absorbing shields"], nil, nil, function(info) return E.db.pz.unitframe.units[groupName].absorbPrediction[info[#info]] end, function(info, value) E.db.pz.unitframe.units[groupName].absorbPrediction[info[#info]] = value updateFunc(UF, groupName, numGroup) end)
+	config.args.enable = ACH:Toggle(L["Enable"], nil, 1)
+	config.args.height = ACH:Range(L["Height"], nil, 2, { min = -1, max = 500, step = 1 })
+	config.args.colorsButton = ACH:Execute(L["COLORS"], nil, 3, function() E.Libs.AceConfigDialog:SelectGroup("ElvUI", "PZ", "modules", "unitFramesGroup", "colors", "absorbPrediction") end)
+	config.args.anchorPoint = ACH:Select(L["Anchor Point"], nil, 4, { TOP = "TOP", BOTTOM = "BOTTOM", CENTER = "CENTER" })
+	config.args.absorbStyle = ACH:Select(L["Absorb Style"], nil, 5, { NONE = L["NONE"], NORMAL = L["Normal"], REVERSED = L["Reversed"], WRAPPED = L["Wrapped"], OVERFLOW = L["Overflow"], STACKED = L["Stacked"] })
+	config.args.overflowButton = ACH:Execute(L["Max Overflow"], nil, 6, function() E.Libs.AceConfigDialog:SelectGroup("ElvUI", "unitframe", "generalOptionsGroup", "allColorsGroup", "healPrediction") end)
+	config.args.absorbTexture = ACH:SharedMediaStatusbar(L["Absorb StatusBar Texture"], nil, 7)
+	config.args.warning = ACH:Description(function()
+				if UF.db.colors.healPrediction.maxOverflow == 0 then
+					local text = L["Max Overflow is set to zero. Absorb Overflows will be hidden when using Overflow style.\nIf used together Max Overflow at zero and Overflow mode will act like Normal mode without the ending sliver of overflow."]
+					return text .. (E.db.pz.unitframe.units[groupName].absorbPrediction.absorbStyle == "OVERFLOW" and " |cffFF9933You are using Overflow with Max Overflow at zero.|r " or "")
 				end
-			},
-		}
-	}
+			end, 50, "medium", nil, nil, nil, nil, "full")
+
+	if subGroup then
+		config.inline = true
+		config.get = function(info) return E.db.pz.unitframe.units[groupName][subGroup].absorbPrediction[info[#info]] end
+		config.set = function(info, value) E.db.pz.unitframe.units[groupName][subGroup].absorbPrediction[info[#info]] = value updateFunc(UF, groupName, numGroup) end
+	end
+
+	return config
+end
+
+local function UnitFramesOptions()
+	local config = ACH:Group(L["UnitFrames"], nil, 3, "tab", function(info) return E.db.pz.unitframe[info[#info]] end, function(info, value) E.db.pz.unitframe[info[#info]] = value end, function() return not E.private.unitframe.enable end)
+	config.args.desc = ACH:Description(L["Options for customizing unit frames. Please don't change these setting when ElvUI's testing frames for bosses and arena teams are shown. That will make them invisible until retoggling."], 1)
+
+	config.args.colors = ACH:Group(L["COLORS"], nil, 1, "tree", function(info) return E.db.pz.unitframe.colors[info[#info]] end, function(info, value) E.db.unitframe.colors[info[#info]] = value UF:Update_AllFrames() end, function() return not E.UnitFrames.Initialized end)
+	config.args.colors.args.absorbPrediction = ACH:Group(L["Absorb Prediction"], nil, 1, nil, function(info)
+		if info.type == "color" then
+			local t, d = E.db.pz.unitframe.colors.absorbPrediction[info[#info]], P.pz.unitframe.colors.absorbPrediction[info[#info]]
+			return t.r, t.g, t.b, t.a, d.r, d.g, d.b, d.a
+		else
+			return E.db.pz.unitframe.colors.absorbPrediction[info[#info]]
+		end
+	end,
+	function(info, ...)
+		if info.type == "color" then
+			local r, g, b, a = ...
+			local t = E.db.pz.unitframe.colors.absorbPrediction[info[#info]]
+			t.r, t.g, t.b, t.a = r, g, b, a
+		else
+			local value = ...
+			E.db.pz.unitframe.colors.absorbPrediction[info[#info]] = value
+		end
+
+		UF:Update_AllFrames()
+	end)
+	local colorsAbsorbPrediction = config.args.colors.args.absorbPrediction.args
+	colorsAbsorbPrediction.absorbs = ACH:Color(L["Absorbs"], nil, 1, true)
+	colorsAbsorbPrediction.healAbsorbs = ACH:Color(L["Heal Absorbs"], nil, 2, true)
+	colorsAbsorbPrediction.overabsorbs = ACH:Color(L["Over Absorbs"], nil, 3, true)
+	colorsAbsorbPrediction.overhealabsorbs = ACH:Color(L["Over Heal Absorbs"], nil, 4, true)
+
+	config.args.individualUnits = ACH:Group(L["Individual Units"], nil, 15, "tab", nil, nil, function() return not E.UnitFrames.Initialized end)
+	local individualUnits = config.args.individualUnits.args
+	individualUnits.player = ACH:Group(L["Player"], nil, 1, nil, function(info) return E.db.unitframe.units.player[info[#info]] end, function(info, value) E.db.unitframe.units.player[info[#info]] = value UF:CreateAndUpdateUF("player") end)
+	individualUnits.player.args.AbsorbPrediction = GetOptionsTable_AbsorbPrediction(UF.CreateAndUpdateUF, "player")
+	individualUnits.target = ACH:Group(L["Target"], nil, 2, nil, function(info) return E.db.unitframe.units.target[info[#info]] end, function(info, value) E.db.unitframe.units.target[info[#info]] = value UF:CreateAndUpdateUF("target") end)
+	individualUnits.target.args.AbsorbPrediction = GetOptionsTable_AbsorbPrediction(UF.CreateAndUpdateUF, "target")
+	individualUnits.focus = ACH:Group(L["Focus"], nil, 5, nil, function(info) return E.db.unitframe.units.focus[info[#info]] end, function(info, value) E.db.unitframe.units.focus[info[#info]] = value UF:CreateAndUpdateUF("focus") end)
+	individualUnits.focus.args.AbsorbPrediction = GetOptionsTable_AbsorbPrediction(UF.CreateAndUpdateUF, "focus")
+	individualUnits.pet = ACH:Group(L["Pet"], nil, 7, nil, function(info) return E.db.unitframe.units.pet[info[#info]] end, function(info, value) E.db.unitframe.units.pet[info[#info]] = value UF:CreateAndUpdateUF("pet") end)
+	individualUnits.pet.args.AbsorbPrediction = GetOptionsTable_AbsorbPrediction(UF.CreateAndUpdateUF, "pet")
+
+	config.args.groupUnits = ACH:Group(L["Group Units"], nil, 20, "tab", nil, nil, function() return not E.UnitFrames.Initialized end)
+	local groupUnits = config.args.groupUnits.args
+	groupUnits.arena = ACH:Group(L["Arena"], nil, 1, nil, function(info) return E.db.unitframe.units.arena[info[#info]] end, function(info, value) E.db.unitframe.units.arena[info[#info]] = value UF:CreateAndUpdateUFGroup("arena", 5) end)
+	groupUnits.arena.args.AbsorbPrediction = GetOptionsTable_AbsorbPrediction(UF.CreateAndUpdateUFGroup, "arena", 5)
+	groupUnits.party = ACH:Group(L["Party"], nil, 2, nil, function(info) return E.db.unitframe.units.party[info[#info]] end, function(info, value) E.db.unitframe.units.party[info[#info]] = value UF:CreateAndUpdateHeaderGroup("party") end)
+	groupUnits.party.args.AbsorbPrediction = GetOptionsTable_AbsorbPrediction(UF.CreateAndUpdateHeaderGroup, "party")
+	groupUnits.raid = ACH:Group(L["Raid"], nil, 3, nil, function(info) return E.db.unitframe.units.raid[info[#info]] end, function(info, value) E.db.unitframe.units.raid[info[#info]] = value UF:CreateAndUpdateHeaderGroup("raid") end)
+	groupUnits.raid.args.AbsorbPrediction = GetOptionsTable_AbsorbPrediction(UF.CreateAndUpdateHeaderGroup, "raid")
+	groupUnits.raid40 = ACH:Group(L["Raid-40"], nil, 4, nil, function(info) return E.db.unitframe.units.raid40[info[#info]] end, function(info, value) E.db.unitframe.units.raid40[info[#info]] = value UF:CreateAndUpdateHeaderGroup("raid40") end)
+	groupUnits.raid40.args.AbsorbPrediction = GetOptionsTable_AbsorbPrediction(UF.CreateAndUpdateHeaderGroup, "raid40")
+	groupUnits.raidpet = ACH:Group(L["Raid Pet"], nil, 5, nil, function(info) return E.db.unitframe.units.raidpet[info[#info]] end, function(info, value) E.db.unitframe.units.raidpet[info[#info]] = value UF:CreateAndUpdateHeaderGroup("raidpet") end)
+	groupUnits.raidpet.args.AbsorbPrediction = GetOptionsTable_AbsorbPrediction(UF.CreateAndUpdateHeaderGroup, "raidpet")
+
+	return config
 end
 
 function PZ:InsertOptions()
@@ -117,6 +155,7 @@ function PZ:InsertOptions()
 					--* Modules are added here
 					chatGroup = ChatOptions(),
 					namePlatesGroup = NamePlatesOptions(),
+					unitFramesGroup = UnitFramesOptions(),
 				},
 			},
 			help = {

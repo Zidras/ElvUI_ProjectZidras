@@ -1,3 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file='LibAceConfigHelper\LibAceConfigHelper.lua'/>
 	<Include file="LibCompat-1.0\lib.xml"/>
+	<Script file="SpecializedAbsorbs-1.0\SpecializedAbsorbs-1.0.lua"/>
+	<Include file="oUF_Plugins\oUF_Plugins.xml"/>
 </Ui>
