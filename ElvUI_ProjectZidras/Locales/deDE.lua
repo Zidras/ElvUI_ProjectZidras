@@ -1,5 +1,6 @@
 local L = ElvUI[1].Libs.ACL:NewLocale("ElvUI", "deDE")
 
+L["About"] = "Über"
 L["About/Help"] = "Über/Hilfe"
 L["Absorbs"] = "Absorbierungen"
 L["Absorbs Prediction"] = "Absorbierungen Vorhersage"
@@ -25,6 +26,7 @@ L["FAQ_pz_2"] = "|cff30ee30Q: Hat Project Zidras die gleiche Sprachrichtlinie wi
 L["FAQ_pz_3"] = "|cff30ee30Q: Warum unterscheiden sich die Screenshots des Layouts auf der Download-Seite von denen, die ich im Spiel sehe?|r\n|cff9482c9A:|r Weil ich nur vergessen habe, diese zu aktualisieren."
 L["FAQ_pz_4"] = "|cff30ee30Q: Warum sehe ich einige seltsame Symbole neben den Namen einiger Leute im Chat?|r\n|cff9482c9A:|r Diese Symbole werden von PZ bereitgestellt und sind mit Personen verbunden, die ich auf irgendeine Weise hervorheben möchte.\nZum Beispiel: |TInterface\\AddOns\\ElvUI_ProjectZidras\\Media\\Textures\\Chat\\Chat_ZidrasLogo:20:20|t ist das Hauptsymbol für das Entwicklungsteam von Project Zidras."
 L["FAQ_pz_5"] = "|cff30ee30Q: Wie kann ich dich kontaktieren?|r\n|cff9482c9A:|r Auf meinem Discord-Server gibt es dedizierte Kanäle für Support: https://discord.gg/CyVWDWS."
+L["GitHub Link / Report Errors"] = "GitHub Link / Fehler melden"
 L["Group Units"] = "Gruppen Einheiten"
 L["Guild Master Icon"] = "Gildenmeister Symbol"
 L["HD-Client"] = "|cffFF0000Warnung:|r Dies erfordert, dass der HD-Client wie vorgesehen funktioniert."
@@ -33,7 +35,9 @@ L["HD-Nameplates_DESC"] = "Wendet ElvUI-Castbars auf standardmäßige Blizzard-N
 L["Heal Absorbs"] = "Heilung Absorbierungen"
 L["Individual Units"] = "Individuelle Einheiten"
 L["LINK_DESC"] = "Die folgenden Links führen Sie zu den Seiten von Project Zidras auf verschiedenen Websites."
+L["Links"] = true
 L["Max Overflow is set to zero. Absorb Overflows will be hidden when using Overflow style.\nIf used together Max Overflow at zero and Overflow mode will act like Normal mode without the ending sliver of overflow."] = true
+L["Modules"] = "Module"
 L["Normal"] = true
 L["Options for customizing unit frames. Please don't change these setting when ElvUI's testing frames for bosses and arena teams are shown. That will make them invisible until retoggling."] = "Optionen zum Anpassen von Einheitenrahmen. Bitte ändere diese Einstellung nicht, wenn die Testrahmen von ElvUI für Bosse und Arenateams angezeigt werden. Dadurch werden sie bis zum erneuten Umschalten unsichtbar."
 L["Over Absorbs"] = "Über Absorbierungen"

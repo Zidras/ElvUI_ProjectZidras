@@ -1,5 +1,6 @@
 local L = ElvUI[1].Libs.ACL:NewLocale("ElvUI", "esMX")
 
+L["About"] = "Sobre"
 L["About/Help"] = "Acerca de/Ayuda"
 L["Absorbs"] = "Absorciones"
 L["Absorbs Prediction"] = "Predicción de Absorciones"
@@ -26,6 +27,7 @@ L["FAQ_pz_3"] = "|cff30ee30Q: ¿Por qué las capturas de pantalla del diseño en
 L["FAQ_pz_4"] = "|cff30ee30Q: ¿Por qué veo algunos íconos extraños cerca de los nombres de algunas personas en el chat?|r\n|cff9482c9R:|r Esos íconos los proporciona PZ y están asociados con personas que me gustaría resaltar de alguna manera.\nPor ejemplo: |TInterface\\AddOns\\ElvUI_ProjectZidras\\Media\\Textures\\Chat\\Chat_ZidrasLogo:20:20|t es el ícono principal para el equipo de desarrollo de Project Zidras."
 L["FAQ_pz_5"] = "|cff30ee30Q: ¿Cómo puedo ponerme en contacto con usted?|r\n|cff9482c9A:|r Hay canales dedicados para el soporte en mi servidor Discord: https://discord.gg/CyVWDWS."
 L["Focus"] = "Enfoque"
+L["GitHub Link / Report Errors"] = "Enlace de GitHub / Reportar Errores"
 L["Group Units"] = "Unidades de grupo"
 L["Guild Master Icon"] = "Icono de Maestro de Hermandad"
 L["HD-Client"] = "|cffFF0000Advertencia:|r Esto requiere que el cliente HD funcione según lo previsto."
@@ -34,7 +36,9 @@ L["HD-Nameplates_DESC"] = "Aplica barras de fundición ElvUI a las barras de fun
 L["Heal Absorbs"] = "Absorciones de sanación"
 L["Individual Units"] = "Unidades individuales"
 L["LINK_DESC"] = "Los siguientes enlaces lo dirigirán a las páginas del Project Zidras en varios sitios."
+L["Links"] = "Enlaces"
 L["Max Overflow is set to zero. Absorb Overflows will be hidden when using Overflow style.\nIf used together Max Overflow at zero and Overflow mode will act like Normal mode without the ending sliver of overflow."] = true
+L["Modules"] = "Módulos"
 L["Normal"] = true
 L["Options for customizing unit frames. Please don't change these setting when ElvUI's testing frames for bosses and arena teams are shown. That will make them invisible until retoggling."] = "Opciones para personalizar marcos de unidades. No cambie esta configuración cuando se muestren los marcos de prueba de ElvUI para jefes y equipos de arena. Eso los hará invisibles hasta que se reorganicen."
 L["Over Absorbs"] = "Absorciones en exceso"

@@ -1,5 +1,6 @@
 local L = ElvUI[1].Libs.ACL:NewLocale("ElvUI", "frFR")
 
+L["About"] = "À propos de"
 L["About/Help"] = "A propos/Aide"
 L["Absorbs"] = "Absorbtions"
 L["Absorbs Prediction"] = "Absorbtions Prédiction"
@@ -26,6 +27,7 @@ L["FAQ_pz_3"] = "|cff30ee30Q: Pourquoi les captures d'écran de la mise en page 
 L["FAQ_pz_4"] = "|cff30ee30Q: Pourquoi est-ce que je vois des icônes étranges près des noms de certaines personnes dans le chat ?|r\n|cff9482c9A:|r Ces icônes sont fournies par PZ et sont associées à des personnes que je souhaite mettre en évidence de quelque manière que ce soit.\nPar exemple: |TInterface\\AddOns\\ElvUI_ProjectZidras\\Media\\Textures\\Chat\\Chat_ZidrasLogo:20:20|t est l'icône principale pour l'équipe de développement de Project Zidras."
 L["FAQ_pz_5"] = "|cff30ee30Q: Comment puis-je vous contacter ?|r\n|cff9482c9A:|r Il existe des canaux dédiés à l'assistance sur mon serveur Discord : https://discord.gg/CyVWDWS."
 L["Focus"] = "Focalisation"
+L["GitHub Link / Report Errors"] = "Lien GitHub / Report Errors"
 L["Group Units"] = "Groupes d'unités"
 L["Guild Master Icon"] = "Icône du maître de guilde"
 L["HD-Client"] = "|cffFF0000Avertissement:|r Cela nécessite que le client HD fonctionne comme prévu."
@@ -34,7 +36,9 @@ L["HD-Nameplates_DESC"] = "Applique les castbars ElvUI aux castbars de plaque si
 L["Heal Absorbs"] = "Absortion de soin"
 L["Individual Units"] = "Unités individuelles"
 L["LINK_DESC"] = "Les liens suivants vous dirigeront vers les pages du Project Zidras sur divers sites."
+L["Links"] = "Liens"
 L["Max Overflow is set to zero. Absorb Overflows will be hidden when using Overflow style.\nIf used together Max Overflow at zero and Overflow mode will act like Normal mode without the ending sliver of overflow."] = true
+L["Modules"] = "Module"
 L["Normal"] = true
 L["Options for customizing unit frames. Please don't change these setting when ElvUI's testing frames for bosses and arena teams are shown. That will make them invisible until retoggling."] = "Options de personnalisation des cadres unitaires. Veuillez ne pas modifier ces paramètres lorsque les cadres de test d'ElvUI pour les boss et les équipes d'arène sont affichés. Cela les rendra invisibles jusqu'à ce qu'ils soient recalculés."
 L["Over Absorbs"] = "Absorbe l'excès."

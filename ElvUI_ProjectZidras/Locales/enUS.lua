@@ -1,5 +1,6 @@
 local L = ElvUI[1].Libs.ACL:NewLocale("ElvUI", "enUS", true, true)
 
+L["About"] = true
 L["About/Help"] = true
 L["Absorbs"] = true
 L["Absorbs Prediction"] = true
@@ -25,6 +26,7 @@ L["FAQ_pz_2"] = "|cff30ee30Q: Does Project Zidras have the same language policy 
 L["FAQ_pz_3"] = "|cff30ee30Q: Why are the layout's screenshots on download page different from what I see in the game?|r\n|cff9482c9A:|r Because I just forgot to update those."
 L["FAQ_pz_4"] = "|cff30ee30Q: Why do I see some weird icons near some people's names in chat?|r\n|cff9482c9A:|r Those icons are provided by PZ and are associated with people I'd like to highlight in any way.\nFor example: |TInterface\\AddOns\\ElvUI_ProjectZidras\\Media\\Textures\\Chat\\Chat_ZidrasLogo:20:20|t is the main icon for development team of Project Zidras."
 L["FAQ_pz_5"] = "|cff30ee30Q: How can I get in touch with you?|r\n|cff9482c9A:|r There are dedicated channels for support in my Discord server: https://discord.gg/CyVWDWS."
+L["GitHub Link / Report Errors"] = true
 L["Group Units"] = true
 L["Guild Master Icon"] = true
 L["HD-Client"] = "|cffFF0000Warning:|r This requires HD client to work as intended."
@@ -33,7 +35,9 @@ L["HD-Nameplates_DESC"] = "Applies ElvUI castbars to default Blizzard nameplate 
 L["Heal Absorbs"] = true
 L["Individual Units"] = true
 L["LINK_DESC"] = "Following links will direct you to the Project Zidras's pages on various sites."
+L["Links"] = true
 L["Max Overflow is set to zero. Absorb Overflows will be hidden when using Overflow style.\nIf used together Max Overflow at zero and Overflow mode will act like Normal mode without the ending sliver of overflow."] = true
+L["Modules"] = true
 L["Normal"] = true
 L["Options for customizing unit frames. Please don't change these setting when ElvUI's testing frames for bosses and arena teams are shown. That will make them invisible until retoggling."] = true
 L["Over Absorbs"] = true

@@ -1,5 +1,6 @@
 local L = ElvUI[1].Libs.ACL:NewLocale("ElvUI", "koKR")
 
+L["About"] = true
 L["About/Help"] = "정보/도움말"
 L["Absorbs"] = "보호막"
 L["Absorbs Prediction"] = "보호막예측"
@@ -26,6 +27,7 @@ L["FAQ_pz_3"] = "|cff30ee30Q: 다운로드 페이지의 레이아웃 스크린�
 L["FAQ_pz_4"] = "|cff30ee30Q: 채팅에서 일부 사람들의 이름 근처에 이상한 아이콘이 표시되는 이유는 무엇입니까?|r\n|cff9482c9A:|r 이러한 아이콘은 PZ에서 제공하며 어떤 식으로든 강조하고 싶은 사람들과 연결되어 있습니다.\n예: |TInterface\\AddOns\\ElvUI_ProjectZidras\\Media\\Textures\\Chat\\Chat_ZidrasLogo:20:20|t는 Project Zidras 개발 팀의 기본 아이콘입니다."
 L["FAQ_pz_5"] = "|cff30ee30Q: 어떻게 연락할 수 있나요?|r\n|cff9482c9A:|r 내 Discord 서버에 지원을 위한 전용 채널이 있습니다: https://discord.gg/CyVWDWS."
 L["Focus"] = "집중"
+L["GitHub Link / Report Errors"] = "GitHub 링크 / 오류 보고"
 L["Group Units"] = "그룹 단위"
 L["Guild Master Icon"] = "길드장 아이콘"
 L["HD-Client"] = "|cffFF0000경고:|r 이렇게 하려면 HD 클라이언트가 의도한 대로 작동해야 합니다."
@@ -34,7 +36,9 @@ L["HD-Nameplates_DESC"] = "ElvUI 캐스트바를 모든 유닛 및 캐시된 GUI
 L["Heal Absorbs"] = "치유 흡수"
 L["Individual Units"] = "개별 단위"
 L["LINK_DESC"] = "다음 링크는 다양한 사이트의 Project Zidras 페이지로 연결됩니다."
+L["Links"] = "링크"
 L["Max Overflow is set to zero. Absorb Overflows will be hidden when using Overflow style.\nIf used together Max Overflow at zero and Overflow mode will act like Normal mode without the ending sliver of overflow."] = true
+L["Modules"] = "모듈"
 L["Normal"] = "보통"
 L["Options for customizing unit frames. Please don't change these setting when ElvUI's testing frames for bosses and arena teams are shown. That will make them invisible until retoggling."] = "단위 프레임을 사용자 정의하기 위한 옵션입니다. 보스 및 투기장 팀에 대한 ElvUI의 테스트 프레임이 표시될 때 이 설정을 변경하지 마십시오. 그러면 다시 토글할 때까지 보이지 않게 됩니다."
 L["Over Absorbs"] = "오버 흡수"

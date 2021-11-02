@@ -1,5 +1,6 @@
 local L = ElvUI[1].Libs.ACL:NewLocale("ElvUI", "zhCN")
 
+L["About"] = "关于"
 L["About/Help"] = "关于/帮助"
 L["Absorbs"] = "吸收"
 L["Absorbs Prediction"] = "吸收预测"
@@ -25,6 +26,7 @@ L["FAQ_pz_2"] = "|cff30ee30Q: Project Zidras 是否与 ElvUI 具有相同的语�
 L["FAQ_pz_3"] = "|cff30ee30Q: 为什么下载页面的布局截图和我在游戏中看到的不一样？|r\n|cff9482c9A:|r 因为我忘记更新了。"
 L["FAQ_pz_4"] = "|cff30ee30Q: 为什么我在聊天中看到某些人的名字附近有一些奇怪的图标？|r\n|cff9482c9A:|r 这些图标由 PZ 提供，并且与我想以任何方式突出显示的人相关联。\n例如：|TInterface\\AddOns\\ElvUI_ProjectZidras\\Media\\Textures\\Chat\\Chat_ZidrasLogo:20:20|t 是 Project Zidras 开发团队的主要图标。"
 L["FAQ_pz_5"] = "|cff30ee30Q: 我如何与您取得联系？|r\n|cff9482c9A:|r 在我的 Discord 服务器中有专门的支持渠道：https://discord.gg/CyVWDWS。"
+L["GitHub Link / Report Errors"] = "GitHub 链接 / 报告错误"
 L["Group Units"] = "群体单位"
 L["Guild Master Icon"] = "公会大师图标"
 L["HD-Client"] = "|cffFF0000警告：|r 这需要 HD 客户端按预期工作。"
@@ -33,7 +35,9 @@ L["HD-Nameplates_DESC"] = "将 ElvUI castbars 应用于所有单位的默认暴�
 L["Heal Absorbs"] = "治疗吸收盾"
 L["Individual Units"] = "个体单位"
 L["LINK_DESC"] = "以下链接会将您引导至各个站点上的 Project Zidras 页面。"
+L["Links"] = "超链接"
 L["Max Overflow is set to zero. Absorb Overflows will be hidden when using Overflow style.\nIf used together Max Overflow at zero and Overflow mode will act like Normal mode without the ending sliver of overflow."] = true
+L["Modules"] = "模块"
 L["Normal"] = "正常形态"
 L["Options for customizing unit frames. Please don't change these setting when ElvUI's testing frames for bosses and arena teams are shown. That will make them invisible until retoggling."] = "自定义单位框架的选项。 请不要在显示 ElvUI 的 Boss 和竞技场团队测试框架时更改这些设置。 这将使它们不可见，直到重新切换。"
 L["Over Absorbs"] = "过量吸收"
