@@ -118,7 +118,7 @@ local function Update(self, event, unit, absorb)
 	absorb = absorb or SA.UnitTotal(UnitGUID(unit)) or 0
 	local healAbsorb = SA.UnitTotalHealAbsorbs(UnitGUID(unit)) or 0
 	local health, maxHealth = UnitHealth(unit), UnitHealthMax(unit)
-	local otherIncomingHeal = allIncomingHeal - myIncomingHeal
+	local otherIncomingHeal = 0
 	local hasOverHealAbsorb = false
 	local maxOverflowHP = maxHealth * element.maxOverflow
 
