@@ -315,6 +315,10 @@ function ZUF:UpdateHealComm(_, myIncomingHeal, otherIncomingHeal, absorb, _, has
 				end
 			end
 		end
+	elseif db.absorbStyle == "REVERSED" then
+		if absorb > health then
+			absorbBar:SetValue(health)
+		end
 	else
 		if hasOverAbsorb then -- non normal mode overflowing
 			if db.absorbStyle == "WRAPPED" then -- engage backfilling
@@ -337,10 +341,6 @@ function ZUF:UpdateHealComm(_, myIncomingHeal, otherIncomingHeal, absorb, _, has
 			absorbBar:ClearAllPoints()
 			absorbBar:Point(pred.anchor, pred.health)
 			absorbBar:Point(pred.anchor1, pred.otherBarTexture, pred.anchor2)
-		elseif db.absorbStyle == "REVERSED" then
-			if absorb > health then
-				absorbBar:SetValue(health)
-			end
 		end
 	end
 end
