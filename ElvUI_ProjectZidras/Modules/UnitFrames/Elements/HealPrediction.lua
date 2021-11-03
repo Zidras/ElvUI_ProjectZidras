@@ -235,7 +235,7 @@ function ZUF:Configure_HealComm(frame)
 	end
 end
 
-function ZUF:UpdateHealComm(_, _, _, absorb, _, hasOverAbsorb, hasOverHealAbsorb, health, maxHealth)
+function ZUF:UpdateHealComm(_, myIncomingHeal, otherIncomingHeal, absorb, _, hasOverAbsorb, hasOverHealAbsorb, health, maxHealth)
 	local frame = self.frame
 	local db = frame and frame.db and frame.db.healPrediction
 	if not db or not db.absorbStyle or not health then return end
@@ -280,6 +280,10 @@ function ZUF:UpdateHealComm(_, _, _, absorb, _, hasOverAbsorb, hasOverHealAbsorb
 		absorbBar:SetStatusBarColor(absorbColors.absorbs.r, absorbColors.absorbs.g, absorbColors.absorbs.b, absorbColors.absorbs.a)
 	end
 
+	local missingHealthPerc = (maxHealth - health) / maxHealth * 100
+	local healthPostHeal = health + myIncomingHeal + otherIncomingHeal
+	local missingHealthPostHealPerc = (maxHealth - healthPostHeal) / maxHealth * 100
+
 	-- if we are in normal mode and overflowing happens we should let a bit show, like blizzard does
 	if db.absorbStyle == "NORMAL" then
 		if hasOverAbsorb then
@@ -287,12 +291,26 @@ function ZUF:UpdateHealComm(_, _, _, absorb, _, hasOverAbsorb, hasOverHealAbsorb
 				absorbBar:SetValue(1.5)
 				absorbBar:SetMinMaxValues(0, 100)
 			elseif health + absorb > maxHealth then -- workaround to clipframe. Needs work as this will return wrong value if queried. Absorb tag must query SA lib API instead
-				local missingHealthPerc = (maxHealth - health) / maxHealth * 100
 				if missingHealthPerc < 1.5 then
 					absorbBar:SetValue(missingHealthPerc + 1.5)
 					absorbBar:SetMinMaxValues(0, 100)
 				else
 					absorbBar:SetValue(missingHealthPerc)
+					absorbBar:SetMinMaxValues(0, 100)
+				end
+			end
+		end
+	elseif db.absorbStyle == "STACKED" then
+		if hasOverAbsorb then
+			if health == maxHealth then
+				absorbBar:SetValue(1.5)
+				absorbBar:SetMinMaxValues(0, 100)
+			elseif healthPostHeal + absorb > maxHealth then -- workaround to clipframe. Needs work as this will return wrong value if queried. Absorb tag must query SA lib API instead
+				if missingHealthPostHealPerc < 1.5 then
+					absorbBar:SetValue(missingHealthPostHealPerc + 1.5)
+					absorbBar:SetMinMaxValues(0, 100)
+				else
+					absorbBar:SetValue(missingHealthPostHealPerc)
 					absorbBar:SetMinMaxValues(0, 100)
 				end
 			end
