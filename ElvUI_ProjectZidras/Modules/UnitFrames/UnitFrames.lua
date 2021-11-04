@@ -20,6 +20,10 @@ function ZUF:Initialize()
 						ZUF:Configure_HealComm(unitFrame)
 						E:Delay(1, dbUpdater, unitFrame) -- workaround to db being overwritten after configure
 					end
+					if unitFrame.GroupRoleIndicator then
+						unitFrame.GroupRoleIndicator = ZUF:Construct_RoleIcon(unitFrame)
+						ZUF:Configure_RoleIcon(unitFrame)
+					end
 				end
 			end
 		end

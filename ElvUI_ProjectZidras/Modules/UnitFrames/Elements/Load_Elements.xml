@@ -1,4 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="HealPrediction.lua"/>
-	<Script file='Health.lua'/>
+	<Script file="Health.lua"/>
+	<Script file="RoleIcons.lua"/>
 </Ui>

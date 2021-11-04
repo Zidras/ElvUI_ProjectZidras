@@ -8,6 +8,19 @@ local ZUF_AbsorbPrediction = {
 	height = -1
 }
 
+local ZUF_RoleIcon = {
+	enable = true,
+	position = "BOTTOMRIGHT",
+	attachTo = "Health",
+	xOffset = -1,
+	yOffset = 1,
+	size = 15,
+	tank = true,
+	healer = true,
+	damager = true,
+	combatHide = false,
+}
+
 P.pz = {
 	chat = {
 		guildmaster = true,
@@ -49,6 +62,7 @@ P.pz = {
 			},
 			raid40 = {
 				absorbPrediction = CopyTable(ZUF_AbsorbPrediction),
+				roleIcon = CopyTable(ZUF_RoleIcon),
 			},
 			raidpet = {
 				absorbPrediction = CopyTable(ZUF_AbsorbPrediction),

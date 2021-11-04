@@ -80,7 +80,7 @@ A default texture will be applied to the Texture widgets if they don't have a te
 	}
 --]]
 
-local E, L, V, P, G = unpack(ElvUI)
+local E = unpack(ElvUI)
 local oUF = E.oUF
 
 local select = select
