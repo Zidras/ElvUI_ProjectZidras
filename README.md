@@ -20,12 +20,20 @@ Option to add Role (Healer, Tank or Damager) and Guild Master (message sent by y
 ![image](https://user-images.githubusercontent.com/10605951/139589879-7b293771-b9fd-4529-88d2-fc6dd86e7d0a.png)
 ![image](https://user-images.githubusercontent.com/10605951/139590016-d6796a96-a962-44b2-8951-9cf66e0998bc.png)
 
-## 3. Unitframes: Absorb Prediction
+## 3. Unitframes
+### 3.1 Absorb Prediction
 Adds Absorb bars directly into your unitframes. Works in parallel with Heal prediction. Tags for both absorbs and heal prediction were also included.
 
 ![image](https://user-images.githubusercontent.com/10605951/139590349-94f7f4d7-c49d-464a-bdd1-717438a5fe23.png)
 ![image](https://user-images.githubusercontent.com/10605951/139590100-48be98e0-065a-4f20-bc47-56aa26ab9ece.png)
 ![image](https://user-images.githubusercontent.com/10605951/139592806-2db583f8-f2f9-4c2f-9f70-83cd30fa4878.png)
+
+### 3.2 Role Icons
+Adds Role Icons (Healer, Damager, Tank) to all player unitframes: Player, Target, Focus, Arena, Raid-40. Party and Raid were reworked to not depend on RDF roles and their options remained unchanged under ElvUI UnitFrame menu.
+
+![image](https://user-images.githubusercontent.com/10605951/140435721-a0e32151-ab07-4e09-8099-aec5bc708162.png)
+![image](https://user-images.githubusercontent.com/10605951/140436070-6cbd807b-9808-447f-9346-0f99c20c14d4.png)
+![image](https://user-images.githubusercontent.com/10605951/140436140-05272961-20ae-483f-aa6b-53e2af0d9496.png)
 
 
 # How to install and update the addon
