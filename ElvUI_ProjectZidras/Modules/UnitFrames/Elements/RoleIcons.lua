@@ -17,15 +17,10 @@ function ZUF:Construct_RoleIcon(frame)
 	return tex
 end
 
-local roleIconTextures = {
-	TANK = E.Media.Textures.Tank,
-	HEALER = E.Media.Textures.Healer,
-	DAMAGER = E.Media.Textures.DPS
-}
-
 function ZUF:UpdateRoleIcon(event)
 	local lfdrole = self.GroupRoleIndicator
 	if not self.db then return end
+	local pzdb = E.db.pz.unitframe.general.roleIcons
 	local db = self.db.roleIcon
 
 	if not db or not db.enable then
@@ -42,7 +37,7 @@ function ZUF:UpdateRoleIcon(event)
 	local shouldHide = ((event == "PLAYER_REGEN_DISABLED" and db.combatHide and true) or false)
 
 	if (self.isForced or UnitIsConnected(self.unit)) and ((role == "DAMAGER" and db.damager) or (role == "HEALER" and db.healer) or (role == "TANK" and db.tank)) then
-		lfdrole:SetTexture(roleIconTextures[role])
+		lfdrole:SetTexture(PZ.rolePaths[pzdb.icons][role])
 		if not shouldHide then
 			lfdrole:Show()
 		else

@@ -30,6 +30,11 @@ P.pz = {
 		hdNameplates = false,
 	},
 	unitframe = {
+		general = {
+			roleIcons = {
+				icons = "ElvUI",
+			}
+		},
 		colors = {
 			absorbPrediction = {
 				absorbs = {r = 0, g = 1, b = 1, a = 1},
