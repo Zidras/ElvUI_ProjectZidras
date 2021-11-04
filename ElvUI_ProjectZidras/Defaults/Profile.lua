@@ -9,11 +9,11 @@ local ZUF_AbsorbPrediction = {
 }
 
 local ZUF_RoleIcon = {
-	enable = true,
+	enable = false,
 	position = "BOTTOMRIGHT",
 	attachTo = "Health",
-	xOffset = -1,
-	yOffset = 1,
+	xOffset = 0,
+	yOffset = 0,
 	size = 15,
 	tank = true,
 	healer = true,
@@ -46,18 +46,22 @@ P.pz = {
 		units = {
 			player = {
 				absorbPrediction = CopyTable(ZUF_AbsorbPrediction),
+				roleIcon = CopyTable(ZUF_RoleIcon),
 			},
 			target = {
 				absorbPrediction = CopyTable(ZUF_AbsorbPrediction),
+				roleIcon = CopyTable(ZUF_RoleIcon),
 			},
 			focus = {
 				absorbPrediction = CopyTable(ZUF_AbsorbPrediction),
+				roleIcon = CopyTable(ZUF_RoleIcon),
 			},
 			pet = {
 				absorbPrediction = CopyTable(ZUF_AbsorbPrediction),
 			},
 			arena = {
 				absorbPrediction = CopyTable(ZUF_AbsorbPrediction),
+				roleIcon = CopyTable(ZUF_RoleIcon),
 			},
 			party = {
 				absorbPrediction = CopyTable(ZUF_AbsorbPrediction),

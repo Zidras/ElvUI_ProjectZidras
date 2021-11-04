@@ -98,8 +98,8 @@ local function Enable(self)
 		else
 			self:RegisterEvent("PARTY_MEMBERS_CHANGED", Path)
 			self:RegisterEvent("RAID_ROSTER_UPDATE", Path)
-			LGT.RegisterCallback(element, "LibGroupTalents_RoleChange", LGT_RoleChange)
 		end
+		LGT.RegisterCallback(element, "LibGroupTalents_RoleChange", LGT_RoleChange)
 
 		if element:IsObjectType("Texture") and not element:GetTexture() then
 			element:SetTexture([[Interface\LFGFrame\UI-LFG-ICON-PORTRAITROLES]])

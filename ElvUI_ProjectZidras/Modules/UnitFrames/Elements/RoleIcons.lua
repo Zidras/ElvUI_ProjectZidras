@@ -6,6 +6,16 @@ local UF = E:GetModule("UnitFrames")
 
 local random = math.random
 local UnitIsConnected = UnitIsConnected
+local hooksecurefunc = hooksecurefunc
+
+local function dbUpdater(frame)
+	if frame then
+		local unit = frame.unitframeType
+		if unit then
+			frame.db.roleIcon = E.db.pz.unitframe.units[unit].roleIcon
+		end
+	end
+end
 
 function ZUF:Construct_RoleIcon(frame)
 	local tex = frame.RaisedElementParent.TextureParent:CreateTexture(nil, "ARTWORK")
@@ -52,6 +62,10 @@ function ZUF:Configure_RoleIcon(frame)
 	local role = frame.GroupRoleIndicator
 	local db = frame.db
 
+	if not db.roleIcon then
+		dbUpdater(frame)
+	end
+
 	if db.roleIcon.enable then
 		frame:EnableElement("UnitGroupRoleIndicator")
 		local attachPoint = UF:GetObjectAnchorPoint(frame, db.roleIcon.attachTo)
@@ -59,7 +73,6 @@ function ZUF:Configure_RoleIcon(frame)
 		role:ClearAllPoints()
 		role:Point(db.roleIcon.position, attachPoint, db.roleIcon.position, db.roleIcon.xOffset, db.roleIcon.yOffset)
 		role:Size(db.roleIcon.size)
-		role:Hide() -- ugly! the 4 roles were showing on every Button1 frame after login if vacant
 
 		if db.roleIcon.combatHide then
 			E:RegisterEventForObject("PLAYER_REGEN_ENABLED", frame, ZUF.UpdateRoleIcon)
@@ -80,3 +93,34 @@ end
 UF.Construct_RoleIcon = ZUF.Construct_RoleIcon
 UF.UpdateRoleIcon = ZUF.UpdateRoleIcon
 UF.Configure_RoleIcon = ZUF.Configure_RoleIcon
+
+hooksecurefunc(UF, "Update_PlayerFrame", function(_, frame)
+	dbUpdater(frame)
+	if frame and not frame.GroupRoleIndicator then
+		frame.GroupRoleIndicator = ZUF:Construct_RoleIcon(frame)
+	end
+end)
+hooksecurefunc(UF, "Update_TargetFrame", function(_, frame)
+	dbUpdater(frame)
+	if frame and not frame.GroupRoleIndicator then
+		frame.GroupRoleIndicator = ZUF:Construct_RoleIcon(frame)
+	end
+end)
+hooksecurefunc(UF, "Update_FocusFrame", function(_, frame)
+	dbUpdater(frame)
+	if frame and not frame.GroupRoleIndicator then
+		frame.GroupRoleIndicator = ZUF:Construct_RoleIcon(frame)
+	end
+end)
+hooksecurefunc(UF, "Update_ArenaFrames", function(_, frame)
+	dbUpdater(frame)
+	if frame and not frame.GroupRoleIndicator then
+		frame.GroupRoleIndicator = ZUF:Construct_RoleIcon(frame)
+	end
+end)
+hooksecurefunc(UF, "Update_Raid40Frames", function(_, frame)
+	dbUpdater(frame)
+	if frame and not frame.GroupRoleIndicator then
+		frame.GroupRoleIndicator = ZUF:Construct_RoleIcon(frame)
+	end
+end)

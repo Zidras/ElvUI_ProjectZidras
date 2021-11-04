@@ -23,6 +23,11 @@ function ZUF:Initialize()
 					if unitFrame.GroupRoleIndicator then
 						unitFrame.GroupRoleIndicator = ZUF:Construct_RoleIcon(unitFrame)
 						ZUF:Configure_RoleIcon(unitFrame)
+					else
+						if unitFrame.unitframeType == "player" or unitFrame.unitframeType == "target" or unitFrame.unitframeType == "focus" or unitFrame.unitframeType == "arena" then
+							unitFrame.GroupRoleIndicator = ZUF:Construct_RoleIcon(unitFrame)
+							ZUF:Configure_RoleIcon(unitFrame)
+						end
 					end
 				end
 			end
