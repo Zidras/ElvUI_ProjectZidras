@@ -10,23 +10,26 @@ local function dbUpdater(frame)
 		frame.db.healPrediction = E.db.pz.unitframe.units[unit].absorbPrediction
 	end
 end
+
 function ZUF:Initialize()
 	if UF.Initialized then
 		if type(ElvUF) == "table" then
 			if type(ElvUF.objects) == "table" then
 				for _, unitFrame in ipairs(ElvUF.objects) do
-					if unitFrame.HealCommBar then
-						unitFrame.HealCommBar = ZUF:Construct_HealComm(unitFrame)
-						ZUF:Configure_HealComm(unitFrame)
-						E:Delay(1, dbUpdater, unitFrame) -- workaround to db being overwritten after configure
-					end
-					if unitFrame.GroupRoleIndicator then
-						unitFrame.GroupRoleIndicator = ZUF:Construct_RoleIcon(unitFrame)
-						ZUF:Configure_RoleIcon(unitFrame)
-					else
-						if unitFrame.unitframeType == "player" or unitFrame.unitframeType == "target" or unitFrame.unitframeType == "focus" or unitFrame.unitframeType == "arena" then
+					if unitFrame.db then
+						if unitFrame.HealCommBar then
+							unitFrame.HealCommBar = ZUF:Construct_HealComm(unitFrame)
+							ZUF:Configure_HealComm(unitFrame)
+							E:Delay(1, dbUpdater, unitFrame) -- workaround to db being overwritten after configure
+						end
+						if unitFrame.GroupRoleIndicator then
 							unitFrame.GroupRoleIndicator = ZUF:Construct_RoleIcon(unitFrame)
 							ZUF:Configure_RoleIcon(unitFrame)
+						else
+							if unitFrame.unitframeType == "player" or unitFrame.unitframeType == "target" or unitFrame.unitframeType == "focus" or unitFrame.unitframeType == "arena" then
+								unitFrame.GroupRoleIndicator = ZUF:Construct_RoleIcon(unitFrame)
+								ZUF:Configure_RoleIcon(unitFrame)
+							end
 						end
 					end
 				end
