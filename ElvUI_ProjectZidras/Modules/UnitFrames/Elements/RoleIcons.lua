@@ -68,11 +68,11 @@ function ZUF:Configure_RoleIcon(frame)
 
 	if db.roleIcon.enable then
 		frame:EnableElement("UnitGroupRoleIndicator")
-		local attachPoint = UF:GetObjectAnchorPoint(frame, db.roleIcon.attachTo)
+		local attachPoint = UF:GetObjectAnchorPoint(frame, db.roleIcon.attachTo or "Health")
 
 		role:ClearAllPoints()
-		role:Point(db.roleIcon.position, attachPoint, db.roleIcon.position, db.roleIcon.xOffset, db.roleIcon.yOffset)
-		role:Size(db.roleIcon.size)
+		role:Point(db.roleIcon.position or "BOTTOMRIGHT", attachPoint, db.roleIcon.position or "BOTTOMRIGHT", db.roleIcon.xOffset or 0, db.roleIcon.yOffset or 0)
+		role:Size(db.roleIcon.size or 15)
 
 		if db.roleIcon.combatHide then
 			E:RegisterEventForObject("PLAYER_REGEN_ENABLED", frame, ZUF.UpdateRoleIcon)
