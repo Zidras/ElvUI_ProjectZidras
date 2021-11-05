@@ -2,7 +2,7 @@
 -- SpecializedAbsorbs
 ------------------------------------------------------------------------
 
-local MAJOR, MINOR = "SpecializedAbsorbs-1.0", 3
+local MAJOR, MINOR = "SpecializedAbsorbs-1.0", 4
 local lib, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 if not lib then return end
 local Core
@@ -1741,7 +1741,10 @@ end
 
 local function priest_PowerWordShield_Create(srcGUID, srcName, dstGUID, dstName, spellid, destEffects)
 	local _, sp, quality1, sourceScaling, quality2 = UnitStatsAndScaling(srcGUID, 0.1, priest_defaultScaling, 0.1)
-	return floor((sourceScaling[spellid][1] + sp * sourceScaling[spellid][2]) * ZONE_MODIFIER), min(quality1, quality2)
+	sourceScaling[spellid] = sourceScaling[spellid] or priest_defaultScaling[spellid]
+	if sourceScaling[spellid] then
+		return floor((sourceScaling[spellid][1] + sp * sourceScaling[spellid][2]) * ZONE_MODIFIER), min(quality1, quality2)
+	end
 end
 
 local function priest_DivineAegis_Create(srcGUID, srcName, dstGUID, dstName, spellid, destEffects)
