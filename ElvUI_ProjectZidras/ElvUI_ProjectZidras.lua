@@ -42,4 +42,4 @@ function PZ:Initialize()
 	end
 end
 
-E.Libs.EP:HookInitialize(PZ, PZ.Initialize)
+EP:HookInitialize(PZ, PZ.Initialize)
