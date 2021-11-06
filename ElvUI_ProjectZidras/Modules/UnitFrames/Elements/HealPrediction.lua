@@ -1,9 +1,9 @@
-local E, L, V, P, G = unpack(ElvUI)
-
-local ZUF = E:GetModule("ProjectZidras_UnitFrames")
-local PZ = E:GetModule("ProjectZidras")
-local UF = E:GetModule("UnitFrames")
+local PZ, T, E, L, V, P, G = unpack(select(2, ...))
+local ZUF = PZ.UnitFrames
+local UF = E.UnitFrames
 local LSM = E.Libs.LSM
+
+local StatusBarPrototype = T.StatusBarPrototype
 
 function ZUF.HealthClipFrame_HealComm(frame)
 	if frame.HealCommBar then
@@ -45,10 +45,10 @@ function ZUF:Construct_HealComm(frame)
 	local health = frame.Health
 	local parent = health.ClipFrame
 
-	local myBar = PZ.StatusBarPrototype(nil, parent)
-	local otherBar = PZ.StatusBarPrototype(nil, parent)
-	local absorbBar = PZ.StatusBarPrototype(nil, parent)
-	local healAbsorbBar = PZ.StatusBarPrototype(nil, parent)
+	local myBar = StatusBarPrototype(nil, parent)
+	local otherBar = StatusBarPrototype(nil, parent)
+	local absorbBar = StatusBarPrototype(nil, parent)
+	local healAbsorbBar = StatusBarPrototype(nil, parent)
 
 	local prediction = {
 		myBar = myBar,

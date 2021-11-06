@@ -1,7 +1,6 @@
-local E, L, V, P, G = unpack(ElvUI)
-
-local ZNP = E:GetModule("ProjectZidras_NamePlates")
-local NP = E:GetModule("NamePlates")
+local PZ, T, E, L, V, P, G = unpack(select(2, ...))
+local ZNP = PZ.NamePlates
+local NP = E.NamePlates
 
 local abs = math.abs
 

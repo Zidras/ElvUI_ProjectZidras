@@ -1,4 +1,4 @@
-local E, L, V, P, G = unpack(ElvUI)
+local PZ, T, E, L, V, P, G = unpack(select(2, ...))
 
 local ZUF_AbsorbPrediction = {
 	enable = true,

@@ -1,8 +1,7 @@
-local E, L, V, P, G = unpack(ElvUI)
+local PZ, T, E, L, V, P, G = unpack(select(2, ...))
+local ZUF = PZ.UnitFrames
+local UF = E.UnitFrames
 local ElvUF = E.oUF
-
-local ZUF = E:GetModule("ProjectZidras_UnitFrames")
-local UF = E:GetModule("UnitFrames")
 
 local function dbUpdater(frame)
 	if frame then

@@ -1,16 +1,17 @@
-local E, L, V, P, G = unpack(ElvUI)
-
-local ZCH = E:NewModule("ProjectZidras_Chat", "AceEvent-3.0")
-
-local CH = E:GetModule("Chat")
-local PZ = E:GetModule("ProjectZidras")
-
+local PZ, T, E, L, V, P, G = unpack(select(2, ...))
+local ZCH = PZ.Chat
+local CH = E.Chat
 local LGT = LibStub("LibGroupTalents-1.0")
 
 local strsplit, gsub = strsplit, string.gsub
 local wipe = wipe
+
 local IsInGuild, GetNumGuildMembers, GetGuildRosterInfo = IsInGuild, GetNumGuildMembers, GetGuildRosterInfo
 local UnitIsUnit, UnitName = UnitIsUnit, UnitName
+
+local IsInGroup = T.IsInGroup
+local GetUnitRole = T.GetUnitRole
+local UnitIterator = T.UnitIterator
 
 local roleIcons = {
 	TANK = E:TextureString(E.Media.Textures.Tank, ":20:20:0:0:64:64:2:56:2:56"),
@@ -106,18 +107,18 @@ function ZCH:GMIconUpdate()
 end
 
 function ZCH:CheckLFGRoles()
-	if not E.db.pz.chat.lfgIcons or not PZ.IsInGroup() then wipe(lfgRoles) return end
+	if not E.db.pz.chat.lfgIcons or not IsInGroup() then wipe(lfgRoles) return end
 
 	wipe(lfgRoles)
 
-	local playerRole = PZ.GetUnitRole()
+	local playerRole = GetUnitRole()
 	if playerRole then
 		lfgRoles[playerName] = roleIcons[playerRole]
 	end
 
-	for unit, owner in PZ.UnitIterator() do
+	for unit, owner in UnitIterator() do
 		if owner == nil and not UnitIsUnit(unit, "player") then
-			local role = PZ.GetUnitRole(unit)
+			local role = GetUnitRole(unit)
 			local name, realm = UnitName(unit)
 			if realm then
 				realm = strmatch(realm, "%s*(%S+)$")
@@ -135,7 +136,7 @@ function ZCH:ChangeRole(_, _, unit)
 	local name, realm = UnitName(unit)
 	if name then
 		name = (realm and realm ~= "" and name.."-"..realm) or name.."-"..playerRealm
-		lfgRoles[name] = roleIcons[PZ.GetUnitRole(unit)]
+		lfgRoles[name] = roleIcons[GetUnitRole(unit)]
 	end
 end
 

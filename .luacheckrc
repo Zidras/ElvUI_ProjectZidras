@@ -26,7 +26,8 @@ ignore = {
 	"11./BINDING_.*",		-- Setting an undefined (Keybinding header) global variable
 	"111/[A-Z][A-Z0-9_]+",	-- Setting an undefined global variable
 	"113/[A-Z][A-Z0-9_]+",	-- Accessing an undefined global variable (GlobalStrings and Constants 2char+)
-	"211/[E|L|V|P|G]",		-- Unused local variable
+	"211/[T|E|L|V|P|G]",	-- Unused local variable
+	"211/PZ",				-- Unused local variable
 	"212/self",				-- Unused argument
 	"212/this",				-- Unused argument
 }
@@ -66,7 +67,7 @@ globals = {
 	"TexturePoolMixin",
 	"TexturePool_Hide",
 	"TexturePool_HideAndClearAnchors",
-	
+
 	"_G",
 	"bit",
 	"Recount",
