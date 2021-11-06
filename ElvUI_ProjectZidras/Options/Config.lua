@@ -1,7 +1,6 @@
-local E, L, V, P, G = unpack(ElvUI)
-local PZ = E:GetModule("ProjectZidras")
-local ZCH = E:GetModule("ProjectZidras_Chat")
-local UF = E:GetModule("UnitFrames")
+local PZ, T, E, L, V, P, G = unpack(select(2, ...))
+local ZCH = PZ.Chat
+local UF = E.UnitFrames
 local ACH = LibStub("LibAceConfigHelper")
 
 --GLOBALS: unpack, format

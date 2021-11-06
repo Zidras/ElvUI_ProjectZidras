@@ -16,6 +16,7 @@ Libraries\Load_Libraries.xml
 
 ElvUI_ProjectZidras.lua
 
+Core\Load_Core.xml
 Defaults\Load_Defaults.xml
 Modules\Load_Modules.xml
 Options\Load_Options.xml

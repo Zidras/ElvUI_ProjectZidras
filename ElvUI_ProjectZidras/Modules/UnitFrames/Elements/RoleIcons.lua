@@ -1,12 +1,12 @@
-local E, L, V, P, G = unpack(ElvUI)
-
-local ZUF = E:GetModule("ProjectZidras_UnitFrames")
-local PZ = E:GetModule("ProjectZidras")
-local UF = E:GetModule("UnitFrames")
+local PZ, T, E, L, V, P, G = unpack(select(2, ...))
+local ZUF = PZ.UnitFrames
+local UF = E.UnitFrames
 
 local random = math.random
 local UnitIsConnected = UnitIsConnected
 local hooksecurefunc = hooksecurefunc
+
+local GetUnitRole = T.GetUnitRole
 
 local function dbUpdater(frame)
 	if frame then
@@ -38,7 +38,7 @@ function ZUF:UpdateRoleIcon(event)
 		return
 	end
 
-	local role = PZ.GetUnitRole(self.unit)
+	local role = GetUnitRole(self.unit)
 	if self.isForced and role == "NONE" then
 		local rnd = random(1, 3)
 		role = rnd == 1 and "TANK" or (rnd == 2 and "HEALER" or (rnd == 3 and "DAMAGER"))

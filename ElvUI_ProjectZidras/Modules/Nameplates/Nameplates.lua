@@ -1,9 +1,6 @@
-local E, L, V, P, G = unpack(ElvUI)
-
-local PZ = E:GetModule("ProjectZidras")
-local NP = E:GetModule("NamePlates")
-
-local ZNP = E:NewModule("ProjectZidras_NamePlates", "AceEvent-3.0")
+local PZ, T, E, L, V, P, G = unpack(select(2, ...))
+local ZNP = PZ.NamePlates
+local NP = E.NamePlates
 
 local pairs = pairs
 local twipe = table.wipe
@@ -12,6 +9,8 @@ local SetCVar = SetCVar
 local UnitExists = UnitExists
 local UnitGUID = UnitGUID
 local UnitName = UnitName
+
+local UnitIterator = T.UnitIterator
 
 -- GLOBALS: hooksecurefunc
 
@@ -65,7 +64,7 @@ end
 function NP:CacheGroupUnits()
 	twipe(self.FRIENDLY_PLAYER)
 
-	for unit, owner in PZ.UnitIterator() do
+	for unit, owner in UnitIterator() do
 		if owner == nil then -- ignore pets
 			local name = UnitName(unit)
 			local guid = UnitGUID(unit)
@@ -114,7 +113,7 @@ function NP:CacheGroupPetUnits()
 		end
 	end
 
-	for unit, owner in PZ.UnitIterator() do
+	for unit, owner in UnitIterator() do
 		if owner ~= nil then -- ignore players
 			local name = UnitName(unit)
 			local guid = UnitGUID(unit)

@@ -1,10 +1,9 @@
-local E, L, V, P, G = unpack(ElvUI)
-
-local ZUF = E:GetModule("ProjectZidras_UnitFrames")
-local UF = E:GetModule("UnitFrames")
+local PZ, T, E, L, V, P, G = unpack(select(2, ...))
+local ZUF = PZ.UnitFrames
+local UF = E.UnitFrames
 
 function ZUF:Construct_PlayerFrame(frame)
 	frame.HealCommBar = self:Construct_HealComm(frame)
 end
 
-hooksecurefunc (UF, "Construct_PlayerFrame", ZUF.Construct_PlayerFrame)
+hooksecurefunc(UF, "Construct_PlayerFrame", ZUF.Construct_PlayerFrame)

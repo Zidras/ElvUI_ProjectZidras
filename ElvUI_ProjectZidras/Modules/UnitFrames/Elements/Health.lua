@@ -1,7 +1,6 @@
-local E, L, V, P, G = unpack(ElvUI)
-
-local ZUF = E:GetModule("ProjectZidras_UnitFrames")
-local UF = E:GetModule("UnitFrames")
+local PZ, T, E, L, V, P, G = unpack(select(2, ...))
+local ZUF = PZ.UnitFrames
+local UF = E.UnitFrames
 
 function ZUF.HealthClipFrame_OnUpdate(clipFrame)
 	ZUF.HealthClipFrame_HealComm(clipFrame.__frame)
