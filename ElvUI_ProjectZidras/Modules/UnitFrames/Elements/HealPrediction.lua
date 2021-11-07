@@ -50,6 +50,7 @@ function ZUF:Construct_HealComm(frame)
 	local absorbBar = StatusBarPrototype(nil, parent)
 	local healAbsorbBar = StatusBarPrototype(nil, parent)
 	local overAbsorb = parent:CreateTexture(nil, "OVERLAY")
+	local overHealAbsorb = parent:CreateTexture(nil, "OVERLAY")
 
 	local prediction = {
 		myBar = myBar,
@@ -57,6 +58,7 @@ function ZUF:Construct_HealComm(frame)
 		absorbBar = absorbBar,
 		healAbsorbBar = healAbsorbBar,
 		overAbsorb = overAbsorb,
+		overHealAbsorb = overHealAbsorb,
 		PostUpdate = ZUF.UpdateHealComm,
 		maxOverflow = 1,
 		health = health,
@@ -88,6 +90,7 @@ function ZUF:SetSize_HealComm(frame)
 		pred.healAbsorbBar:SetSize(width, barHeight)
 		pred.absorbBar:SetSize(width, barHeight)
 		pred.overAbsorb:SetSize(16, barHeight + 5)
+		pred.overHealAbsorb:SetSize(16, barHeight + 5)
 		pred.parent:SetSize(width * (pred.maxOverflow or 0), height)
 	else
 		local barWidth = db.height or -1 -- this is really width now not height
@@ -98,6 +101,7 @@ function ZUF:SetSize_HealComm(frame)
 		pred.healAbsorbBar:SetSize(barWidth, height)
 		pred.absorbBar:SetSize(barWidth, height)
 		pred.overAbsorb:SetSize(barWidth + 5, 16)
+		pred.overHealAbsorb:SetSize(barWidth + 5, 16)
 		pred.parent:SetSize(width, height * (pred.maxOverflow or 0))
 	end
 end
@@ -120,6 +124,7 @@ function ZUF:Configure_HealComm(frame)
 		local absorbBar = pred.absorbBar
 		local healAbsorbBar = pred.healAbsorbBar
 		local overAbsorb = pred.overAbsorb
+		local overHealAbsorb = pred.overHealAbsorb
 
 		local unit = frame.unitframeType
 		db = E.db.pz.unitframe.units[unit].absorbPrediction
@@ -146,7 +151,7 @@ function ZUF:Configure_HealComm(frame)
 		ZUF:SetTexture_HealComm(pred, UF.db.colors.transparentHealth and E.media.blankTex or healthBarTexture:GetTexture())
 
 		local absorbTexture = LSM:Fetch("statusbar", db.absorbTexture)
-		pred.absorbBar:SetStatusBarTexture(absorbTexture)
+		absorbBar:SetStatusBarTexture(absorbTexture)
 
 		myBar:SetReverseFill(reverseFill)
 		otherBar:SetReverseFill(reverseFill)
@@ -194,6 +199,9 @@ function ZUF:Configure_HealComm(frame)
 			overAbsorb:ClearAllPoints()
 			overAbsorb:Point(p1, health, p2, -7, 0)
 
+			overHealAbsorb:ClearAllPoints()
+			overHealAbsorb:Point(p2, health, p1, 7, 0)
+
 			parent:ClearAllPoints()
 			parent:Point(p1, health, p1)
 
@@ -231,6 +239,10 @@ function ZUF:Configure_HealComm(frame)
 			overAbsorb:Point(p1, health, p2, 0, -7)
 			overAbsorb:SetTexCoord(1, 0, 0, 0, 1, 1, 0, 1)
 
+			overHealAbsorb:ClearAllPoints()
+			overHealAbsorb:Point(p2, health, p1, 0, 7)
+			overHealAbsorb:SetTexCoord(1, 0, 0, 0, 1, 1, 0, 1)
+
 			parent:ClearAllPoints()
 			parent:Point(p1, health, p1)
 
@@ -255,7 +267,6 @@ function ZUF:UpdateHealComm(_, myIncomingHeal, otherIncomingHeal, absorb, _, has
 	local pred = frame.HealCommBar
 	local healAbsorbBar = pred.healAbsorbBar
 	local absorbBar = pred.absorbBar
-	local overAbsorb = pred.overAbsorb
 
 	if not pred.anchor then
 		ZUF:Configure_HealComm(frame) -- workaround to db.enable returning false for some reason on configure_HealComm initial run
@@ -270,6 +281,9 @@ function ZUF:UpdateHealComm(_, myIncomingHeal, otherIncomingHeal, absorb, _, has
 		return
 	end
 
+	local missingHealth = maxHealth - health
+	local healthPostHeal = health + myIncomingHeal + otherIncomingHeal
+
 	-- handle over heal absorbs
 	healAbsorbBar:ClearAllPoints()
 	healAbsorbBar:Point(pred.anchor, frame.Health)
@@ -280,6 +294,7 @@ function ZUF:UpdateHealComm(_, myIncomingHeal, otherIncomingHeal, absorb, _, has
 		healAbsorbBar:SetReverseFill(pred.reverseFill)
 		healAbsorbBar:Point(pred.anchor1, pred.healthBarTexture, pred.anchor2)
 		healAbsorbBar:SetStatusBarColor(absorbColors.overhealabsorbs.r, absorbColors.overhealabsorbs.g, absorbColors.overhealabsorbs.b, absorbColors.overhealabsorbs.a)
+		healAbsorbBar:SetValue(missingHealth) -- workaround to clipframe.
 	else -- otherwise just let it backfill so that we know how much is being stolen
 		healAbsorbBar:SetReverseFill(not pred.reverseFill)
 		healAbsorbBar:Point(pred.anchor2, pred.healthBarTexture, pred.anchor2)
@@ -289,48 +304,31 @@ function ZUF:UpdateHealComm(_, myIncomingHeal, otherIncomingHeal, absorb, _, has
 	-- color absorb bar if in over state
 	if hasOverAbsorb then
 		absorbBar:SetStatusBarColor(absorbColors.overabsorbs.r, absorbColors.overabsorbs.g, absorbColors.overabsorbs.b, absorbColors.overabsorbs.a)
-		overAbsorb:Show()
 	else
 		absorbBar:SetStatusBarColor(absorbColors.absorbs.r, absorbColors.absorbs.g, absorbColors.absorbs.b, absorbColors.absorbs.a)
-		overAbsorb:Hide()
 	end
-
-	local missingHealthPerc = (maxHealth - health) / maxHealth * 100
-	local healthPostHeal = health + myIncomingHeal + otherIncomingHeal
-	local missingHealthPostHealPerc = (maxHealth - healthPostHeal) / maxHealth * 100
 
 	-- if we are in normal mode and overflowing happens we should let a bit show, like blizzard does
 	if db.absorbStyle == "NORMAL" then
 		if hasOverAbsorb then
 			if health == maxHealth then
 				absorbBar:SetValue(0)
-			elseif health + absorb > maxHealth then -- workaround to clipframe. Needs work as this will return wrong value if queried. Absorb tag must query SA lib API instead
-				if missingHealthPerc < 1.5 then
-					absorbBar:SetValue(missingHealthPerc)
-					absorbBar:SetMinMaxValues(0, 100)
-				else
-					absorbBar:SetValue(missingHealthPerc)
-					absorbBar:SetMinMaxValues(0, 100)
-				end
+			elseif health + absorb > maxHealth then -- workaround to clipframe
+				absorbBar:SetValue(missingHealth)
 			end
 		end
 	elseif db.absorbStyle == "STACKED" then
 		if hasOverAbsorb then
 			if health == maxHealth then
 				absorbBar:SetValue(0)
-			elseif healthPostHeal + absorb > maxHealth then -- workaround to clipframe. Needs work as this will return wrong value if queried. Absorb tag must query SA lib API instead
-				if missingHealthPostHealPerc < 1.5 then
-					absorbBar:SetValue(missingHealthPostHealPerc)
-					absorbBar:SetMinMaxValues(0, 100)
-				else
-					absorbBar:SetValue(missingHealthPostHealPerc)
-					absorbBar:SetMinMaxValues(0, 100)
-				end
+			elseif healthPostHeal + absorb > maxHealth then -- workaround to clipframe
+				absorbBar:SetValue(maxHealth - healthPostHeal)
 			end
 		end
 	elseif db.absorbStyle == "REVERSED" then
 		if absorb > health then
 			absorbBar:SetValue(health)
+			healAbsorbBar:SetValue(health)
 		end
 	else
 		if hasOverAbsorb then -- non normal mode overflowing
