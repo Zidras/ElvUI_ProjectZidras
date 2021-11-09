@@ -13,6 +13,7 @@
 
 Locales\Load_Locales.xml
 Libraries\Load_Libraries.xml
+Media\Load_Media.xml
 
 ElvUI_ProjectZidras.lua
 

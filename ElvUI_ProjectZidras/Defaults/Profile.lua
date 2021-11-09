@@ -5,6 +5,7 @@ local ZUF_AbsorbPrediction = {
 	absorbStyle = "REVERSED",
 	anchorPoint = "BOTTOM",
 	absorbTexture = "ElvUI Norm",
+	absorbOverlay = "None",
 	height = -1
 }
 
