@@ -172,6 +172,22 @@ function ZNP:COMBAT_LOG_EVENT_UNFILTERED(_, _, event, sourceGUID, sourceName, _,
 	end
 end
 
+-- NP:SetTargetFrame() PostHook start
+-- Adding Title/Rank to Target Nameplate
+local original_SetTargetFrame = NP.SetTargetFrame
+function NP:SetTargetFrame(...)
+    local frame = ...
+    if not frame.isTarget then
+        if E.db.pz.nameplates.titlesNameplates then -- only if enabled
+            if UnitIsPlayer("target") then
+                frame.UnitName = UnitPVPName("target")
+            end
+        end
+    end
+    original_SetTargetFrame(self,...)
+end
+-- NP:SetTargetFrame() PostHook end
+
 function ZNP:Initialize()
 	if not E.db.pz.nameplates.hdClient.hdNameplates then return end -- Tags theoretically don't need HD client/nameplates, but since HD nameplates overwrite NP functions, refactoring this would be too high effort for low reward.
 
