@@ -48,7 +48,7 @@ local function NamePlatesOptions()
 	local config = ACH:Group(L["NamePlates"], nil, 2, nil, function(info) return E.db.pz.nameplates[info[#info]] end)
 	config.args.header = ACH:Header(L["NamePlates"], 0)
 	config.args.hdClient = ACH:Description(L["HD-Client"], 1)
-	config.args.hdNameplates = ACH:Toggle(L["HD-Nameplates"], L["HD-Nameplates_DESC"], 2, nil, nil, nil, nil, function(info, value) E.db.pz.nameplates[info[#info]] = value E:StaticPopup_Show("PRIVATE_RL") end)
+	config.args.hdNameplates = ACH:Toggle(L["HD-Nameplates"], L["HD-Nameplates_DESC"], 2, nil, nil, 100, nil, function(info, value) E.db.pz.nameplates[info[#info]] = value E:StaticPopup_Show("PRIVATE_RL") end)
 
 	return config
 end
@@ -65,7 +65,7 @@ local function GetOptionsTable_AbsorbPrediction(updateFunc, groupName, numGroup,
 	config.args.warning = ACH:Description(function()
 				if UF.db.colors.healPrediction.maxOverflow == 0 then
 					local text = L["Max Overflow is set to zero. Absorb Overflows will be hidden when using Overflow style.\nIf used together Max Overflow at zero and Overflow mode will act like Normal mode without the ending sliver of overflow."]
-					return text .. (E.db.pz.unitframe.units[groupName].absorbPrediction.absorbStyle == "OVERFLOW" and " |cffFF9933You are using Overflow with Max Overflow at zero.|r " or "")
+					return text .. (E.db.pz.unitframe.units[groupName].absorbPrediction.absorbStyle == "OVERFLOW" and (" |cffFF9933" .. L["You are using Overflow with Max Overflow at zero."] .. "|r ") or "")
 				end
 			end, 50, "medium", nil, nil, nil, nil, "full")
 
@@ -110,7 +110,7 @@ local function UnitFramesOptions()
 	config.args.general.args.roleIcons.args.icons = ACH:Select(L["LFG Icons"], nil, 2, RoleIconValues)
 
 	config.args.colors = ACH:Group(L["COLORS"], nil, 2, "tree", function(info) return E.db.pz.unitframe.colors[info[#info]] end, function(info, value) E.db.pz.unitframe.colors[info[#info]] = value UF:Update_AllFrames() end, function() return not E.UnitFrames.Initialized end)
-	config.args.colors.args.absorbPrediction = ACH:Group(L["Absorb Prediction"], nil, 1, nil, function(info)
+	config.args.colors.args.absorbPrediction = ACH:Group(L["Absorbs Prediction"], nil, 1, nil, function(info)
 		if info.type == "color" then
 			local t, d = E.db.pz.unitframe.colors.absorbPrediction[info[#info]], P.pz.unitframe.colors.absorbPrediction[info[#info]]
 			return t.r, t.g, t.b, t.a, d.r, d.g, d.b, d.a
