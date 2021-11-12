@@ -12,7 +12,8 @@ L["ELVUI_PZ_CODERS"] = [[Apollyon
 Loaal
 Inmortalz
 Empress
-Kader]]
+Kader
+Alchem1ster]]
 
 local roleValues = {}
 
