@@ -13,7 +13,6 @@ L["Displays only personal incoming heals"] = "Affiche uniquement les soins entra
 L["Displays the amount of absorbs"] = "Affiche la quantité d'absorbe"
 L["Donators"] = "Donateurs"
 L["ELVUI_PZ_CREDITS"] = "Je voudrais signaler les personnes suivantes pour m'avoir aidé à créer cet addon en testant, en codant et en d'autres choses."
-L["ELVUI_PZ_DONORS"] = "Inmortalz"
 L["ELVUI_PZ_DONORS_TITLE"] = "Merci à ces personnes formidables de soutenir mon travail via des dons :"
 L["FAQ_DESC"] = "Cette section contient quelques questions sur ElvUI et le projet Zidras."
 L["FAQ_Elv_1"] = "|cff30ee30Q: Où puis-je obtenir le support ElvUI?|r\n|cff9482c9A:|r Le meilleur moyen serait ElvUI - Backport discord - https://discord.gg/UXSc7nt\nPour signaler un bogue, vous pouvez utiliser le problème tracker situé à https://github.com/ElvUI-WotLK/ElvUI/issues.\nL'anglais devrait être la langue choisie, cependant, si vous êtes russe, il est fortement recommandé de l'écrire (également) en russe pour mieux transmettre votre message à nos développeurs russes."

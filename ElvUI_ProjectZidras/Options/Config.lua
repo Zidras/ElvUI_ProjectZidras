@@ -8,6 +8,9 @@ local format = string.format
 local wipe = wipe
 
 --* Leave here as there is no need for translation
+L["ELVUI_PZ_DONORS"] = [[Inmortalz
+Volke]]
+
 L["ELVUI_PZ_CODERS"] = [[Apollyon
 Loaal
 Inmortalz

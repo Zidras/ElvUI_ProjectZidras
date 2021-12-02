@@ -13,7 +13,6 @@ L["Displays only personal incoming heals"] = "Zeigt nur persönliche eingehende 
 L["Displays the amount of absorbs"] = "Zeigt die Menge der absorbierten an"
 L["Donators"] = "Spender"
 L["ELVUI_PZ_CREDITS"] = "Ich möchte die folgenden Leute hervorheben, die mir beim Erstellen dieses Addons durch Testen, Codieren und andere Dinge geholfen haben."
-L["ELVUI_PZ_DONORS"] = "Inmortalz"
 L["ELVUI_PZ_DONORS_TITLE"] = "Danke an diese tollen Menschen, die meine Arbeit durch Spenden unterstützen:"
 L["FAQ_DESC"] = "Dieser Abschnitt enthält einige Fragen zu ElvUI und Project Zidras."
 L["FAQ_Elv_1"] = "|cff30ee30Q: Wo bekomme ich ElvUI-Unterstützung?|r\n|cff9482c9A:|r Der beste Weg wäre die ElvUI - Backport Discord - https://discord.gg/UXSc7nt\nUm einen Fehler zu melden, können Sie das Problem verwenden Tracker befindet sich unter https://github.com/ElvUI-WotLK/ElvUI/issues.\nEnglisch sollte die gewählte Sprache sein. Wenn Sie jedoch Russisch sind, wird dringend empfohlen, dass Sie es (auch) auf Russisch schreiben, um es besser zu vermitteln Ihre Nachricht an unsere russischen Entwickler."
