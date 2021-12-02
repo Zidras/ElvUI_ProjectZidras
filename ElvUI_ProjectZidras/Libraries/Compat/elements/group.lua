@@ -117,8 +117,8 @@ do
 	end
 end
 
-function Compat.IsGroupDead(incPets)
-	for unit in Compat.UnitIterator(not incPets) do
+function Compat.IsGroupDead()
+	for unit in Compat.UnitIterator(true) do
 		if not UnitIsDeadOrGhost(unit) then
 			return false
 		end
@@ -126,8 +126,8 @@ function Compat.IsGroupDead(incPets)
 	return true
 end
 
-function Compat.IsGroupInCombat(incPets)
-	for unit in Compat.UnitIterator(not incPets) do
+function Compat.IsGroupInCombat()
+	for unit in Compat.UnitIterator() do
 		if UnitAffectingCombat(unit) then
 			return true
 		end
