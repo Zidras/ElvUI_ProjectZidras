@@ -28,6 +28,7 @@ P.pz = {
 	},
 	nameplates = {
 		hdNameplates = false,
+        titlesNameplates = false,
 	},
 	unitframe = {
 		general = {

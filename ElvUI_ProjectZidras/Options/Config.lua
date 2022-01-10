@@ -54,6 +54,7 @@ local function NamePlatesOptions()
 	config.args.header = ACH:Header(L["NamePlates"], 0)
 	config.args.hdClient = ACH:Description(L["HD-Client"], 1)
 	config.args.hdNameplates = ACH:Toggle(L["HD-Nameplates"], L["HD-Nameplates_DESC"], 2, nil, nil, 100, nil, function(info, value) E.db.pz.nameplates[info[#info]] = value E:StaticPopup_Show("PRIVATE_RL") end)
+	config.args.titlesNameplates = ACH:Toggle(L["Title/Rank in target nameplate"], L["Show title or PvP rank in target nameplate"], 3, nil, nil, 100, nil, function(info, value) E.db.pz.nameplates[info[#info]] = value end)
 
 	return config
 end
