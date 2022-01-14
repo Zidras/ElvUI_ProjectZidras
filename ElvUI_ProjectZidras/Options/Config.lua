@@ -40,6 +40,8 @@ local attachToValues = {
 	Frame = L["Frame"],
 }
 
+local HDClientIcon = [[|TInterface\AddOns\ElvUI_ProjectZidras\Media\Textures\HDClient.tga:20:20|t ]]
+
 local function ChatOptions()
 	local config = ACH:Group(L["Chat"], nil, 1, nil, function(info) return E.db.pz.chat[info[#info]] end)
 	config.args.header = ACH:Header(L["Chat"], 0)
@@ -52,8 +54,8 @@ end
 local function NamePlatesOptions()
 	local config = ACH:Group(L["NamePlates"], nil, 2, nil, function(info) return E.db.pz.nameplates[info[#info]] end)
 	config.args.header = ACH:Header(L["NamePlates"], 0)
-	config.args.hdClient = ACH:Description(L["HD-Client"], 1)
-	config.args.hdNameplates = ACH:Toggle(L["HD-Nameplates"], L["HD-Nameplates_DESC"], 2, nil, nil, 100, nil, function(info, value) E.db.pz.nameplates[info[#info]] = value E:StaticPopup_Show("PRIVATE_RL") end)
+	config.args.hdClient = ACH:Description(HDClientIcon..L["HD-Client"], 1)
+	config.args.hdNameplates = ACH:Toggle(HDClientIcon..L["HD-Nameplates"], L["HD-Nameplates_DESC"], 2, nil, nil, 100, nil, function(info, value) E.db.pz.nameplates[info[#info]] = value E:StaticPopup_Show("PRIVATE_RL") end)
 
 	return config
 end
