@@ -1,12 +1,17 @@
+<div align="center">
+
+![ProjectZidras logo outline](https://user-images.githubusercontent.com/10605951/150194385-5b7347dc-dbdf-4750-ae39-30d1b2fb5cb3.png)
+
 [![Game Version](https://img.shields.io/badge/wow-3.3.5-blue.svg)](https://github.com/Zidras/ElvUI_ProjectZidras)
 [![Twitch](https://img.shields.io/twitch/status/the_zidras?style=social)](https://www.twitch.tv/the_zidras)
 [![Discord](https://img.shields.io/discord/598993375479463946.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/CyVWDWS)
 [![PayPal](https://img.shields.io/endpoint?url=https://www.stormfx.com/img/svg/paypal.json)](https://paypal.me/zidras)
 
-
-# ElvUI-ProjectZidras for WOTLK (3.3.5a)
+# Project Zidras for WOTLK (3.3.5a)
 Plugin for ElvUI that aims to add and improve features of the addon.
 ![image](https://user-images.githubusercontent.com/10605951/139590485-fa6bc8a6-2eb0-46a8-b141-2662b6f41690.png)
+
+</div>
 
 # Feature list
 ## 1. Nameplates castbars
