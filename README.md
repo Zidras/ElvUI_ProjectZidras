@@ -1,6 +1,6 @@
 <div align="center">
 
-![ProjectZidras logo outline](https://user-images.githubusercontent.com/10605951/150194385-5b7347dc-dbdf-4750-ae39-30d1b2fb5cb3.png)
+<img src="https://user-images.githubusercontent.com/10605951/150194385-5b7347dc-dbdf-4750-ae39-30d1b2fb5cb3.png" width=50% height=50%>
 
 [![Game Version](https://img.shields.io/badge/wow-3.3.5-blue.svg)](https://github.com/Zidras/ElvUI_ProjectZidras)
 [![Twitch](https://img.shields.io/twitch/status/the_zidras?style=social)](https://www.twitch.tv/the_zidras)
