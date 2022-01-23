@@ -176,15 +176,15 @@ end
 -- Adding Title/Rank to Target Nameplate
 local original_SetTargetFrame = NP.SetTargetFrame
 function NP:SetTargetFrame(...)
-    local frame = ...
-    if not frame.isTarget then
-        if E.db.pz.nameplates.titlesNameplates then -- only if enabled
-            if UnitIsPlayer("target") then
-                frame.UnitName = UnitPVPName("target")
-            end
-        end
-    end
-    original_SetTargetFrame(self,...)
+	local frame = ...
+	if not frame.isTarget then
+		if E.db.pz.nameplates.titlesNameplates then -- only if enabled
+			if UnitIsPlayer("target") then
+				frame.UnitName = UnitPVPName("target")
+			end
+		end
+	end
+	original_SetTargetFrame(self,...)
 end
 -- NP:SetTargetFrame() PostHook end
 
