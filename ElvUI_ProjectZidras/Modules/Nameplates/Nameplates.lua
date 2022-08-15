@@ -179,7 +179,7 @@ function ZNP:Initialize()
 
 	hooksecurefunc(NP, "OnCreated", function(this, frame)
 		local CastBar = frame.UnitFrame.oldCastBar
-		CastBar.Icon:SetParent(E.HiddenFrame)
+--		CastBar.Icon:SetParent(E.HiddenFrame) -- Hide the original castbar icon. Commented out and moved to OnValueChanged :Hide()
 
 		CastBar:HookScript("OnShow", ZNP.Update_CastBarOnShow)
 		CastBar:HookScript("OnHide", ZNP.Update_CastBarOnHide)
