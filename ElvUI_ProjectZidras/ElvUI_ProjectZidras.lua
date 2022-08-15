@@ -30,7 +30,7 @@ _G[AddOnName] = Engine
 
 -- List of Modules
 PZ.Chat = E:NewModule("ProjectZidras_Chat", "AceEvent-3.0")
-PZ.NamePlates = E:NewModule("ProjectZidras_NamePlates", "AceEvent-3.0")
+PZ.NamePlates = E:NewModule("ProjectZidras_NamePlates", "AceEvent-3.0", "AceHook-3.0")
 PZ.UnitFrames = E:NewModule("ProjectZidras_UnitFrames")
 
 function PZ:Initialize()
