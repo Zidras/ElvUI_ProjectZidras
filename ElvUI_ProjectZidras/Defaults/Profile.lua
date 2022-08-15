@@ -27,7 +27,21 @@ P.pz = {
 		lfgIcons = true,
 	},
 	nameplates = {
-		hdNameplates = false,
+		hdClient = {
+			hdNameplates = false,
+		},
+		tags = {
+			guid = {
+				enable = false,
+				position = "BOTTOM",
+				parent = "Health",
+				font = "PT Sans Narrow",
+				fontSize = 12,
+				fontOutline = "OUTLINE",
+				xOffset = 0,
+				yOffset = 0,
+			},
+		}
 	},
 	unitframe = {
 		general = {

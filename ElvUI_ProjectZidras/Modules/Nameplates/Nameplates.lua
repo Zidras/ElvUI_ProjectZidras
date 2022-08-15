@@ -173,7 +173,7 @@ function ZNP:COMBAT_LOG_EVENT_UNFILTERED(_, _, event, sourceGUID, sourceName, _,
 end
 
 function ZNP:Initialize()
-	if not E.db.pz.nameplates.hdNameplates then return end
+	if not E.db.pz.nameplates.hdClient.hdNameplates then return end -- Tags theoretically don't need HD client/nameplates, but since HD nameplates overwrite NP functions, refactoring this would be too high effort for low reward.
 
 	NP.Update_CastBar = ZNP.Update_CastBar
 
@@ -186,6 +186,22 @@ function ZNP:Initialize()
 		CastBar:HookScript("OnValueChanged", ZNP.Update_CastBarOnValueChanged)
 
 		frame.UnitFrame.CastBar:SetScript("OnUpdate", nil)
+	end)
+
+	hooksecurefunc(NP, "OnShow", function(np)
+		local frame = np.UnitFrame
+		if not frame.tagGUID then
+			frame.tagGUID = ZNP:Construct_tagGUID(frame) -- this is running here and not OnCreated due to a bug on ElvUI funtion runtime: UpdateElement_All finishes before OnShow, which finishes before OnCreated, so hooking them both is not possible unless I'd full replace OnCreated
+		end
+		ZNP:Configure_tagGUID(frame)
+		ZNP:Update_tagGUID(frame)
+	end)
+
+	hooksecurefunc(NP, "OnHide", function(np)
+		local frame = np.UnitFrame
+		if frame.tagGUID then
+			frame.tagGUID:SetText()
+		end
 	end)
 
 	NP.OnEvent = function(this, event, unit, ...)
@@ -215,6 +231,111 @@ function ZNP:Initialize()
 		frame.isEventsRegistered = nil
 	end
 
+	-- Couldn't find an efficient workaround to the UpdateElement_All finishing before OnShow/OnCreated, and hooking SetTargetFrame is onUpdate, so I am overwriting NP SetTargetFrame instead, to properly place the Update_tagGUID so it only runs once
+	local hasTarget
+	hooksecurefunc(NP, "PLAYER_TARGET_CHANGED", function()
+		hasTarget = UnitExists("target") == 1
+	end)
+	NP.SetTargetFrame = function(this, frame)
+		if hasTarget and frame.alpha == 1 then
+			if not frame.isTarget then
+				frame.isTarget = true
+
+				this:SetPlateFrameLevel(frame, this:GetPlateFrameLevel(frame), true)
+
+				if this.db.useTargetScale then
+					this:SetFrameScale(frame, (frame.ThreatScale or 1) * this.db.targetScale)
+				end
+
+				if not frame.isGroupUnit then
+					frame.unit = "target"
+					frame.guid = UnitGUID("target")
+					ZNP:Update_tagGUID(frame)
+
+
+					this:RegisterEvents(frame)
+				end
+
+				this:UpdateElement_Auras(frame)
+
+				if not this.db.units[frame.UnitType].health.enable and this.db.alwaysShowTargetHealth then
+					frame.Health.r, frame.Health.g, frame.Health.b = nil, nil, nil
+
+					this:Configure_HealthBar(frame)
+					this:Configure_CastBar(frame)
+					this:Configure_Elite(frame)
+					this:Configure_CPoints(frame)
+
+					this:RegisterEvents(frame)
+
+					this:UpdateElement_All(frame, true)
+				end
+
+				NP:PlateFade(frame, NP.db.fadeIn and 1 or 0, frame:GetAlpha(), 1)
+
+				this:Update_Highlight(frame)
+				this:Update_CPoints(frame)
+				this:StyleFilterUpdate(frame, "PLAYER_TARGET_CHANGED")
+				this:ForEachVisiblePlate("ResetNameplateFrameLevel") --keep this after `StyleFilterUpdate`
+			end
+		elseif frame.isTarget then
+			frame.isTarget = nil
+
+			this:SetPlateFrameLevel(frame, this:GetPlateFrameLevel(frame))
+
+			if this.db.useTargetScale then
+				this:SetFrameScale(frame, (frame.ThreatScale or 1))
+			end
+
+			if not frame.isGroupUnit then
+				frame.unit = nil
+
+				if frame.isEventsRegistered then
+					this:UnregisterAllEvents(frame)
+					this:Update_CastBar(frame)
+				end
+			end
+
+			if not this.db.units[frame.UnitType].health.enable then
+				this:UpdateAllFrame(frame, nil, true)
+			end
+
+			this:Update_CPoints(frame)
+
+			if not frame.AlphaChanged then
+				if hasTarget then
+					NP:PlateFade(frame, NP.db.fadeIn and 1 or 0, frame:GetAlpha(), this.db.nonTargetTransparency)
+				else
+					NP:PlateFade(frame, NP.db.fadeIn and 1 or 0, frame:GetAlpha(), 1)
+				end
+			end
+
+			this:StyleFilterUpdate(frame, "PLAYER_TARGET_CHANGED")
+			this:ForEachVisiblePlate("ResetNameplateFrameLevel") --keep this after `StyleFilterUpdate`
+		else
+			if hasTarget and not frame.isAlphaChanged then
+				frame.isAlphaChanged = true
+
+				if not frame.AlphaChanged then
+					NP:PlateFade(frame, NP.db.fadeIn and 1 or 0, frame:GetAlpha(), this.db.nonTargetTransparency)
+				end
+
+				this:StyleFilterUpdate(frame, "PLAYER_TARGET_CHANGED")
+			elseif not hasTarget and frame.isAlphaChanged then
+				frame.isAlphaChanged = nil
+
+				if not frame.AlphaChanged then
+					NP:PlateFade(frame, NP.db.fadeIn and 1 or 0, frame:GetAlpha(), 1)
+				end
+
+				this:StyleFilterUpdate(frame, "PLAYER_TARGET_CHANGED")
+			end
+		end
+
+		this:Configure_Glow(frame)
+		this:Update_Glow(frame)
+	end
+
 	NP.SetMouseoverFrame = function(this, frame)
 		if frame.oldHighlight:IsShown() then
 			if not frame.isMouseover then
@@ -225,6 +346,7 @@ function ZNP:Initialize()
 				if not frame.isGroupUnit then
 					frame.unit = "mouseover"
 					frame.guid = UnitGUID("mouseover")
+					ZNP:Update_tagGUID(frame)
 
 					NP:Update_CastBar(frame, nil, frame.unit)
 				end

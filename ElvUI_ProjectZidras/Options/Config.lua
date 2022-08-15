@@ -1,6 +1,7 @@
 local PZ, T, E, L, V, P, G = unpack(select(2, ...))
 local ZCH = PZ.Chat
 local UF = E.UnitFrames
+local NP = E.NamePlates
 local ACH = LibStub("LibAceConfigHelper")
 
 --GLOBALS: unpack, format
@@ -43,7 +44,7 @@ local attachToValues = {
 local HDClientIcon = [[|TInterface\AddOns\ElvUI_ProjectZidras\Media\Textures\HDClient.tga:20:20|t ]]
 
 local function ChatOptions()
-	local config = ACH:Group(L["Chat"], nil, 1, nil, function(info) return E.db.pz.chat[info[#info]] end)
+	local config = ACH:Group(L["Chat"], nil, 1, "tab", function(info) return E.db.pz.chat[info[#info]] end)
 	config.args.header = ACH:Header(L["Chat"], 0)
 	config.args.guildmaster = ACH:Toggle(L["Guild Master Icon"], L["Displays an icon near your Guild Master in chat.\n\n|cffFF0000Note:|r Some messages in chat history may disappear on login."], 1, nil, nil, nil, nil, function(self, value)	E.db.pz.chat.guildmaster = value ZCH:GMIconUpdate()	end)
 	config.args.lfgIcons = ACH:Toggle(L["Role Icon"], L["Display LFG Icons in chat."], 2, nil, nil, nil, nil, function(self, value)	E.db.pz.chat.lfgIcons = value ZCH:CheckLFGRoles() end)
@@ -52,10 +53,24 @@ local function ChatOptions()
 end
 
 local function NamePlatesOptions()
-	local config = ACH:Group(L["NamePlates"], nil, 2, nil, function(info) return E.db.pz.nameplates[info[#info]] end)
-	config.args.header = ACH:Header(L["NamePlates"], 0)
-	config.args.hdClient = ACH:Description(HDClientIcon..L["HD-Client"], 1)
-	config.args.hdNameplates = ACH:Toggle(HDClientIcon..L["HD-Nameplates"], L["HD-Nameplates_DESC"], 2, nil, nil, 100, nil, function(info, value) E.db.pz.nameplates[info[#info]] = value E:StaticPopup_Show("PRIVATE_RL") end)
+	local config = ACH:Group(L["NamePlates"], nil, 2, "tab", function(info) return E.db.pz.nameplates[info[#info]] end, function(info, value) E.db.pz.nameplates[info[#info]] = value NP:ConfigureAll() end)
+	config.args.hdClient = ACH:Group(HDClientIcon.."HD-Client", nil, 1, "tab", function(info) return E.db.pz.nameplates.hdClient[info[#info]] end, function(info, value) E.db.pz.nameplates.hdClient[info[#info]] = value end)
+	config.args.hdClient.args.hdClientdesc = ACH:Description(L["HD-Client"], 1)
+	config.args.hdClient.args.hdNameplates = ACH:Toggle(HDClientIcon..L["HD-Nameplates"], L["HD-Nameplates_DESC"], 2, nil, nil, 100, nil, function(info, value) E.db.pz.nameplates.hdClient[info[#info]] = value E:StaticPopup_Show("PRIVATE_RL") end)
+
+	config.args.tags = ACH:Group("Tags", nil, 2, "tree", function(info) return E.db.pz.nameplates.tags[info[#info]] end, function(info, value) E.db.pz.nameplates.tags[info[#info]] = value end, function() return not E.NamePlates.Initialized end)
+	local tags = config.args.tags.args
+	tags.guidGroup = ACH:Group(L["GUID"], L["GUID_DESC"], 1, nil, function(info) return E.db.pz.nameplates.tags.guid[info[#info]] end, function(info, value) E.db.pz.nameplates.tags.guid[info[#info]] = value NP:ConfigureAll() end, function() return not E.db.pz.nameplates.hdClient.hdNameplates end)
+	tags.guidGroup.args.enable = ACH:Toggle(L["Enable"], nil, 1)
+	tags.guidGroup.args.position = ACH:Select(L["Position"], nil, 2, positionValues)
+	tags.guidGroup.args.parent = ACH:Select(L["Parent"], nil, 3, { Nameplate = L["Nameplate"], Health = L["Health"] })
+	tags.guidGroup.args.xOffset = ACH:Range(L["X-Offset"], nil, 4, { min = -100, max = 100, step = 1 })
+	tags.guidGroup.args.yOffset = ACH:Range(L["Y-Offset"], nil, 5, { min = -100, max = 100, step = 1 })
+	tags.guidGroup.args.fontGroup = ACH:Group("", nil, 6)
+	tags.guidGroup.args.fontGroup.inline = true
+	tags.guidGroup.args.fontGroup.args.font = ACH:SharedMediaFont(L["Font"], nil, 1)
+	tags.guidGroup.args.fontGroup.args.fontSize = ACH:Range(L["Font Size"], nil, 2, { min = 4, max = 60, step = 1 })
+	tags.guidGroup.args.fontGroup.args.fontOutline = ACH:FontFlags(L["Font Outline"], nil, 3)
 
 	return config
 end
