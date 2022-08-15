@@ -175,7 +175,7 @@ end
 local function updatePVPNameHook(self, frame)
 	ZNP.hooks[NP].Update_Name(self, frame)
 
-	if not frame.unit then return end
+	if not frame.unit then return end -- if Name Only, de-targeting will run UpdateAllFrame(frame, nil, true) and cause PVPName to reset to UnitName since frame.unit is nil
 
 	if UnitIsPlayer(frame.unit) then
 		frame.Name:SetText(UnitPVPName(frame.unit))
