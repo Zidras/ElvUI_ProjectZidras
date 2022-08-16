@@ -78,6 +78,7 @@ globals = {
 	"BigWigs",
 	"BigWigsLoader",
 	"ElvUI",
+	"ElvDB",
 	"BigBrother",
 	"Transcriptor",
 	"KuiNameplates",

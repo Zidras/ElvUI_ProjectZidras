@@ -33,8 +33,32 @@ PZ.Chat = E:NewModule("ProjectZidras_Chat", "AceEvent-3.0")
 PZ.NamePlates = E:NewModule("ProjectZidras_NamePlates", "AceEvent-3.0")
 PZ.UnitFrames = E:NewModule("ProjectZidras_UnitFrames")
 
+-- Database Conversion
+local function databaseConversions()
+	--Profile options conversion
+	for _, data in pairs(ElvDB.profiles) do
+		if data then
+			if data.pz then
+				if data.pz.nameplates then
+					if data.pz.nameplates.hdNameplates then
+						if data.pz.nameplates.hdClient then
+							data.pz.nameplates.hdClient.hdNameplates = data.pz.nameplates.hdNameplates
+						else
+							data.pz.nameplates.hdClient = {
+								hdNameplates = data.pz.nameplates.hdNameplates
+							}
+						end
+						data.pz.nameplates.hdNameplates = nil
+					end
+				end
+			end
+		end
+	end
+end
+
 function PZ:Initialize()
 	ProjectZidrasDB = ProjectZidrasDB or {}
+	databaseConversions()
 
 	EP:RegisterPlugin(AddOnName, self.InsertOptions)
 
