@@ -41,6 +41,9 @@ P.pz = {
 				xOffset = 0,
 				yOffset = 0,
 			},
+			title = {
+				enable = false,
+			}
 		}
 	},
 	unitframe = {

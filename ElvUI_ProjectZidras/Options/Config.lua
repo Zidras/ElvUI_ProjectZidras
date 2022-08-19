@@ -73,6 +73,9 @@ local function NamePlatesOptions()
 	tags.guidGroup.args.fontGroup.args.fontSize = ACH:Range(L["Font Size"], nil, 2, { min = 4, max = 60, step = 1 })
 	tags.guidGroup.args.fontGroup.args.fontOutline = ACH:FontFlags(L["Font Outline"], nil, 3)
 
+	tags.titleGroup = ACH:Group(L["Player Titles"], L["Display player titles."], 2, nil, function(info) return E.db.pz.nameplates.tags.title[info[#info]] end, function(info, value) E.db.pz.nameplates.tags.title[info[#info]] = value NP:ConfigureAll() end, function() return not E.db.pz.nameplates.hdClient.hdNameplates end)
+	tags.titleGroup.args.enable = ACH:Toggle(L["Enable"], nil, 1)
+
 	return config
 end
 

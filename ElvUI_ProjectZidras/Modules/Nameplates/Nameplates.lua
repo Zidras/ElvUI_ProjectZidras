@@ -172,7 +172,27 @@ function ZNP:COMBAT_LOG_EVENT_UNFILTERED(_, _, event, sourceGUID, sourceName, _,
 	end
 end
 
+local function updatePVPNameHook(self, frame)
+	ZNP.hooks[NP].Update_Name(self, frame)
+
+	if not frame.unit then return end -- if Name Only, de-targeting will run UpdateAllFrame(frame, nil, true) and cause PVPName to reset to UnitName since frame.unit is nil
+
+	if UnitIsPlayer(frame.unit) then
+		frame.Name:SetText(UnitPVPName(frame.unit))
+	end
+end
+
 function ZNP:Initialize()
+	if E.db.pz.nameplates.tags.title.enable then
+		if not ZNP:IsHooked(NP, "Update_Name") then
+			ZNP:RawHook(NP, "Update_Name", updatePVPNameHook, true)
+		end
+	elseif not E.db.pz.nameplates.tags.title.enable then
+		if ZNP:IsHooked(NP, "Update_Name") then
+			ZNP:Unhook(NP, "Update_Name")
+		end
+	end
+
 	if not E.db.pz.nameplates.hdClient.hdNameplates then return end -- Tags theoretically don't need HD client/nameplates, but since HD nameplates overwrite NP functions, refactoring this would be too high effort for low reward.
 
 	NP.Update_CastBar = ZNP.Update_CastBar
@@ -252,6 +272,9 @@ function ZNP:Initialize()
 					frame.guid = UnitGUID("target")
 					ZNP:Update_tagGUID(frame)
 
+					if E.db.pz.nameplates.tags.title.enable then
+						NP:Update_Name(frame)
+					end
 
 					this:RegisterEvents(frame)
 				end
@@ -347,6 +370,9 @@ function ZNP:Initialize()
 					frame.unit = "mouseover"
 					frame.guid = UnitGUID("mouseover")
 					ZNP:Update_tagGUID(frame)
+					if E.db.pz.nameplates.tags.title.enable then
+						NP:Update_Name(frame)
+					end
 
 					NP:Update_CastBar(frame, nil, frame.unit)
 				end
