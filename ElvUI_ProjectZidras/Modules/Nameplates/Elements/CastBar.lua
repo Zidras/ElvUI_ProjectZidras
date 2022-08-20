@@ -21,12 +21,12 @@ function ZNP:Update_CastBarOnValueChanged(value)
 	local frame = self:GetParent().UnitFrame
 	if not frame.UnitType then return end
 
+	if frame.oldCastBar and frame.oldCastBar.Icon:IsShown() then -- Instead of SetParent to E.HiddenFrame, workaround it by hiding it here. This is necessary because SetParent will change Region count and thus break Weakauras findNewPlate.
+		frame.oldCastBar.Icon:Hide() -- Keep this before db checks, since NameOnly doesn't have a ElvUI castbar but still needs to hide Blizzard NP castbar icon.
+	end
+
 	local db = NP.db.units[frame.UnitType]
 	if not db.castbar.enable or (not db.health.enable and not (frame.isTarget and NP.db.alwaysShowTargetHealth)) then return end
-
-	if frame.oldCastBar and frame.oldCastBar.Icon:IsShown() then -- Instead of SetParent to E.HiddenFrame, workaround it by hiding it here. This is necessary because SetParent will change Region count and thus break Weakauras findNewPlate.
-		frame.oldCastBar.Icon:Hide()
-	end
 
 	local castBar = frame.CastBar
 
