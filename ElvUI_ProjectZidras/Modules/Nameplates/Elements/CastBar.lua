@@ -80,6 +80,10 @@ function ZNP:Update_CastBarOnValueChanged(value)
 	castBar.Name:SetText(castBar.spellName)
 	castBar.Icon.texture:SetTexture(self.Icon:GetTexture())
 
+	if not castBar:IsShown() then -- First cast of a nameplate gets hidden somewhere in the chain of execution, so re-check visibility here and correct it.
+		castBar:Show()
+	end
+
 	NP:StyleFilterUpdate(frame, "FAKE_Casting")
 end
 
