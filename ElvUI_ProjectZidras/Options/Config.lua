@@ -1,5 +1,6 @@
 local PZ, T, E, L, V, P, G = unpack(select(2, ...))
 local ZCH = PZ.Chat
+local ZNP = PZ.NamePlates
 local UF = E.UnitFrames
 local NP = E.NamePlates
 local ACH = LibStub("LibAceConfigHelper")
@@ -54,14 +55,14 @@ local function ChatOptions()
 end
 
 local function NamePlatesOptions()
-	local config = ACH:Group(L["NamePlates"], nil, 2, "tab", function(info) return E.db.pz.nameplates[info[#info]] end, function(info, value) E.db.pz.nameplates[info[#info]] = value NP:ConfigureAll() end)
-	config.args.hdClient = ACH:Group(HDClientIcon.."HD-Client", nil, 1, "tab", function(info) return E.db.pz.nameplates.hdClient[info[#info]] end, function(info, value) E.db.pz.nameplates.hdClient[info[#info]] = value end)
+	local config = ACH:Group(L["NamePlates"], nil, 2, "tab", function(info) return E.db.pz.nameplates[info[#info]] end, function(info, value) E.db.pz.nameplates[info[#info]] = value NP:ConfigureAll() end, function() return not E.NamePlates.Initialized end)
+	config.args.hdClient = ACH:Group(HDClientIcon.."HD-Client", nil, 1, "tab", function(info) return E.db.pz.nameplates.hdClient[info[#info]] end, function(info, value) E.db.pz.nameplates.hdClient[info[#info]] = value ZNP:UpdateAllSettings() NP:ConfigureAll() end)
 	config.args.hdClient.args.hdClientdesc = ACH:Description(L["HD-Client"], 1)
-	config.args.hdClient.args.hdNameplates = ACH:Toggle(HDClientIcon..L["HD-Nameplates"], L["HD-Nameplates_DESC"], 2, nil, nil, 100, nil, function(info, value) E.db.pz.nameplates.hdClient[info[#info]] = value E:StaticPopup_Show("PRIVATE_RL") end)
+	config.args.hdClient.args.hdNameplates = ACH:Toggle(HDClientIcon..L["HD-Nameplates"], L["HD-Nameplates_DESC"], 2, nil, nil, 100)
 
-	config.args.tags = ACH:Group("Tags", nil, 2, "tree", function(info) return E.db.pz.nameplates.tags[info[#info]] end, function(info, value) E.db.pz.nameplates.tags[info[#info]] = value end, function() return not E.NamePlates.Initialized end)
+	config.args.tags = ACH:Group("Tags", nil, 2, "tree", function(info) return E.db.pz.nameplates.tags[info[#info]] end, function(info, value) E.db.pz.nameplates.tags[info[#info]] = value end)
 	local tags = config.args.tags.args
-	tags.guidGroup = ACH:Group(L["GUID"], L["GUID_DESC"], 1, nil, function(info) return E.db.pz.nameplates.tags.guid[info[#info]] end, function(info, value) E.db.pz.nameplates.tags.guid[info[#info]] = value NP:ConfigureAll() end, function() return not E.db.pz.nameplates.hdClient.hdNameplates end)
+	tags.guidGroup = ACH:Group(L["GUID"], L["GUID_DESC"], 1, nil, function(info) return E.db.pz.nameplates.tags.guid[info[#info]] end, function(info, value) E.db.pz.nameplates.tags.guid[info[#info]] = value ZNP:UpdateAllSettings() NP:ConfigureAll() end)
 	tags.guidGroup.args.enable = ACH:Toggle(L["Enable"], nil, 1)
 	tags.guidGroup.args.position = ACH:Select(L["Position"], nil, 2, positionValues)
 	tags.guidGroup.args.parent = ACH:Select(L["Parent"], nil, 3, { Nameplate = L["Nameplate"], Health = L["Health"] })
@@ -73,7 +74,7 @@ local function NamePlatesOptions()
 	tags.guidGroup.args.fontGroup.args.fontSize = ACH:Range(L["Font Size"], nil, 2, { min = 4, max = 60, step = 1 })
 	tags.guidGroup.args.fontGroup.args.fontOutline = ACH:FontFlags(L["Font Outline"], nil, 3)
 
-	tags.titleGroup = ACH:Group(L["Player Titles"], L["Display player titles."], 2, nil, function(info) return E.db.pz.nameplates.tags.title[info[#info]] end, function(info, value) E.db.pz.nameplates.tags.title[info[#info]] = value NP:ConfigureAll() end, function() return not E.db.pz.nameplates.hdClient.hdNameplates end)
+	tags.titleGroup = ACH:Group(L["Player Titles"], L["Display player titles."], 2, nil, function(info) return E.db.pz.nameplates.tags.title[info[#info]] end, function(info, value) E.db.pz.nameplates.tags.title[info[#info]] = value ZNP:UpdateAllSettings() NP:ConfigureAll() end)
 	tags.titleGroup.args.enable = ACH:Toggle(L["Enable"], nil, 1)
 
 	return config
