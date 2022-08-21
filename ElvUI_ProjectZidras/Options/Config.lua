@@ -56,9 +56,9 @@ end
 
 local function NamePlatesOptions()
 	local config = ACH:Group(L["NamePlates"], nil, 2, "tab", function(info) return E.db.pz.nameplates[info[#info]] end, function(info, value) E.db.pz.nameplates[info[#info]] = value NP:ConfigureAll() end, function() return not E.NamePlates.Initialized end)
-	config.args.hdClient = ACH:Group(HDClientIcon.."HD-Client", nil, 1, "tab", function(info) return E.db.pz.nameplates.hdClient[info[#info]] end, function(info, value) E.db.pz.nameplates.hdClient[info[#info]] = value ZNP:UpdateAllSettings() NP:ConfigureAll() end)
+	config.args.hdClient = ACH:Group(HDClientIcon.."HD-Client", nil, 1, "tab", function(info) return E.db.pz.nameplates.hdClient[info[#info]] end, function(info, value) E.db.pz.nameplates.hdClient[info[#info]] = value E:StaticPopup_Show("PRIVATE_RL") end)
 	config.args.hdClient.args.hdClientdesc = ACH:Description(L["HD-Client"], 1)
-	config.args.hdClient.args.hdNameplates = ACH:Toggle(HDClientIcon..L["HD-Nameplates"], L["HD-Nameplates_DESC"], 2, nil, nil, 100)
+	config.args.hdClient.args.hdNameplates = ACH:Toggle(HDClientIcon..L["HD-Nameplates"], L["HD-Nameplates_DESC"], 2)
 
 	config.args.tags = ACH:Group("Tags", nil, 2, "tree", function(info) return E.db.pz.nameplates.tags[info[#info]] end, function(info, value) E.db.pz.nameplates.tags[info[#info]] = value end)
 	local tags = config.args.tags.args
