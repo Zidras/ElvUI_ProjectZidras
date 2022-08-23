@@ -164,12 +164,6 @@ function ZNP:CacheBossUnits()
 		end
 	end
 end
-
--- Exiting on unit - self.unit mismatch would prevent castbars from showing on the nameplate that have unit already cached, so fix that too
-function NP:OnEvent(event, unit, ...)
-	if not unit then return end
-	NP:Update_CastBar(self, event, unit, ...) -- overwritten later on HD Nameplates
-end
 -- End ElvUI Bugfixes --
 
 -- For HD nameplates castbar spellName completion. Could also be used to generate castbars for non-HD clients if nameplateGUID is cached, but I won't develop it since HD nameplates are the better option
@@ -196,6 +190,11 @@ local function OnCreatedHook(self, frame) -- this function requires a reload to 
 	CastBar:HookScript("OnValueChanged", ZNP.Update_CastBarOnValueChanged)
 
 	frame.UnitFrame.CastBar:SetScript("OnUpdate", nil)
+end
+
+local function OnEventHook(self, event, unit, ...) -- Exiting on unit - self.unit mismatch would prevent castbars from showing on the nameplate that have unit already cached. Hook required since for non-HD it would make it so every unit cached would replace the nameplate castbar
+	if not unit then return end
+	NP:Update_CastBar(self, event, unit, ...) -- overwritten later on HD Nameplates
 end
 
 local function RegisterEventsHook(self, frame)
@@ -247,6 +246,7 @@ function ZNP:CastBarHD()
 ]]
 		NP.Update_CastBar = ZNP.Update_CastBar -- keep this before OnCreated hook
 		hooksecurefunc(NP, "OnCreated", OnCreatedHook)
+		NP.OnEvent = OnEventHook
 		NP.RegisterEvents = RegisterEventsHook
 		NP.UnregisterAllEvents = UnregisterAllEventsHook
 		NP.UpdateCVars = UpdateCVarsHook
