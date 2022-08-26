@@ -172,11 +172,27 @@ end
 function ZNP:Update_CastBarName(frame, unit)
 	if not unit then return end
 
-	local name = UnitCastingInfo(unit) or UnitChannelInfo(unit)
-	if name then
-		frame.CastBar.spellName = spellNameWithUnit(NP, frame, name, unit.."target")
-		if not E.db.pz.nameplates.hdClient.hdNameplates then
-			frame.CastBar.Name:SetText(frame.CastBar.spellName) -- with Update_Tags coming from mouseover, ZNP was running before NP, so add this for the hooksecurefunc to run the post-hook for non-HD.
+	local db = E.db.pz.nameplates
+	local unitType = NP:GetUnitTypeFromUnit(unit)
+	local proceed
+
+	if unitType == "FRIENDLY_PLAYER" then
+		proceed = db.tags.displayTarget.friendlyPlayer
+	elseif unitType == "FRIENDLY_NPC" then
+		proceed = db.tags.displayTarget.friendlyNPC
+	elseif unitType == "ENEMY_PLAYER" then
+		proceed = db.tags.displayTarget.enemyPlayer
+	elseif unitType == "ENEMY_NPC" then
+		proceed = db.tags.displayTarget.enemyNPC
+	end
+
+	if proceed then
+		local name = UnitCastingInfo(unit) or UnitChannelInfo(unit)
+		if name then
+			frame.CastBar.spellName = spellNameWithUnit(NP, frame, name, unit.."target")
+			if not db.hdClient.hdNameplates then
+				frame.CastBar.Name:SetText(frame.CastBar.spellName) -- with Update_Tags coming from mouseover, ZNP was running before NP, so add this for the hooksecurefunc to run the post-hook for non-HD.
+			end
 		end
 	end
 end

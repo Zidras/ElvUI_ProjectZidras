@@ -46,7 +46,11 @@ P.pz = {
 			},
 			displayTarget = {
 				enable = false,
-			}
+				friendlyPlayer = false,
+				friendlyNPC = true,
+				enemyPlayer = false,
+				enemyNPC = true,
+			},
 		}
 	},
 	unitframe = {
