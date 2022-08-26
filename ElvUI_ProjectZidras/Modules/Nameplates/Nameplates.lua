@@ -173,7 +173,7 @@ function ZNP:COMBAT_LOG_EVENT_UNFILTERED(_, _, event, sourceGUID, sourceName, _,
 			local frame = NP:SearchNameplateByGUID(sourceGUID)
 			if frame then
 				frame.CastBar.spellName = spellName
-				if frame.unit then -- REFACTOR for non-HD
+				if frame.unit then
 					ZNP:Update_Tags(frame)
 				end
 			end
@@ -306,8 +306,8 @@ function ZNP:Update_Tags(frame)
 	if tagsOptions.title.enable then
 		NP:Update_Name(frame)
 	end
-	if tagsOptions.displayTarget.enable then -- refactor to not need HD
-		NP:Update_CastBar(frame, nil, frame.unit, true)
+	if tagsOptions.displayTarget.enable then
+		ZNP:Update_CastBarName(frame, frame.unit)
 	end
 end
 
@@ -406,6 +406,9 @@ function ZNP:NameplateTags()
 			self:Unhook(NP, "Update_Name")
 		end
 	end
+	if tagsOptions.displayTarget.enable and not E.db.pz.nameplates.hdClient.hdNameplates then
+		hooksecurefunc(NP, "Update_CastBar", ZNP.Update_CastBarName) -- doesn't need Ace Hooks, since HD Nameplates will prompt a reload anyways. Not the best approach in terms of optimization (since Update_Tags will still run) but not interested in perfecting non-HD NP features.
+	end
 end
 
 function ZNP:UpdateAllSettings()
@@ -415,22 +418,22 @@ end
 
 function ZNP:Initialize()
 	if NP.Initialized then
-		ZNP:UpdateAllSettings()
+		self:UpdateAllSettings()
 
 		if E.db.pz.nameplates.hdClient.hdNameplates then
 			UpdateCVarsHook(NP) -- update once since we cannot hook it in time on NP:Initialize.
 		end
 	end
 
-	ZNP:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-	ZNP:RegisterEvent("PLAYER_TARGET_CHANGED")
-	ZNP:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
-	ZNP:RegisterEvent("CURSOR_UPDATE")
-	ZNP:RegisterEvent("UNIT_TARGET")
+	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+	self:RegisterEvent("PLAYER_TARGET_CHANGED")
+	self:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
+	self:RegisterEvent("CURSOR_UPDATE")
+	self:RegisterEvent("UNIT_TARGET")
 
 	-- Bosses
-	ZNP:CacheBossUnits()
-	ZNP:RegisterEvent("INSTANCE_ENCOUNTER_ENGAGE_UNIT", "CacheBossUnits")
+	self:CacheBossUnits()
+	self:RegisterEvent("INSTANCE_ENCOUNTER_ENGAGE_UNIT", "CacheBossUnits")
 end
 
 local function InitializeCallback()

@@ -149,8 +149,8 @@ function ZNP:Update_CastBarOnHide()
 	NP:StyleFilterUpdate(frame, "FAKE_Casting")
 end
 
-function ZNP:Update_CastBar(frame, event, unit, forceCheck)
-	if frame.CastBar.spellName and not forceCheck then return end
+function ZNP:Update_CastBar(frame, event, unit)
+	if frame.CastBar.spellName then return end
 
 	if not (self.db.units[frame.UnitType].castbar.enable and frame.Health:IsShown()) then return end
 
@@ -160,11 +160,23 @@ function ZNP:Update_CastBar(frame, event, unit, forceCheck)
 	then
 		local name = UnitCastingInfo(unit) or UnitChannelInfo(unit)
 		if name then
-			frame.CastBar.spellName = spellNameWithUnit(self, frame, name, unit.."target")
+			frame.CastBar.spellName = name
 		end
 	elseif event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED" then
 		if frame.CastBar:IsShown() then
 			frame.CastBar.Name:SetText(event == "UNIT_SPELLCAST_FAILED" and FAILED or INTERRUPTED)
+		end
+	end
+end
+
+function ZNP:Update_CastBarName(frame, unit)
+	if not unit then return end
+
+	local name = UnitCastingInfo(unit) or UnitChannelInfo(unit)
+	if name then
+		frame.CastBar.spellName = spellNameWithUnit(NP, frame, name, unit.."target")
+		if not E.db.pz.nameplates.hdClient.hdNameplates then
+			frame.CastBar.Name:SetText(frame.CastBar.spellName) -- with Update_Tags coming from mouseover, ZNP was running before NP, so add this for the hooksecurefunc to run the post-hook for non-HD.
 		end
 	end
 end
