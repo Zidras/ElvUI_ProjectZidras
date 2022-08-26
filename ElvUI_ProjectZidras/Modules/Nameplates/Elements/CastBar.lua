@@ -3,18 +3,53 @@ local ZNP = PZ.NamePlates
 local NP = E.NamePlates
 
 local abs = math.abs
+local format = string.format
 
 local UnitCastingInfo = UnitCastingInfo
 local UnitChannelInfo = UnitChannelInfo
 
+local CUSTOM_CLASS_COLORS = CUSTOM_CLASS_COLORS
 local FAILED = FAILED
 local INTERRUPTED = INTERRUPTED
+local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 
 local function resetAttributes(self)
 	self.casting = nil
 	self.channeling = nil
 	self.notInterruptible = nil
 	self.spellName = nil
+end
+
+local function spellNameWithUnit(self, frame, spellName, sourceUnitTarget)
+	if not E.db.pz.nameplates.tags.displayTarget.enable then return spellName end
+
+	local sourceUnitTargetName = UnitName(sourceUnitTarget)
+
+	if not sourceUnitTargetName then return spellName end
+
+	if UnitIsPlayer(sourceUnitTarget) then
+		local _, englishClass = UnitClass(sourceUnitTarget)
+		local classColorTable = CUSTOM_CLASS_COLORS and CUSTOM_CLASS_COLORS[englishClass] or RAID_CLASS_COLORS[englishClass]
+
+		if classColorTable then
+			return format("%s > \124cff%.2x%.2x%.2x%s\124r", spellName, classColorTable.r*255, classColorTable.g*255, classColorTable.b*255, sourceUnitTargetName)
+		end
+	else
+		local db = self.db.colors
+		local unitReaction = UnitReaction(frame.unit, sourceUnitTarget)
+		local r, g, b
+		if unitReaction == 5 then -- friendly
+			r, g, b = db.reactions.good.r, db.reactions.good.g, db.reactions.good.b
+		elseif unitReaction == 1 or unitReaction == 2 then -- hostile
+			r, g, b = db.reactions.bad.r, db.reactions.bad.g, db.reactions.bad.b
+		elseif unitReaction == 4  then -- neutral
+			r, g, b = db.reactions.neutral.r, db.reactions.neutral.g, db.reactions.neutral.b
+		else
+			r, g, b = 1, 1, 1
+		end
+
+		return format("%s > \124cff%.2x%.2x%.2x%s\124r", spellName, r*255, g*255, b*255, sourceUnitTargetName)
+	end
 end
 
 function ZNP:Update_CastBarOnValueChanged(value)
@@ -132,4 +167,21 @@ function ZNP:Update_CastBar(frame, event, unit)
 			frame.CastBar.Name:SetText(event == "UNIT_SPELLCAST_FAILED" and FAILED or INTERRUPTED)
 		end
 	end
+end
+
+function ZNP:Update_CastBarName(frame, unit)
+	if not unit then return end
+
+	local name = UnitCastingInfo(unit) or UnitChannelInfo(unit)
+	if name then
+		frame.CastBar.spellName = spellNameWithUnit(NP, frame, name, unit.."target")
+		if not E.db.pz.nameplates.hdClient.hdNameplates then
+			frame.CastBar.Name:SetText(frame.CastBar.spellName) -- with Update_Tags coming from mouseover, ZNP was running before NP, so add this for the hooksecurefunc to run the post-hook for non-HD.
+		end
+	end
+end
+
+function ZNP:Configure_CastBar(frame)
+	local castBar = frame.CastBar
+	castBar.Name:SetPoint("BOTTOMRIGHT", castBar.Time, "BOTTOMLEFT") -- prevent overlap by making spellName elide with ...
 end

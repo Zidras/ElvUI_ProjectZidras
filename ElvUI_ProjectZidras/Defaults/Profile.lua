@@ -43,6 +43,9 @@ P.pz = {
 			},
 			title = {
 				enable = false,
+			},
+			displayTarget = {
+				enable = false,
 			}
 		}
 	},
