@@ -77,6 +77,10 @@ local function NamePlatesOptions()
 	tags.titleGroup = ACH:Group(L["Player Titles"], L["Display player titles."], 2, nil, function(info) return E.db.pz.nameplates.tags.title[info[#info]] end, function(info, value) E.db.pz.nameplates.tags.title[info[#info]] = value ZNP:UpdateAllSettings() NP:ConfigureAll() end)
 	tags.titleGroup.args.enable = ACH:Toggle(L["Enable"], nil, 1)
 
+	tags.displayTargetGroup = ACH:Group(L["Display Target"], L["Display the target of the current cast in the castbar"], 3, nil, function(info) return E.db.pz.nameplates.tags.displayTarget[info[#info]] end, function(info, value) E.db.pz.nameplates.tags.displayTarget[info[#info]] = value ZNP:UpdateAllSettings() NP:ConfigureAll() end)
+	tags.displayTargetGroup.args.warning = ACH:Description(L["Based on the unit's target, which isn't always an indicator of the cast target. Will be inaccurate for self/mouseover/macro casts if unit is targeting elsewhere."], 1)
+	tags.displayTargetGroup.args.enable = ACH:Toggle(L["Enable"], nil, 1)
+
 	return config
 end
 

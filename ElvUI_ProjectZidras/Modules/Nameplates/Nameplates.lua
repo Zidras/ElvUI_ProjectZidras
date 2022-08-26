@@ -173,6 +173,9 @@ function ZNP:COMBAT_LOG_EVENT_UNFILTERED(_, _, event, sourceGUID, sourceName, _,
 			local frame = NP:SearchNameplateByGUID(sourceGUID)
 			if frame then
 				frame.CastBar.spellName = spellName
+				if frame.unit then -- REFACTOR for non-HD
+					ZNP:Update_Tags(frame)
+				end
 			end
 		end
 	end
@@ -226,6 +229,7 @@ local function UpdateCVarsHook(self)
 end
 
 function ZNP:CastBarHD()
+	hooksecurefunc(NP, "Configure_CastBar", ZNP.Configure_CastBar) -- outside the HDClient check since this is meant to be applied in all situations - castbar spellName must never overlap the cast time, so assign proper setpoints
 	if E.db.pz.nameplates.hdClient.hdNameplates then
 --[[ initially designed with AceHook to prevent not having to reload, but it caused unstable behavior (possibly due to hookscripts not being able to be unhooked), so revert back to a reload based toggle and hooksecurefunc/replace.
 		if not self:IsHooked(NP, "Update_CastBar") then
@@ -302,6 +306,9 @@ function ZNP:Update_Tags(frame)
 	if tagsOptions.title.enable then
 		NP:Update_Name(frame)
 	end
+	if tagsOptions.displayTarget.enable then -- refactor to not need HD
+		NP:Update_CastBar(frame, nil, frame.unit, true)
+	end
 end
 
 function ZNP:PLAYER_TARGET_CHANGED()
@@ -322,9 +329,11 @@ function ZNP:UPDATE_MOUSEOVER_UNIT()
 	if UnitExists("mouseover") and not UnitIsUnit("mouseover", "player") then
 		for frame in pairs(NP.VisiblePlates) do
 			if frame.oldHighlight:IsShown() then
-				-- runs before SetMouseoverFrame so ensure frame.unit and frame.guid are the right values (also needed due to CURSOR_UPDATE when mouseovering a model and afterwards a different nameplate would assume a different frame.guid)
-				frame.unit = "mouseover"
-				frame.guid = UnitGUID("mouseover")
+				if not frame.isGroupUnit then -- preserve already cached group unitIDs
+					-- runs before SetMouseoverFrame so ensure frame.unit and frame.guid are the right values (also needed due to CURSOR_UPDATE when mouseovering a model and afterwards a different nameplate would assume a different frame.guid)
+					frame.unit = "mouseover"
+					frame.guid = UnitGUID("mouseover")
+				end
 
 				ZNP:Update_Tags(frame)
 				break
@@ -333,6 +342,14 @@ function ZNP:UPDATE_MOUSEOVER_UNIT()
 	end
 end
 ZNP.CURSOR_UPDATE = ZNP.UPDATE_MOUSEOVER_UNIT
+
+function ZNP:UNIT_TARGET(_, unit)
+	for frame in pairs(NP.VisiblePlates) do
+		if unit == frame.unit then
+			ZNP:Update_Tags(frame)
+		end
+	end
+end
 
 local function OnShowHook(self)
 	local frame = self.UnitFrame
@@ -409,6 +426,7 @@ function ZNP:Initialize()
 	ZNP:RegisterEvent("PLAYER_TARGET_CHANGED")
 	ZNP:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
 	ZNP:RegisterEvent("CURSOR_UPDATE")
+	ZNP:RegisterEvent("UNIT_TARGET")
 
 	-- Bosses
 	ZNP:CacheBossUnits()
