@@ -193,7 +193,11 @@ local function UnitFramesOptions()
 	colorsAbsorbPrediction.overabsorbs = ACH:Color(L["Over Absorbs"], nil, 3, true)
 	colorsAbsorbPrediction.overhealabsorbs = ACH:Color(L["Over Heal Absorbs"], nil, 4, true)
 
-	config.args.individualUnits = ACH:Group(L["Individual Units"], nil, 3, "tab", nil, nil, function() return not E.UnitFrames.Initialized end)
+	config.args.allUnits = ACH:Group(L["Global"], nil, 3, "tree", nil, nil, function() return not E.UnitFrames.Initialized end)
+	config.args.allUnits.args.healPrediction = ACH:Group(L["Heal Prediction"], nil, 1, nil, function(info) return E.db.pz.unitframe.allUnits.healPrediction[info[#info]] end, function(info, value) E.db.pz.unitframe.allUnits.healPrediction[info[#info]] = value UF:Update_AllFrames() end, function() return not E.UnitFrames.Initialized end)
+	config.args.allUnits.args.healPrediction.args.lookAhead = ACH:Range(L["Look Ahead"], L["Duration in seconds into the future to look for incoming healing."], 1, { min = 0, max = 30, step = 1 })
+
+	config.args.individualUnits = ACH:Group(L["Individual Units"], nil, 4, "tab", nil, nil, function() return not E.UnitFrames.Initialized end)
 	local individualUnits = config.args.individualUnits.args
 	individualUnits.player = ACH:Group(L["Player"], nil, 1, nil, function(info) return E.db.unitframe.units.player[info[#info]] end, function(info, value) E.db.unitframe.units.player[info[#info]] = value UF:CreateAndUpdateUF("player") end)
 	individualUnits.player.args.absorbPrediction = GetOptionsTable_AbsorbPrediction(UF.CreateAndUpdateUF, "player")
@@ -207,7 +211,7 @@ local function UnitFramesOptions()
 	individualUnits.pet = ACH:Group(L["Pet"], nil, 7, nil, function(info) return E.db.unitframe.units.pet[info[#info]] end, function(info, value) E.db.unitframe.units.pet[info[#info]] = value UF:CreateAndUpdateUF("pet") end)
 	individualUnits.pet.args.absorbPrediction = GetOptionsTable_AbsorbPrediction(UF.CreateAndUpdateUF, "pet")
 
-	config.args.groupUnits = ACH:Group(L["Group Units"], nil, 4, "tab", nil, nil, function() return not E.UnitFrames.Initialized end)
+	config.args.groupUnits = ACH:Group(L["Group Units"], nil, 5, "tab", nil, nil, function() return not E.UnitFrames.Initialized end)
 	local groupUnits = config.args.groupUnits.args
 	groupUnits.arena = ACH:Group(L["Arena"], nil, 1, nil, function(info) return E.db.unitframe.units.arena[info[#info]] end, function(info, value) E.db.unitframe.units.arena[info[#info]] = value UF:CreateAndUpdateUFGroup("arena", 5) end)
 	groupUnits.arena.args.absorbPrediction = GetOptionsTable_AbsorbPrediction(UF.CreateAndUpdateUFGroup, "arena", 5)

@@ -62,6 +62,7 @@ function ZUF:Construct_HealComm(frame)
 		overHealAbsorb = overHealAbsorb,
 		PostUpdate = ZUF.UpdateHealComm,
 		maxOverflow = 1,
+		lookAhead = 0,
 		health = health,
 		parent = parent,
 		frame = frame
@@ -136,6 +137,7 @@ function ZUF:Configure_HealComm(frame)
 		local colors = UF.db.colors.healPrediction
 		local absorbColors = E.db.pz.unitframe.colors.absorbPrediction
 		pred.maxOverflow = 1 + (colors.maxOverflow or 0)
+		pred.lookAhead = E.db.pz.unitframe.allUnits.healPrediction.lookAhead
 
 		if not frame:IsElementEnabled("HealthPrediction") then
 			frame:EnableElement("HealthPrediction")

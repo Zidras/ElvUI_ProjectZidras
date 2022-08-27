@@ -111,10 +111,10 @@ local function Update(self, event, unit, absorb)
 	end
 
 	local unitGUID = UnitGUID(unit)
---	local lookAhead = element.lookAhead or 5
+	local lookAhead = element.lookAhead or 5
 
-	local myIncomingHeal = (HealComm:GetHealAmount(unitGUID, HealComm.ALL_HEALS, nil--[[GetTime() + lookAhead]], UnitGUID("player")) or 0) * (HealComm:GetHealModifier(unitGUID) or 1) or 0
-	local allIncomingHeal = (HealComm:GetHealAmount(unitGUID, HealComm.ALL_HEALS, nil--[[GetTime() + lookAhead]]) or 0) * (HealComm:GetHealModifier(unitGUID) or 1) or 0
+	local myIncomingHeal = (HealComm:GetHealAmount(unitGUID, HealComm.ALL_HEALS, GetTime() + lookAhead, UnitGUID("player")) or 0) * (HealComm:GetHealModifier(unitGUID) or 1) or 0
+	local allIncomingHeal = (HealComm:GetHealAmount(unitGUID, HealComm.ALL_HEALS, GetTime() + lookAhead) or 0) * (HealComm:GetHealModifier(unitGUID) or 1) or 0
 	absorb = absorb or SA.UnitTotal(UnitGUID(unit)) or 0
 	local healAbsorb = SA.UnitTotalHealAbsorbs(UnitGUID(unit)) or 0
 	local health, maxHealth = UnitHealth(unit), UnitHealthMax(unit)
@@ -198,19 +198,19 @@ local function Update(self, event, unit, absorb)
 		end
 	end
 	oUF.Tags.Methods["incomingheals:personal"] = function(tagUnit)
-		local incHealP = (HealComm:GetHealAmount(UnitGUID(tagUnit), HealComm.ALL_HEALS, nil--[[GetTime() + (element.lookAhead or 5)]], UnitGUID("player")) or 0) * (HealComm:GetHealModifier(UnitGUID(tagUnit)) or 1) or 0
+		local incHealP = (HealComm:GetHealAmount(UnitGUID(tagUnit), HealComm.ALL_HEALS, GetTime() + (element.lookAhead or 5), UnitGUID("player")) or 0) * (HealComm:GetHealModifier(UnitGUID(tagUnit)) or 1) or 0
 		if incHealP > 0 then
 			return E:ShortValue(incHealP)
 		end
 	end
 	oUF.Tags.Methods["incomingheals:others"] = function(tagUnit)
-		local incHealO = (HealComm:GetOthersHealAmount(UnitGUID(tagUnit), HealComm.ALL_HEALS, nil--[[GetTime() + (element.lookAhead or 5)]]) or 0) * (HealComm:GetHealModifier(UnitGUID(tagUnit)) or 1) or 0
+		local incHealO = (HealComm:GetOthersHealAmount(UnitGUID(tagUnit), HealComm.ALL_HEALS, GetTime() + (element.lookAhead or 5)) or 0) * (HealComm:GetHealModifier(UnitGUID(tagUnit)) or 1) or 0
 		if incHealO > 0 then
 			return E:ShortValue(incHealO)
 		end
 	end
 	oUF.Tags.Methods["incomingheals"] = function(tagUnit)
-		local incHeal = (HealComm:GetHealAmount(UnitGUID(tagUnit), HealComm.ALL_HEALS, nil--[[GetTime() + (element.lookAhead or 5)]]) or 0) * (HealComm:GetHealModifier(UnitGUID(tagUnit)) or 1) or 0
+		local incHeal = (HealComm:GetHealAmount(UnitGUID(tagUnit), HealComm.ALL_HEALS, GetTime() + (element.lookAhead or 5)) or 0) * (HealComm:GetHealModifier(UnitGUID(tagUnit)) or 1) or 0
 		if incHeal > 0 then
 			return E:ShortValue(incHeal)
 		end
@@ -295,9 +295,9 @@ local function Enable(self)
 			element.maxOverflow = 1.05
 		end
 
-		--[[if not element.lookAhead then
+		if not element.lookAhead then
 			element.lookAhead = 5
-		end]]
+		end
 
 		if element.myBar  then
 			if element.myBar:IsObjectType("StatusBar") and not element.myBar:GetStatusBarTexture() then

@@ -79,6 +79,11 @@ P.pz = {
 				overhealabsorbs = {r = 1, g = 0, b = 0, a = 0.25},
 			}
 		},
+		allUnits = {
+			healPrediction = {
+				lookAhead = 5,
+			}
+		},
 		units = {
 			player = {
 				absorbPrediction = CopyTable(ZUF_AbsorbPrediction),
