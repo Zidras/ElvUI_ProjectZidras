@@ -55,6 +55,7 @@ L["PZ_DESC"] = "|cff00BFFFProject Zidras|r es una extensión de ElvUI. Agrega:\n
 L["PZ_LOGIN_MSG"] = "%s versión %s%s|r para %sElvUI|r ha cargado."
 L["Raid"] = "Marcos de Banda"
 L["Reversed"] = "Invertido"
+L["Separator"] = "Separador"
 L["Stacked"] = "Apilado"
 L["Show a prediction bar with all absorbs on the unitframe. Also displays a slightly different colored bar for heal absorbing shields"] = "Muestra una barra de predicción con todas las absorciones en el marco de la unidad. También muestra una barra de color ligeramente diferente para curar los escudos absorbentes."
 L["Submodules and Coding:"] = "Submódulos y codificación:"

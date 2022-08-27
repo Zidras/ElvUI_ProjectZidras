@@ -52,6 +52,7 @@ L["PZ_DESC"] = "|cff00BFFFProject Zidras|r 是 ElvUI 的擴展。 它增加了�
 L["PZ_LOGIN_MSG"] = "%s version %s%s|r for %sElvUI|r has loaded." -- Needs translation
 L["Raid"] = "團隊副本"
 L["Reversed"] = "反轉"
+L["Separator"] = "分隔器"
 L["Stacked"] = "堆疊"
 L["Show a prediction bar with all absorbs on the unitframe. Also displays a slightly different colored bar for heal absorbing shields"] = "在單位框架上顯示一個包含所有吸收的預測條。還顯示一個顏色略有不同的治療吸收盾的條"
 L["Submodules and Coding:"] = "子模塊和編碼："

@@ -80,7 +80,14 @@ local function NamePlatesOptions()
 	tags.displayTargetGroup = ACH:Group(L["Display Target"], L["Display the target of the current cast in the castbar"], 3, nil, function(info) return E.db.pz.nameplates.tags.displayTarget[info[#info]] end, function(info, value) E.db.pz.nameplates.tags.displayTarget[info[#info]] = value ZNP:UpdateAllSettings() NP:ConfigureAll() end)
 	tags.displayTargetGroup.args.warning = ACH:Description(L["Based on the unit's target, which isn't always an indicator of the cast target. Will be inaccurate for self/mouseover/macro casts if unit is targeting elsewhere."], 1)
 	tags.displayTargetGroup.args.enable = ACH:Toggle(L["Enable"], nil, 1)
-	tags.displayTargetGroup.args.unitTypeGroup = ACH:Group(L["Unit Type"], nil, 2)
+	tags.displayTargetGroup.args.separator = ACH:Select(L["Separator"], nil, 2, {
+		[">"] = ">",
+		["<"] = "< >",
+		["("] = "( )",
+		["["] = "[ ]",
+		["{"] = "{ }"
+	})
+	tags.displayTargetGroup.args.unitTypeGroup = ACH:Group(L["Unit Type"], nil, 3)
 	tags.displayTargetGroup.args.unitTypeGroup.inline = true
 	tags.displayTargetGroup.args.unitTypeGroup.args.friendlyPlayer = ACH:Toggle(L["FRIENDLY_PLAYER"], nil, 1)
 	tags.displayTargetGroup.args.unitTypeGroup.args.friendlyNPC = ACH:Toggle(L["FRIENDLY_NPC"], nil, 2)

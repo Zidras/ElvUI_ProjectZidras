@@ -56,6 +56,7 @@ L["PZ_DESC"] = "|cff00BFFFProject Zidras|r является расширение
 L["PZ_LOGIN_MSG"] = "%s версия %s%s|r для %sElvUI|r загрузилась."
 L["Raid"] = "Рейд"
 L["Reversed"] = "Перевернутый"
+L["Separator"] = "Сепаратор"
 L["Stacked"] = "Сложенный"
 L["Show a prediction bar with all absorbs on the unitframe. Also displays a slightly different colored bar for heal absorbing shields"] = "Панель прогноза всех поглощений в рамке юнита. Также, отображает немного другой цвет для отображения поглощающих исцеление щитов."
 L["Submodules and Coding:"] = "Модули и код:"

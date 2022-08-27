@@ -46,6 +46,7 @@ P.pz = {
 			},
 			displayTarget = {
 				enable = false,
+				separator = ">",
 				friendlyPlayer = false,
 				friendlyNPC = true,
 				enemyPlayer = false,

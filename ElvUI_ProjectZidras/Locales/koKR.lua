@@ -54,6 +54,7 @@ L["PZ_DESC"] = "|cff00BFFFProject Zidras|r은 ElvUI의 확장입니다. 추가 �
 L["PZ_LOGIN_MSG"] = "%s 버전 %s%s|r(%sElvUI|r)이 로드되었습니다."
 L["Raid"] = "공격대"
 L["Reversed"] = "반전"
+L["Separator"] = "분리 기호"
 L["Stacked"] = "쌓인"
 L["Show a prediction bar with all absorbs on the unitframe. Also displays a slightly different colored bar for heal absorbing shields"] = "단위 프레임에 모든 흡수가 있는 예측 막대를 표시합니다. 또한 치유 흡수 보호막에 대해 약간 다른 색상의 막대를 표시합니다."
 L["Submodules and Coding:"] = "하위 모듈 및 코딩:"

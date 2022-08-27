@@ -53,6 +53,7 @@ L["PZ_LOGIN_MSG"] = "%s version %s%s|r for %sElvUI|r has loaded."
 L["Raid"] = true
 L["Raid-40"] = true
 L["Reversed"] = true
+L["Separator"] = true
 L["Stacked"] = true
 L["Show a prediction bar with all absorbs on the unitframe. Also displays a slightly different colored bar for heal absorbing shields"] = true
 L["Submodules and Coding:"] = true

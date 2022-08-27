@@ -27,12 +27,24 @@ local function spellNameWithUnit(self, frame, spellName, sourceUnitTarget)
 
 	if not sourceUnitTargetName then return spellName end
 
+	local separator = E.db.pz.nameplates.tags.displayTarget.separator
+
 	if UnitIsPlayer(sourceUnitTarget) then
 		local _, englishClass = UnitClass(sourceUnitTarget)
 		local classColorTable = CUSTOM_CLASS_COLORS and CUSTOM_CLASS_COLORS[englishClass] or RAID_CLASS_COLORS[englishClass]
 
 		if classColorTable then
-			return format("%s > \124cff%.2x%.2x%.2x%s\124r", spellName, classColorTable.r*255, classColorTable.g*255, classColorTable.b*255, sourceUnitTargetName)
+			if separator == "<" then
+				return format("%s <\124cff%.2x%.2x%.2x%s\124r>", spellName, classColorTable.r*255, classColorTable.g*255, classColorTable.b*255, sourceUnitTargetName)
+			elseif separator == "(" then
+				return format("%s (\124cff%.2x%.2x%.2x%s\124r)", spellName, classColorTable.r*255, classColorTable.g*255, classColorTable.b*255, sourceUnitTargetName)
+			elseif separator == "[" then
+				return format("%s [\124cff%.2x%.2x%.2x%s\124r]", spellName, classColorTable.r*255, classColorTable.g*255, classColorTable.b*255, sourceUnitTargetName)
+			elseif separator == "{" then
+				return format("%s {\124cff%.2x%.2x%.2x%s\124r}", spellName, classColorTable.r*255, classColorTable.g*255, classColorTable.b*255, sourceUnitTargetName)
+			else
+				return format("%s > \124cff%.2x%.2x%.2x%s\124r", spellName, classColorTable.r*255, classColorTable.g*255, classColorTable.b*255, sourceUnitTargetName)
+			end
 		end
 	else
 		local db = self.db.colors
@@ -48,7 +60,17 @@ local function spellNameWithUnit(self, frame, spellName, sourceUnitTarget)
 			r, g, b = 1, 1, 1
 		end
 
-		return format("%s > \124cff%.2x%.2x%.2x%s\124r", spellName, r*255, g*255, b*255, sourceUnitTargetName)
+		if separator == "<" then
+			return format("%s <\124cff%.2x%.2x%.2x%s\124r>", spellName, r*255, g*255, b*255, sourceUnitTargetName)
+		elseif separator == "(" then
+			return format("%s (\124cff%.2x%.2x%.2x%s\124r)", spellName, r*255, g*255, b*255, sourceUnitTargetName)
+		elseif separator == "[" then
+			return format("%s [\124cff%.2x%.2x%.2x%s\124r]", spellName, r*255, g*255, b*255, sourceUnitTargetName)
+		elseif separator == "{" then
+			return format("%s {\124cff%.2x%.2x%.2x%s\124r}", spellName, r*255, g*255, b*255, sourceUnitTargetName)
+		else
+			return format("%s > \124cff%.2x%.2x%.2x%s\124r", spellName, r*255, g*255, b*255, sourceUnitTargetName)
+		end
 	end
 end
 
