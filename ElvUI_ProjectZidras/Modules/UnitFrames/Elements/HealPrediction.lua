@@ -276,6 +276,7 @@ function ZUF:UpdateHealComm(_, myIncomingHeal, otherIncomingHeal, absorb, _, has
 	local pred = frame.HealCommBar
 	local healAbsorbBar = pred.healAbsorbBar
 	local absorbBar = pred.absorbBar
+	local overAbsorb = pred.overAbsorb
 
 	if not pred.anchor then
 		ZUF:Configure_HealComm(frame) -- workaround to db.enable returning false for some reason on configure_HealComm initial run
@@ -288,6 +289,11 @@ function ZUF:UpdateHealComm(_, myIncomingHeal, otherIncomingHeal, absorb, _, has
 		healAbsorbBar:Hide()
 		absorbBar:Hide()
 		return
+	end
+
+	-- Hide Over Absorbs Blizzard glow if not enabled
+	if not db.overAbsorb then
+		overAbsorb:Hide()
 	end
 
 	local missingHealth = maxHealth - health

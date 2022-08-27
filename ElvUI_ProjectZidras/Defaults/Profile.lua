@@ -6,7 +6,8 @@ local ZUF_AbsorbPrediction = {
 	anchorPoint = "BOTTOM",
 	absorbTexture = "ElvUI Norm",
 	absorbOverlay = "None",
-	height = -1
+	height = -1,
+	overAbsorb = true,
 }
 
 local ZUF_RoleIcon = {
