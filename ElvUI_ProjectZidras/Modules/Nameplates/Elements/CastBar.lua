@@ -183,6 +183,7 @@ function ZNP:Update_CastBar(frame, event, unit)
 		local name = UnitCastingInfo(unit) or UnitChannelInfo(unit)
 		if name then
 			frame.CastBar.spellName = name
+			ZNP:Update_CastBarName(frame, unit) -- since on HD this is not hooked and therefore it may not have an event to run ZNP:Update_Tags
 		end
 	elseif event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED" then
 		if frame.CastBar:IsShown() then
