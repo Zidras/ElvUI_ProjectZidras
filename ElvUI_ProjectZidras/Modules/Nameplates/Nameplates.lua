@@ -303,6 +303,9 @@ function ZNP:Update_Tags(frame)
 	if tagsOptions.guid.enable then
 		ZNP:Update_tagGUID(frame)
 	end
+	if tagsOptions.unit.enable then
+		ZNP:Update_tagUnit(frame)
+	end
 	if tagsOptions.title.enable then
 		NP:Update_Name(frame)
 	end
@@ -322,6 +325,14 @@ function ZNP:PLAYER_TARGET_CHANGED()
 				end
 			end
 		end)
+	else
+		for frame in pairs(NP.VisiblePlates) do
+			if frame.unit == "target" then
+				frame.unit = nil
+				ZNP:Update_Tags(frame)
+				break
+			end
+		end
 	end
 end
 
@@ -356,7 +367,11 @@ local function OnShowHook(self)
 	if not frame.tagGUID then
 		frame.tagGUID = ZNP:Construct_tagGUID(frame) -- this is running here and not OnCreated due to a bug on ElvUI funtion runtime: UpdateElement_All finishes before OnShow, which finishes before OnCreated, so hooking them both is not possible unless I'd full replace OnCreated
 	end
+	if not frame.tagUnit then
+		frame.tagUnit = ZNP:Construct_tagUnit(frame)
+	end
 	ZNP:Configure_tagGUID(frame)
+	ZNP:Configure_tagUnit(frame)
 	ZNP:Update_Tags(frame)
 
 	if hasTarget then
@@ -368,6 +383,9 @@ local function OnHideHook(self)
 	local frame = self.UnitFrame
 	if frame.tagGUID then
 		frame.tagGUID:SetText()
+	end
+	if frame.tagUnit then
+		frame.tagUnit:SetText()
 	end
 end
 
@@ -381,14 +399,25 @@ end
 
 function ZNP:NameplateTags()
 	local tagsOptions = E.db.pz.nameplates.tags
-	if tagsOptions.guid.enable or tagsOptions.title.enable then
+	if tagsOptions.guid.enable or tagsOptions.unit.enable or tagsOptions.title.enable then
 		if not self:IsHooked(NP, "OnShow") then
 			self:SecureHook(NP, "OnShow", OnShowHook)
 		end
 		if not self:IsHooked(NP, "OnHide") then
 			self:SecureHook(NP, "OnHide", OnHideHook)
 		end
-	elseif not tagsOptions.guid.enable and not tagsOptions.title.enable then
+
+		if tagsOptions.unit.enable then
+			if not self:IsHooked(NP, "SetMouseoverFrame") then
+				self:SecureHook(NP, "SetMouseoverFrame", ZNP.Update_tagUnit) -- sadly runs OnUpdate, but couldn't figure out a better way since there is no event for losing mouseover, which is necessary for clearing mouseover unit tag
+			end
+		elseif not tagsOptions.unit.enable then
+			if self:IsHooked(NP, "SetMouseoverFrame") then
+				self:Unhook(NP, "SetMouseoverFrame")
+			end
+		end
+
+	elseif not tagsOptions.guid.enable and not tagsOptions.unit.enable and not tagsOptions.title.enable then
 		if self:IsHooked(NP, "OnShow") then
 			self:Unhook(NP, "OnShow")
 		end

@@ -41,6 +41,16 @@ P.pz = {
 				xOffset = 0,
 				yOffset = 0,
 			},
+			unit = {
+				enable = false,
+				position = "RIGHT",
+				parent = "Health",
+				font = "PT Sans Narrow",
+				fontSize = 10,
+				fontOutline = "OUTLINE",
+				xOffset = 0,
+				yOffset = 0,
+			},
 			title = {
 				enable = false,
 			},

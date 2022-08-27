@@ -74,10 +74,22 @@ local function NamePlatesOptions()
 	tags.guidGroup.args.fontGroup.args.fontSize = ACH:Range(L["Font Size"], nil, 2, { min = 4, max = 60, step = 1 })
 	tags.guidGroup.args.fontGroup.args.fontOutline = ACH:FontFlags(L["Font Outline"], nil, 3)
 
-	tags.titleGroup = ACH:Group(L["Player Titles"], L["Display player titles."], 2, nil, function(info) return E.db.pz.nameplates.tags.title[info[#info]] end, function(info, value) E.db.pz.nameplates.tags.title[info[#info]] = value ZNP:UpdateAllSettings() NP:ConfigureAll() end)
+	tags.unitGroup = ACH:Group(L["Unit"], L["Unit_DESC"], 2, nil, function(info) return E.db.pz.nameplates.tags.unit[info[#info]] end, function(info, value) E.db.pz.nameplates.tags.unit[info[#info]] = value ZNP:UpdateAllSettings() NP:ConfigureAll() end)
+	tags.unitGroup.args.enable = ACH:Toggle(L["Enable"], nil, 1)
+	tags.unitGroup.args.position = ACH:Select(L["Position"], nil, 2, positionValues)
+	tags.unitGroup.args.parent = ACH:Select(L["Parent"], nil, 3, { Nameplate = L["Nameplate"], Health = L["Health"] })
+	tags.unitGroup.args.xOffset = ACH:Range(L["X-Offset"], nil, 4, { min = -100, max = 100, step = 1 })
+	tags.unitGroup.args.yOffset = ACH:Range(L["Y-Offset"], nil, 5, { min = -100, max = 100, step = 1 })
+	tags.unitGroup.args.fontGroup = ACH:Group("Fonts", nil, 6)
+	tags.unitGroup.args.fontGroup.inline = true
+	tags.unitGroup.args.fontGroup.args.font = ACH:SharedMediaFont(L["Font"], nil, 1)
+	tags.unitGroup.args.fontGroup.args.fontSize = ACH:Range(L["Font Size"], nil, 2, { min = 4, max = 60, step = 1 })
+	tags.unitGroup.args.fontGroup.args.fontOutline = ACH:FontFlags(L["Font Outline"], nil, 3)
+
+	tags.titleGroup = ACH:Group(L["Player Titles"], L["Display player titles."], 3, nil, function(info) return E.db.pz.nameplates.tags.title[info[#info]] end, function(info, value) E.db.pz.nameplates.tags.title[info[#info]] = value ZNP:UpdateAllSettings() NP:ConfigureAll() end)
 	tags.titleGroup.args.enable = ACH:Toggle(L["Enable"], nil, 1)
 
-	tags.displayTargetGroup = ACH:Group(L["Display Target"], L["Display the target of the current cast in the castbar"], 3, nil, function(info) return E.db.pz.nameplates.tags.displayTarget[info[#info]] end, function(info, value) E.db.pz.nameplates.tags.displayTarget[info[#info]] = value ZNP:UpdateAllSettings() NP:ConfigureAll() end)
+	tags.displayTargetGroup = ACH:Group(L["Display Target"], L["Display the target of the current cast in the castbar"], 4, nil, function(info) return E.db.pz.nameplates.tags.displayTarget[info[#info]] end, function(info, value) E.db.pz.nameplates.tags.displayTarget[info[#info]] = value ZNP:UpdateAllSettings() NP:ConfigureAll() end)
 	tags.displayTargetGroup.args.warning = ACH:Description(L["Based on the unit's target, which isn't always an indicator of the cast target. Will be inaccurate for self/mouseover/macro casts if unit is targeting elsewhere."], 1)
 	tags.displayTargetGroup.args.enable = ACH:Toggle(L["Enable"], nil, 1)
 	tags.displayTargetGroup.args.separator = ACH:Select(L["Separator"], nil, 2, {

@@ -2,4 +2,5 @@
 	<Script file="Nameplates.lua"/>
 	<Script file="Elements\CastBar.lua"/>
 	<Script file="Elements\GUID.lua"/>
+	<Script file="Elements\Unit.lua"/>
 </Ui>
