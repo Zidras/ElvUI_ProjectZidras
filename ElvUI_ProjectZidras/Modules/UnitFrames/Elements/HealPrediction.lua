@@ -119,6 +119,10 @@ function ZUF:Configure_HealComm(frame)
 		if db.enable ~= E.db.pz.unitframe.units[frame.unitframeType].absorbPrediction.enable then db.enable = true end -- workaround because RaidGroup1Button1 and PartyGroup1Button1 db.enable were being rewritten to false for some reason
 	end
 
+	if frame:IsElementEnabled("HealComm4") then
+		frame:DisableElement("HealComm4") -- disable stock ElvUI element since it was messing with the heal prediction (lookAhead, tags, statusbar). HealthPrediction is provided by PZ and is meant to be a full replacement.
+	end
+
 	if db and db.enable then
 
 		local pred = frame.HealCommBar

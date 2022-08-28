@@ -112,9 +112,10 @@ local function Update(self, event, unit, absorb)
 
 	local unitGUID = UnitGUID(unit)
 	local lookAhead = element.lookAhead or 5
+	local timeWindow = lookAhead and (GetTime() + lookAhead) or nil
 
-	local myIncomingHeal = (HealComm:GetHealAmount(unitGUID, HealComm.ALL_HEALS, GetTime() + lookAhead, UnitGUID("player")) or 0) * (HealComm:GetHealModifier(unitGUID) or 1) or 0
-	local allIncomingHeal = (HealComm:GetHealAmount(unitGUID, HealComm.ALL_HEALS, GetTime() + lookAhead) or 0) * (HealComm:GetHealModifier(unitGUID) or 1) or 0
+	local myIncomingHeal = ((HealComm:GetHealAmount(unitGUID, HealComm.ALL_HEALS, timeWindow, UnitGUID("player")) or 0) * (HealComm:GetHealModifier(unitGUID) or 1)) or 0
+	local allIncomingHeal = ((HealComm:GetHealAmount(unitGUID, HealComm.ALL_HEALS, timeWindow) or 0) * (HealComm:GetHealModifier(unitGUID) or 1)) or 0
 	absorb = absorb or SA.UnitTotal(UnitGUID(unit)) or 0
 	local healAbsorb = SA.UnitTotalHealAbsorbs(UnitGUID(unit)) or 0
 	local health, maxHealth = UnitHealth(unit), UnitHealthMax(unit)
