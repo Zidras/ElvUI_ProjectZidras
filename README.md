@@ -40,6 +40,13 @@ Adds Role Icons (Healer, Damager, Tank) to all player unitframes: Player, Target
 ![image](https://user-images.githubusercontent.com/10605951/140436070-6cbd807b-9808-447f-9346-0f99c20c14d4.png)
 ![image](https://user-images.githubusercontent.com/10605951/140436140-05272961-20ae-483f-aa6b-53e2af0d9496.png)
 
+## 4. WrathArmory: Gems and Enchants
+Displays gems and enchants to the character and inspect frames. Best paired with Enhanced Character Frame from ElvUI Enhanced plugin.
+
+https://user-images.githubusercontent.com/10605951/194050536-517922f8-09cb-45f7-9442-64d18889513a.mp4
+
+
+
 
 # How to install and update the addon
 1. Download the addon from the **main** repository (https://github.com/Zidras/ElvUI_ProjectZidras/archive/refs/heads/main.zip).
