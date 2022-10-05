@@ -2,4 +2,5 @@
 	<Include file="Chat\Load_Chat.xml"/>
 	<Include file="Nameplates\Load_Nameplates.xml"/>
 	<Include file="UnitFrames\Load_UnitFrames.xml"/>
+	<Include file="WrathArmory\Load_WrathArmory.xml"/>
 </Ui>

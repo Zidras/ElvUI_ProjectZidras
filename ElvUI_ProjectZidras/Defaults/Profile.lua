@@ -23,6 +23,37 @@ local ZUF_RoleIcon = {
 	combatHide = false,
 }
 
+local SharedFontOptions = {
+	enable = true,
+	font = "PT Sans Narrow",
+	fontSize = 12,
+	fontOutline = "OUTLINE",
+	xOffset = 0,
+	yOffset = 0,
+	color = {r = 0.99, g = 0.81, b = 0},
+	qualityColor = false,
+}
+
+local SharedGemOptions = {
+	enable = true,
+	size = 14,
+	xOffset = 3,
+	yOffset = 0,
+	spacing = 2,
+	MainHandSlot = {
+		xOffset = -2,
+		yOffset = 0,
+	},
+	SecondaryHandSlot = {
+		xOffset = 0,
+		yOffset = 2,
+	},
+	RangedSlot = {
+		xOffset = 2,
+		yOffset = 0,
+	},
+}
+
 P.pz = {
 	chat = {
 		guildmaster = true,
@@ -119,5 +150,57 @@ P.pz = {
 				absorbPrediction = CopyTable(ZUF_AbsorbPrediction),
 			},
 		}
-	}
+	},
+	wratharmory = {
+		character = {
+			enable = true,
+			enchant = CopyTable(SharedFontOptions),
+			gems = CopyTable(SharedGemOptions),
+		},
+		inspect = {
+			enable = true,
+			enchant = CopyTable(SharedFontOptions),
+			gems = CopyTable(SharedGemOptions),
+		},
+	},
+}
+
+--* Character
+-- Enchant
+--P.pz.wratharmory.character.enchant.mouseover = false --! NYI
+P.pz.wratharmory.character.enchant.color = {r = 0, g = 0.99, b = 0}
+P.pz.wratharmory.character.enchant.qualityColor = false
+P.pz.wratharmory.character.enchant.xOffset = 1
+P.pz.wratharmory.character.enchant.yOffset = -2
+P.pz.wratharmory.character.enchant.MainHandSlot = {
+	xOffset = -1,
+	yOffset = -9,
+}
+P.pz.wratharmory.character.enchant.SecondaryHandSlot = {
+	xOffset = -2,
+	yOffset = 0,
+}
+P.pz.wratharmory.character.enchant.RangedSlot = {
+	xOffset = 2,
+	yOffset = 0,
+}
+
+--* Inspect
+-- Enchant
+--P.pz.wratharmory.inspect.enchant.mouseover = false --! NYI
+P.pz.wratharmory.inspect.enchant.color = {r = 0, g = 0.99, b = 0}
+P.pz.wratharmory.inspect.enchant.qualityColor = false
+P.pz.wratharmory.inspect.enchant.xOffset = 1
+P.pz.wratharmory.inspect.enchant.yOffset = -2
+P.pz.wratharmory.inspect.enchant.MainHandSlot = {
+	xOffset = -1,
+	yOffset = -9,
+}
+P.pz.wratharmory.inspect.enchant.SecondaryHandSlot = {
+	xOffset = 0,
+	yOffset = -2,
+}
+P.pz.wratharmory.inspect.enchant.RangedSlot = {
+	xOffset = 2,
+	yOffset = 0,
 }
