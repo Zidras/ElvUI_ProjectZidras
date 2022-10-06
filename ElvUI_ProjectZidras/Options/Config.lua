@@ -278,7 +278,7 @@ local function GetOptionsTable_FontGroup(name, groupName)
 	config.args.yOffset = ACH:Range(L["Y-Offset"], nil, 7, { min = -300, max = 300, step = 1 })
 
 	config.args.qualityColor = ACH:Toggle(L["Quality Color"], nil, 10, nil, nil, nil)
-	config.args.color = ACH:Color(L["Color"], nil, 11)
+	config.args.color = ACH:Color(L["COLOR"], nil, 11)
 
 	if groupName == 'enchant' then
 		local MainHandSlot = ACH:Group(L["Main Hand Slot"], nil, 10, nil)
@@ -332,14 +332,14 @@ local function WrathArmoryOptions()
 	local Armory = ACH:Group('|cFF16C3F2Wrath|rArmory', nil, 4, "tab", function(info) return E.db.pz.wratharmory[info[#info]] end)
 	Armory.args.desc = ACH:Description(L["Armory module that displays gems and enchants to the character and inspect frames.\nBest paired with Enhanced Character Frame from |cff1784d1E|r|cffe5e3e3lvUI|r |cff1784d1E|r|cffe5e3e3nhanced|r."], 1)
 
-    local Character = ACH:Group(L["Character"], nil, 1, nil, nil, nil)
+    local Character = ACH:Group(L["CHARACTER"], nil, 1, nil, nil, nil)
 	Armory.args.character = Character
-	Character.args.enchant = GetOptionsTable_FontGroup(L["Enchants"], 'enchant')
+	Character.args.enchant = GetOptionsTable_FontGroup(L["ENCHANTS"], 'enchant')
 	Character.args.gems = GetOptionsTable_Gems()
 
-    local Inspect = ACH:Group(L["Inspect"], nil, 2, nil, nil, nil)
+    local Inspect = ACH:Group(L["INSPECT"], nil, 2, nil, nil, nil)
 	Armory.args.inspect = Inspect
-	Inspect.args.enchant = GetOptionsTable_FontGroup(L["Enchants"], 'enchant')
+	Inspect.args.enchant = GetOptionsTable_FontGroup(L["ENCHANTS"], 'enchant')
 	Inspect.args.gems = GetOptionsTable_Gems()
 
 	return Armory
