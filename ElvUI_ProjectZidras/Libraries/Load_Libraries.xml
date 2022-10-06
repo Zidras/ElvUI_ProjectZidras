@@ -3,4 +3,5 @@
 	<Include file="Compat\Compat.xml"/>
 	<Script file="SpecializedAbsorbs-1.0\SpecializedAbsorbs-1.0.lua"/>
 	<Include file="oUF_Plugins\oUF_Plugins.xml"/>
+	<Include file="LibGetEnchant-1.0\LibGetEnchant-1.0.xml"/>
 </Ui>

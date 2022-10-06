@@ -32,6 +32,7 @@ _G[AddOnName] = Engine
 PZ.Chat = E:NewModule("ProjectZidras_Chat", "AceEvent-3.0")
 PZ.NamePlates = E:NewModule("ProjectZidras_NamePlates", "AceEvent-3.0", "AceHook-3.0")
 PZ.UnitFrames = E:NewModule("ProjectZidras_UnitFrames")
+PZ.WrathArmory = E:NewModule("ProjectZidras_WrathArmory", "AceEvent-3.0", "AceHook-3.0")
 
 -- Database Conversion
 local function databaseConversions()
