@@ -2658,4 +2658,5 @@ LibGetEnchantDB = {
 	[3880] = "+6 Armor Pen",
 	[3881] = "+17 MP5",
 	[3882] = "+8 Armor Pen",
+	[3883] = "Nerubian Carapace",
 }
