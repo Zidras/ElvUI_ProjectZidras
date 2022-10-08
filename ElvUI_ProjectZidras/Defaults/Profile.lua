@@ -152,6 +152,7 @@ P.pz = {
 		}
 	},
 	wratharmory = {
+		enable = true,
 		character = {
 			enable = true,
 			enchant = CopyTable(SharedFontOptions),

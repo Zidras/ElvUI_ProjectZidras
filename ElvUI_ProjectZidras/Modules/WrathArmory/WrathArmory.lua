@@ -431,6 +431,8 @@ function module:ADDON_LOADED(_, addon)
 end
 
 function module:Initialize()
+	if not E.db.pz.wratharmory.enable then return end
+
 	module:ToggleArmoryInfo(true)
 
 	if IsAddOnLoaded('Blizzard_InspectUI') then

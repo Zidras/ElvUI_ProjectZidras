@@ -331,13 +331,14 @@ end
 local function WrathArmoryOptions()
 	local Armory = ACH:Group('|cFF16C3F2Wrath|rArmory', nil, 4, "tab", function(info) return E.db.pz.wratharmory[info[#info]] end)
 	Armory.args.desc = ACH:Description(L["Armory module that displays gems and enchants to the character and inspect frames.\nBest paired with Enhanced Character Frame from |cff1784d1E|r|cffe5e3e3lvUI|r |cff1784d1E|r|cffe5e3e3nhanced|r."], 1)
+	Armory.args.enable = ACH:Toggle(L["Enable"], nil, 2, nil, function(info, value) E.db.pz.wratharmory[info[#info]] = value E:StaticPopup_Show("PRIVATE_RL") end)
 
-    local Character = ACH:Group(L["CHARACTER"], nil, 1, nil, nil, nil)
+	local Character = ACH:Group(L["CHARACTER"], nil, 1, nil, nil, nil, function() return not E.db.pz.wratharmory.enable end)
 	Armory.args.character = Character
 	Character.args.enchant = GetOptionsTable_FontGroup(L["ENCHANTS"], 'enchant')
 	Character.args.gems = GetOptionsTable_Gems()
 
-    local Inspect = ACH:Group(L["INSPECT"], nil, 2, nil, nil, nil)
+	local Inspect = ACH:Group(L["INSPECT"], nil, 2, nil, nil, nil, function() return not E.db.pz.wratharmory.enable end)
 	Armory.args.inspect = Inspect
 	Inspect.args.enchant = GetOptionsTable_FontGroup(L["ENCHANTS"], 'enchant')
 	Inspect.args.gems = GetOptionsTable_Gems()
