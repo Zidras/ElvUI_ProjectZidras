@@ -310,6 +310,8 @@ function module:UpdateInspectPageFonts(which, gems)
 	if not frame then return end
 
 	local unit = (which == 'Character' and 'player') or frame.unit
+	if not unit then return end
+
 	local db = E.db.pz.wratharmory[string.lower(which)]
 	local enchant = db.enchant
 
