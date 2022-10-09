@@ -20,9 +20,10 @@ local function resetAttributes(self)
 	self.spellName = nil
 end
 
-local function spellNameWithUnit(self, frame, spellName, sourceUnitTarget)
-	if not E.db.pz.nameplates.tags.displayTarget.enable then return spellName end
+local function spellNameWithUnit(self, _, spellName, sourceUnit) -- self, frame, spellName, sourceUnit
+	if not E.db.pz.nameplates.tags.displayTarget.enable or not sourceUnit then return spellName end
 
+	local sourceUnitTarget = sourceUnit.."target"
 	local sourceUnitTargetName = UnitName(sourceUnitTarget)
 
 	if not sourceUnitTargetName then return spellName end
@@ -48,7 +49,7 @@ local function spellNameWithUnit(self, frame, spellName, sourceUnitTarget)
 		end
 	else
 		local db = self.db.colors
-		local unitReaction = UnitReaction(frame.unit, sourceUnitTarget)
+		local unitReaction = UnitReaction(sourceUnit, sourceUnitTarget)
 		local r, g, b
 		if unitReaction == 5 then -- friendly
 			r, g, b = db.reactions.good.r, db.reactions.good.g, db.reactions.good.b
@@ -212,7 +213,7 @@ function ZNP:Update_CastBarName(frame, unit)
 	if proceed then
 		local name = UnitCastingInfo(unit) or UnitChannelInfo(unit)
 		if name then
-			frame.CastBar.spellName = spellNameWithUnit(NP, frame, name, unit.."target")
+			frame.CastBar.spellName = spellNameWithUnit(NP, frame, name, unit)
 			if not db.hdClient.hdNameplates then
 				frame.CastBar.Name:SetText(frame.CastBar.spellName) -- with Update_Tags coming from mouseover, ZNP was running before NP, so add this for the hooksecurefunc to run the post-hook for non-HD.
 			end
