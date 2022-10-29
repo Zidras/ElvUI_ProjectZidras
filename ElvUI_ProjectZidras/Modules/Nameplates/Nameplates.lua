@@ -9,6 +9,8 @@ local SetCVar = SetCVar
 local UnitExists = UnitExists
 local UnitGUID = UnitGUID
 local UnitName = UnitName
+local C_NamePlate = C_NamePlate -- https://github.com/FrostAtom/awesome_wotlk
+local GetNamePlateForUnit = C_NamePlate and C_NamePlate.GetNamePlateForUnit
 
 local UnitIterator = T.UnitIterator
 
@@ -328,7 +330,12 @@ function ZNP:PLAYER_TARGET_CHANGED()
 	else
 		for frame in pairs(NP.VisiblePlates) do
 			if frame.unit == "target" then
-				frame.unit = nil
+				frame.unit = frame.nameplateUnit or nil -- restore nameplate%d
+				if frame.unit == frame.nameplateUnit then
+					E:Delay(0.01, function() -- Delay needed since frame.unit is wiped on ElvUI NP module with no target
+						frame.unit = frame.nameplateUnit -- restore nameplate%d
+					end)
+				end
 				ZNP:Update_Tags(frame)
 				break
 			end
@@ -340,7 +347,7 @@ function ZNP:UPDATE_MOUSEOVER_UNIT()
 	if UnitExists("mouseover") and not UnitIsUnit("mouseover", "player") then
 		for frame in pairs(NP.VisiblePlates) do
 			if frame.oldHighlight:IsShown() then
-				if not frame.isGroupUnit then -- preserve already cached group unitIDs
+				if not frame.isGroupUnit or not frame.unit then -- preserve cached permanent unitIDs, such as group and nameplate
 					-- runs before SetMouseoverFrame so ensure frame.unit and frame.guid are the right values (also needed due to CURSOR_UPDATE when mouseovering a model and afterwards a different nameplate would assume a different frame.guid)
 					frame.unit = "mouseover"
 					frame.guid = UnitGUID("mouseover")
@@ -440,6 +447,24 @@ function ZNP:NameplateTags()
 	end
 end
 
+function ZNP:NAME_PLATE_UNIT_ADDED(_, unit)
+	local plate = GetNamePlateForUnit(unit)
+	E:Delay(0.05, function()
+		local frame = plate.UnitFrame
+		frame.guid = UnitGUID(unit)
+		frame.unit = unit
+		frame.nameplateUnit = unit
+
+		OnShowHook(plate)
+	end) -- Delay needed since ElvUI plate (plate.UnitFrame) is created a few frames after this event
+end
+
+function ZNP:NAME_PLATE_UNIT_REMOVED(_, unit)
+	local plate = GetNamePlateForUnit(unit)
+
+	OnHideHook(plate)
+end
+
 function ZNP:UpdateAllSettings()
 	self:CastBarHD()
 	self:NameplateTags()
@@ -459,6 +484,11 @@ function ZNP:Initialize()
 	self:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
 	self:RegisterEvent("CURSOR_UPDATE")
 	self:RegisterEvent("UNIT_TARGET")
+
+	if C_NamePlate then
+		self:RegisterEvent("NAME_PLATE_UNIT_ADDED")
+		self:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
+	end
 
 	-- Bosses
 	self:CacheBossUnits()
