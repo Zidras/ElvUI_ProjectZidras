@@ -14,6 +14,81 @@ function module:UpdateOptions(unit, updateGems)
 	end
 end
 
+local function tInvert(tbl)
+	local inverted = {};
+	for k, v in pairs(tbl) do
+		inverted[v] = k;
+	end
+	return inverted;
+end
+
+local ProfessionNames = {
+	enUS = {
+		[164] = "Blacksmithing",
+		[333] = "Enchanting",
+	},
+	deDE = {
+		[164] = "Schmiedekunst",
+		[333] = "Verzauberkunst",
+	},
+	frFR = {
+		[164] = "Forge",
+		[333] = "Enchantement",
+	},
+	esES = {
+		[164] = "Herrería",
+		[333] = "Encantamiento",
+	},
+	esMX = {
+		[164] = "Herrería",
+		[333] = "Encantamiento",
+	},
+	ruRU = {
+		[164] = "Кузнечное дело",
+		[333] = "Наложение чар",
+	},
+	zhCN = {
+		[164] = "锻造",
+		[333] = "附魔",
+	},
+	zhTW = {
+		[164] = "鍛造",
+		[333] = "附魔",
+	},
+	koKR = {
+		[164] = "대장기술",
+		[333] = "마법부여",
+	},
+}
+
+local profNames = ProfessionNames[GetLocale()]
+local profNames_rev = tInvert(profNames)
+local emptySlots = {
+	[1] = true, --"HeadSlot",
+	[3] = true, --"ShoulderSlot",
+	[5] = true, --"ChestSlot",
+	[7] = true, --"WaistSlot",
+	[8] = true, --"LegsSlot",
+	[9] = true, --"FeetSlot",
+	[10] = true, --"WristSlot",
+	[11] = false, --"Finger0Slot",
+	[12] = false, --"Finger1Slot",
+	[15] = true, --"HandsSlot",
+	[16] = true, --"MainHandSlot",
+	[17] = true, --"SecondaryHandSlot",
+	--[18] = true, --"RangedSlot", Check for hunter scope?
+}
+
+for i = 1, GetNumSkillLines() do
+	local name, _, _, skillRank = GetSkillLineInfo(i)
+	if profNames_rev[name] == 333 and skillRank and skillRank >= 420 then --Enchanting
+		emptySlots[11] = true
+		emptySlots[12] = true
+	end
+end
+
+local _, _, _, _, _, shieldsSubClass = GetAuctionItemSubClasses(2)
+
 local InspectItems = {
 	'HeadSlot',			--1L
 	'NeckSlot',			--2L
@@ -175,7 +250,17 @@ function module:UpdatePageStrings(i, inspectItem, slotInfo, which)
 		inspectItem.enchantText:ClearAllPoints()
 		inspectItem.enchantText:Point(point, inspectItem, relativePoint, x, y)
 		inspectItem.enchantText:FontTemplate(LSM:Fetch('font', db.enchant.font), db.enchant.fontSize, db.enchant.fontOutline)
-		inspectItem.enchantText:SetText(slotInfo.enchantTextShort)
+
+		local text = slotInfo.enchantTextShort
+		if emptySlots[i] and (not text or text == "" ) then
+			if which == "Character" or (which == "Inspect" and (i ~= 11 or i ~= 12)) then
+				if not (i == 17 and slotInfo.subClass ~= shieldsSubClass) then -- Exclusion: Off-hands cannot have enchants
+					text = "|cFFFF0000MISSING|r"
+				end
+			end
+		end
+
+		inspectItem.enchantText:SetText(text)
 		if db.enchant.enable then
 			inspectItem.enchantText:Show()
 		else
@@ -403,8 +488,9 @@ function module:GetGearSlotInfo(unit, slot)
 
 	local itemLink = GetInventoryItemLink(unit, slot)
 	if itemLink then
-		local _, _, quality = GetItemInfo(itemLink) -- GetInventoryItemQuality only works for player, not inspected unit, despite what it says on API documentation
+		local _, _, quality, _, _, _, subclass = GetItemInfo(itemLink) -- GetInventoryItemQuality only works for player, not inspected unit, despite what it says on API documentation
 		slotInfo.itemQualityColors.r, slotInfo.itemQualityColors.g, slotInfo.itemQualityColors.b = GetItemQualityColor(quality)
+		slotInfo.subClass = subclass
 
 		local enchantID = tonumber(string.match(itemLink, 'item:%d+:(%d+):'))
 		if enchantID and enchantID ~= 0 then
