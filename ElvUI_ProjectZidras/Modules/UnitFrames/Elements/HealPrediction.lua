@@ -7,7 +7,7 @@ local StatusBarPrototype = T.StatusBarPrototype
 
 function ZUF.HealthClipFrame_HealComm(frame)
 	if frame.HealCommBar then
-		ZUF:SetAlpha_HealComm(frame.HealCommBar, 1)
+		ZUF:SetAlpha_HealComm(frame.HealCommBar, 0) --xD changed from 1 to 0 to start it off hidden avoiding bug yet still have it there so it still positions properly
 	end
 end
 
@@ -302,6 +302,30 @@ function ZUF:UpdateHealComm(_, myIncomingHeal, otherIncomingHeal, absorb, _, has
 
 	local missingHealth = maxHealth - health
 	local healthPostHeal = health + myIncomingHeal + otherIncomingHeal
+
+	-- xD shit code fix to visually hide heal and absorb bar if it is empty avoiding the 1 pixel line they each have by default in that state. Can prob be placed in a better position and fixed in a much better way. 
+	-- This fix is insipred by EvlUI's default function "UpdateFillBar" in their HealComm.lua, they use "if amount == 0 then bar:Hide()" there to do the same thing, calling it on UpdateHealComm. The reason I used SetAlpha instead is
+	-- that for Zidras UpdateHealComm using :Hide() breaks bar positioning.
+
+	if healthPostHeal == health then    
+        self.myBar:SetAlpha(0)
+        self.otherBar:SetAlpha(0)
+    else
+        self.myBar:SetAlpha(1)
+        self.otherBar:SetAlpha(1)
+    end
+
+    if absorb == 0 then                    
+        healAbsorbBar:SetAlpha(0)
+        absorbBar:SetAlpha(0)
+        overAbsorb:SetAlpha(0)
+    else
+        healAbsorbBar:SetAlpha(1)
+        absorbBar:SetAlpha(1)
+        overAbsorb:SetAlpha(1)
+    end
+
+	-- xD end of shit code
 
 	-- handle over heal absorbs
 	healAbsorbBar:ClearAllPoints()
