@@ -468,6 +468,7 @@ end
 
 function ZNP:NAME_PLATE_UNIT_REMOVED(_, unit)
 	local plate = GetNamePlateForUnit(unit)
+	if not plate then return end -- prevent Lua error after Zoning Loading Screen if nameplate was visible prior to zoning
 
 	OnHideHook(plate)
 end
