@@ -9,6 +9,8 @@ local SetCVar = SetCVar
 local UnitExists = UnitExists
 local UnitGUID = UnitGUID
 local UnitName = UnitName
+local C_NamePlate = C_NamePlate -- https://github.com/FrostAtom/awesome_wotlk
+local GetNamePlateForUnit = C_NamePlate and C_NamePlate.GetNamePlateForUnit
 
 local UnitIterator = T.UnitIterator
 
@@ -328,7 +330,12 @@ function ZNP:PLAYER_TARGET_CHANGED()
 	else
 		for frame in pairs(NP.VisiblePlates) do
 			if frame.unit == "target" then
-				frame.unit = nil
+				frame.unit = frame.nameplateUnit or nil -- restore nameplate%d
+				if frame.unit == frame.nameplateUnit then
+					E:Delay(0.01, function() -- Delay needed since frame.unit is wiped on ElvUI NP module with no target
+						frame.unit = frame.nameplateUnit -- restore nameplate%d
+					end)
+				end
 				ZNP:Update_Tags(frame)
 				break
 			end
@@ -340,12 +347,12 @@ function ZNP:UPDATE_MOUSEOVER_UNIT()
 	if UnitExists("mouseover") and not UnitIsUnit("mouseover", "player") then
 		for frame in pairs(NP.VisiblePlates) do
 			if frame.oldHighlight:IsShown() then
-				if not frame.isGroupUnit then -- preserve already cached group unitIDs
+				frame.unitPriorToMouseover = frame.unit -- SetMouseoverFrame on losing mouseover will nil frame.unit, overriding permanent unitIDs. This variable will be used to restore the previous unit by the hook
+				if not frame.isGroupUnit and not frame.unit then -- preserve cached permanent unitIDs, such as group and nameplate
 					-- runs before SetMouseoverFrame so ensure frame.unit and frame.guid are the right values (also needed due to CURSOR_UPDATE when mouseovering a model and afterwards a different nameplate would assume a different frame.guid)
 					frame.unit = "mouseover"
 					frame.guid = UnitGUID("mouseover")
 				end
-
 				ZNP:Update_Tags(frame)
 				break
 			end
@@ -353,6 +360,13 @@ function ZNP:UPDATE_MOUSEOVER_UNIT()
 	end
 end
 ZNP.CURSOR_UPDATE = ZNP.UPDATE_MOUSEOVER_UNIT
+
+local function restoreNameplateUnitAfterMouseover(self, frame)
+	if frame.isMouseover or frame.unit or not frame.unitPriorToMouseover then return end -- Only run when frame.IsMousoever is nil (set on NP:SetMouseoverFrame, OnUpdate) and check if frame still has unit and did not carry a unit before mouseover
+
+	frame.unit = frame.unitPriorToMouseover
+	frame.unitPriorToMouseover = nil
+end
 
 function ZNP:UNIT_TARGET(_, unit)
 	for frame in pairs(NP.VisiblePlates) do
@@ -440,6 +454,25 @@ function ZNP:NameplateTags()
 	end
 end
 
+function ZNP:NAME_PLATE_UNIT_ADDED(_, unit)
+	local plate = GetNamePlateForUnit(unit)
+	E:Delay(0.05, function()
+		local frame = plate.UnitFrame
+		frame.guid = UnitGUID(unit)
+		frame.unit = unit
+		frame.nameplateUnit = unit
+
+		OnShowHook(plate)
+	end) -- Delay needed since ElvUI plate (plate.UnitFrame) is created a few frames after this event
+end
+
+function ZNP:NAME_PLATE_UNIT_REMOVED(_, unit)
+	local plate = GetNamePlateForUnit(unit)
+	if not plate then return end -- prevent Lua error after Zoning Loading Screen if nameplate was visible prior to zoning
+
+	OnHideHook(plate)
+end
+
 function ZNP:UpdateAllSettings()
 	self:CastBarHD()
 	self:NameplateTags()
@@ -452,6 +485,8 @@ function ZNP:Initialize()
 		if E.db.pz.nameplates.hdClient.hdNameplates then
 			UpdateCVarsHook(NP) -- update once since we cannot hook it in time on NP:Initialize.
 		end
+
+		hooksecurefunc(NP, "SetMouseoverFrame", restoreNameplateUnitAfterMouseover) -- this is needed to hotfix ElvUI behaviour that clears frame.unit on all mouseover losses, so always hook it
 	end
 
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -459,6 +494,11 @@ function ZNP:Initialize()
 	self:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
 	self:RegisterEvent("CURSOR_UPDATE")
 	self:RegisterEvent("UNIT_TARGET")
+
+	if C_NamePlate then
+		self:RegisterEvent("NAME_PLATE_UNIT_ADDED")
+		self:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
+	end
 
 	-- Bosses
 	self:CacheBossUnits()
