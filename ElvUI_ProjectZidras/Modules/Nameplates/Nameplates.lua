@@ -347,12 +347,12 @@ function ZNP:UPDATE_MOUSEOVER_UNIT()
 	if UnitExists("mouseover") and not UnitIsUnit("mouseover", "player") then
 		for frame in pairs(NP.VisiblePlates) do
 			if frame.oldHighlight:IsShown() then
-				if not frame.isGroupUnit or not frame.unit then -- preserve cached permanent unitIDs, such as group and nameplate
+				frame.unitPriorToMouseover = frame.unit -- SetMouseoverFrame on losing mouseover will nil frame.unit, overriding permanent unitIDs. This variable will be used to restore the previous unit by the hook
+				if not frame.isGroupUnit and not frame.unit then -- preserve cached permanent unitIDs, such as group and nameplate
 					-- runs before SetMouseoverFrame so ensure frame.unit and frame.guid are the right values (also needed due to CURSOR_UPDATE when mouseovering a model and afterwards a different nameplate would assume a different frame.guid)
 					frame.unit = "mouseover"
 					frame.guid = UnitGUID("mouseover")
 				end
-
 				ZNP:Update_Tags(frame)
 				break
 			end
@@ -360,6 +360,13 @@ function ZNP:UPDATE_MOUSEOVER_UNIT()
 	end
 end
 ZNP.CURSOR_UPDATE = ZNP.UPDATE_MOUSEOVER_UNIT
+
+local function restoreNameplateUnitAfterMouseover(self, frame)
+	if frame.isMouseover or frame.unit or not frame.unitPriorToMouseover then return end -- Only run when frame.IsMousoever is nil (set on NP:SetMouseoverFrame, OnUpdate) and check if frame still has unit and did not carry a unit before mouseover
+
+	frame.unit = frame.unitPriorToMouseover
+	frame.unitPriorToMouseover = nil
+end
 
 function ZNP:UNIT_TARGET(_, unit)
 	for frame in pairs(NP.VisiblePlates) do
@@ -477,6 +484,8 @@ function ZNP:Initialize()
 		if E.db.pz.nameplates.hdClient.hdNameplates then
 			UpdateCVarsHook(NP) -- update once since we cannot hook it in time on NP:Initialize.
 		end
+
+		hooksecurefunc(NP, "SetMouseoverFrame", restoreNameplateUnitAfterMouseover) -- this is needed to hotfix ElvUI behaviour that clears frame.unit on all mouseover losses, so always hook it
 	end
 
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
