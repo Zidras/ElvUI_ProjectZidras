@@ -1,6 +1,7 @@
 local PZ, T, E, L, V, P, G = unpack(select(2, ...))
 local ZNP = PZ.NamePlates
 local NP = E.NamePlates
+local LAI = E.Libs.LAI
 
 local pairs = pairs
 local twipe = table.wipe
@@ -462,6 +463,7 @@ function ZNP:NAME_PLATE_UNIT_ADDED(_, unit)
 		frame.unit = unit
 		frame.nameplateUnit = unit
 
+		LAI.frame:UNIT_AURA(_, unit) -- force recheck nameplate auras with nameplate unitID to avoid having to mouseover
 		OnShowHook(plate)
 	end) -- Delay needed since ElvUI plate (plate.UnitFrame) is created a few frames after this event
 end
