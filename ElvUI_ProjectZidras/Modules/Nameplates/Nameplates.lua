@@ -459,11 +459,16 @@ function ZNP:NAME_PLATE_UNIT_ADDED(_, unit)
 	local plate = GetNamePlateForUnit(unit)
 	E:Delay(0.05, function()
 		local frame = plate.UnitFrame
+		local _, unitType = NP:GetUnitInfo(frame)
 		frame.guid = UnitGUID(unit)
 		frame.unit = unit
 		frame.nameplateUnit = unit
 
-		LAI.frame:UNIT_AURA(_, unit) -- force recheck nameplate auras with nameplate unitID to avoid having to mouseover
+		frame.UnitClass = NP:UnitClass(frame, unitType) -- Update UnitClass for Update_HealthColor
+		NP:Update_HealthColor(frame) -- Update Health color to match Class color without having to mouseover (NP.OnShow clears guid, so do NOT use it under any circumstance! This API alone is enough for this purpose)
+
+		LAI.frame:UNIT_AURA(_, unit) -- force recheck nameplate auras with nameplate unitID to avoid having to mouseover. This also sets self.GUIDList[guid] from NP:UpdateElement_AurasByGUID (Auras.lua), so NP:UPDATE_MOUSEOVER_UNIT() won't fire NP.OnShow. As stated above, avoid NP.OnShow in order to preserve the tags.
+
 		OnShowHook(plate)
 	end) -- Delay needed since ElvUI plate (plate.UnitFrame) is created a few frames after this event
 end
