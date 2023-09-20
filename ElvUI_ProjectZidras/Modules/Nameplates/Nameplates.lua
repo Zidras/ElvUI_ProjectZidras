@@ -396,6 +396,8 @@ end
 
 local function OnHideHook(self)
 	local frame = self.UnitFrame
+	if not frame then return end --	OnShowHook(plate) sometimes does not have ElvUI UnitFrame created yet, so prevent nil index
+
 	if frame.tagGUID then
 		frame.tagGUID:SetText()
 	end
