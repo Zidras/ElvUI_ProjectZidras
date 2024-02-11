@@ -461,6 +461,10 @@ function ZNP:NAME_PLATE_UNIT_ADDED(_, unit)
 	local plate = GetNamePlateForUnit(unit)
 	E:Delay(0.05, function()
 		local frame = plate.UnitFrame
+		if not frame then -- Compatibility with VirtualPlates
+            frame = plate:GetChildren().UnitFrame
+            plate = plate:GetChildren()
+        end
 		local _, unitType = NP:GetUnitInfo(frame)
 		frame.guid = UnitGUID(unit)
 		frame.unit = unit
