@@ -272,12 +272,14 @@ function ZUF:Configure_HealComm(frame)
 	end
 end
 
-function ZUF:UpdateHealComm(_, myIncomingHeal, otherIncomingHeal, absorb, _, hasOverAbsorb, hasOverHealAbsorb, health, maxHealth)
+function ZUF:UpdateHealComm(_, myIncomingHeal, otherIncomingHeal, absorb, healAbsorb, hasOverAbsorb, hasOverHealAbsorb, health, maxHealth)
 	local frame = self.frame
 	local db = frame and frame.db and frame.db.healPrediction
 	if not db or not db.absorbStyle or not health then return end
 
 	local pred = frame.HealCommBar
+	local myBar = pred.myBar
+	local otherBar = pred.otherBar
 	local healAbsorbBar = pred.healAbsorbBar
 	local absorbBar = pred.absorbBar
 	local overAbsorb = pred.overAbsorb
@@ -302,6 +304,15 @@ function ZUF:UpdateHealComm(_, myIncomingHeal, otherIncomingHeal, absorb, _, has
 
 	local missingHealth = maxHealth - health
 	local healthPostHeal = health + myIncomingHeal + otherIncomingHeal
+
+	-- code fix by StefanOyx to visually hide heal and absorb bar if it is empty avoiding the 1 pixel line they each have by default in that state. Can prob be placed in a better position and fixed in a much better way.
+	-- This fix is inspired by ElvUI's default function "UpdateFillBar" in their HealComm.lua, they use "if amount == 0 then bar:Hide()" there to do the same thing, calling it on UpdateHealComm. The reason I used SetAlpha instead is
+	-- that for Zidras UpdateHealComm using :Hide() breaks bar positioning.
+
+	myBar:SetAlpha(myIncomingHeal == 0 and 0 or 1)
+	otherBar:SetAlpha(otherIncomingHeal == 0 and 0 or 1)
+	absorbBar:SetAlpha(absorb == 0 and 0 or 1)
+	healAbsorbBar:SetAlpha(healAbsorb == 0 and 0 or 1)
 
 	-- handle over heal absorbs
 	healAbsorbBar:ClearAllPoints()
