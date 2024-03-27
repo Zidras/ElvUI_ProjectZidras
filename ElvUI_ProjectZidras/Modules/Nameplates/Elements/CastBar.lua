@@ -20,6 +20,10 @@ local function resetAttributes(self)
 	self.spellName = nil
 end
 
+local function castbarHide(frame)
+	frame.CastBar:Hide()
+end
+
 local function spellNameWithUnit(self, _, spellName, sourceUnit) -- self, frame, spellName, sourceUnit
 	if not E.db.pz.nameplates.tags.displayTarget.enable or not sourceUnit then return spellName end
 
@@ -187,8 +191,19 @@ function ZNP:Update_CastBar(frame, event, unit)
 			ZNP:Update_CastBarName(frame, unit) -- since on HD this is not hooked and therefore it may not have an event to run ZNP:Update_Tags
 		end
 	elseif event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED" then
-		if frame.CastBar:IsShown() then
+		if frame.CastBar and frame.unit == unit then
+			if not frame.CastBar:IsShown() then
+				frame.CastBar:Show()
+			end
+
+			frame.CastBar:SetStatusBarColor(NP.db.colors.castInterruptedColor.r, NP.db.colors.castInterruptedColor.g, NP.db.colors.castInterruptedColor.b)
 			frame.CastBar.Name:SetText(event == "UNIT_SPELLCAST_FAILED" and FAILED or INTERRUPTED)
+
+			frame.CastBar.holdTime = NP.db.units[frame.UnitType].castbar.timeToHold --How long the castbar should stay visible after being interrupted, in seconds
+			frame.CastBar.interrupted = true
+
+			resetAttributes(frame.CastBar)
+			E:Delay(frame.CastBar.holdTime, castbarHide, frame)
 		end
 	end
 end
