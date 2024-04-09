@@ -18,6 +18,7 @@ local function resetAttributes(self)
 	self.channeling = nil
 	self.notInterruptible = nil
 	self.spellName = nil
+	self.delay = 0
 end
 
 local function castbarHide(frame)
@@ -95,33 +96,63 @@ function ZNP:Update_CastBarOnValueChanged(value)
 	local min, max = self:GetMinMaxValues()
 	local cur = castBar:GetValue()
 
+	local delta = 0
+	if castBar.casting and cur > value then -- keep this before setting castBar.casting
+		delta = cur - value -- does not produce the same results as UnitCastingInfo math, but I can't justify this being wrong
+	end
+
 	--castBar.spellName = self.Name:GetText()
 	castBar.casting = value > cur
 	castBar.channeling = value < cur
 	castBar.notInterruptible = frame.oldCastBar.Shield:IsShown()
+	castBar.delay = (castBar.delay or 0) + delta
 
 	castBar:SetMinMaxValues(min, max)
 	castBar:SetValue(value)
 
-	if castBar.channeling then
-		if castBar.channelTimeFormat == "CURRENT" then
-			castBar.Time:SetFormattedText("%.1f", abs(value - max))
-		elseif castBar.channelTimeFormat == "CURRENTMAX" then
-			castBar.Time:SetFormattedText("%.1f / %.2f", abs(value - max), max)
-		elseif castBar.channelTimeFormat == "REMAINING" then
-			castBar.Time:SetFormattedText("%.1f", value)
-		elseif castBar.channelTimeFormat == "REMAININGMAX" then
-			castBar.Time:SetFormattedText("%.1f / %.2f", value, max)
+	if castBar.delay ~= 0 then
+		if castBar.channeling then
+			if castBar.channelTimeFormat == "CURRENT" then
+				castBar.Time:SetFormattedText("%.1f |cffaf5050%.2f|r", abs(value - max), castBar.delay)
+			elseif castBar.channelTimeFormat == "CURRENTMAX" then
+				castBar.Time:SetFormattedText("%.1f / %.2f |cffaf5050%.2f|r", abs(value - max), max, castBar.delay)
+			elseif castBar.channelTimeFormat == "REMAINING" then
+				castBar.Time:SetFormattedText("%.1f |cffaf5050%.2f|r", value, castBar.delay)
+			elseif castBar.channelTimeFormat == "REMAININGMAX" then
+				castBar.Time:SetFormattedText("%.1f / %.2f |cffaf5050%.2f|r", value, max, max, castBar.delay)
+			end
+		else
+			if castBar.castTimeFormat == "CURRENT" then
+				castBar.Time:SetFormattedText("%.1f |cffaf5050%s %.2f|r", value, "+", castBar.delay)
+			elseif castBar.castTimeFormat == "CURRENTMAX" then
+				castBar.Time:SetFormattedText("%.1f / %.2f |cffaf5050%s %.2f|r", value, max, "+", castBar.delay)
+			elseif castBar.castTimeFormat == "REMAINING" then
+				castBar.Time:SetFormattedText("%.1f |cffaf5050%s %.2f|r", abs(value - max), "+", castBar.delay)
+			elseif castBar.castTimeFormat == "REMAININGMAX" then
+				castBar.Time:SetFormattedText("%.1f / %.2f |cffaf5050%s %.2f|r", abs(value - max), max, "+", castBar.delay)
+			end
 		end
 	else
-		if castBar.castTimeFormat == "CURRENT" then
-			castBar.Time:SetFormattedText("%.1f", value)
-		elseif castBar.castTimeFormat == "CURRENTMAX" then
-			castBar.Time:SetFormattedText("%.1f / %.2f", value, max)
-		elseif castBar.castTimeFormat == "REMAINING" then
-			castBar.Time:SetFormattedText("%.1f", abs(value - max))
-		elseif castBar.castTimeFormat == "REMAININGMAX" then
-			castBar.Time:SetFormattedText("%.1f / %.2f", abs(value - max), max)
+		if castBar.channeling then
+			if castBar.channelTimeFormat == "CURRENT" then
+				castBar.Time:SetFormattedText("%.1f", abs(value - max))
+			elseif castBar.channelTimeFormat == "CURRENTMAX" then
+				castBar.Time:SetFormattedText("%.1f / %.2f", abs(value - max), max)
+			elseif castBar.channelTimeFormat == "REMAINING" then
+				castBar.Time:SetFormattedText("%.1f", value)
+			elseif castBar.channelTimeFormat == "REMAININGMAX" then
+				castBar.Time:SetFormattedText("%.1f / %.2f", value, max)
+			end
+		else
+			if castBar.castTimeFormat == "CURRENT" then
+				castBar.Time:SetFormattedText("%.1f", value)
+			elseif castBar.castTimeFormat == "CURRENTMAX" then
+				castBar.Time:SetFormattedText("%.1f / %.2f", value, max)
+			elseif castBar.castTimeFormat == "REMAINING" then
+				castBar.Time:SetFormattedText("%.1f", abs(value - max))
+			elseif castBar.castTimeFormat == "REMAININGMAX" then
+				castBar.Time:SetFormattedText("%.1f / %.2f", abs(value - max), max)
+			end
 		end
 	end
 
