@@ -493,15 +493,15 @@ function ZNP:UpdateAllSettings()
 end
 
 function ZNP:Initialize()
-	if NP.Initialized then
-		self:UpdateAllSettings()
+	if not NP.Initialized then return end
 
-		if E.db.pz.nameplates.hdClient.hdNameplates then
-			UpdateCVarsHook(NP) -- update once since we cannot hook it in time on NP:Initialize.
-		end
+	self:UpdateAllSettings()
 
-		hooksecurefunc(NP, "SetMouseoverFrame", restoreNameplateUnitAfterMouseover) -- this is needed to hotfix ElvUI behaviour that clears frame.unit on all mouseover losses, so always hook it
+	if E.db.pz.nameplates.hdClient.hdNameplates then
+		UpdateCVarsHook(NP) -- update once since we cannot hook it in time on NP:Initialize.
 	end
+
+	hooksecurefunc(NP, "SetMouseoverFrame", restoreNameplateUnitAfterMouseover) -- this is needed to hotfix ElvUI behaviour that clears frame.unit on all mouseover losses, so always hook it
 
 	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 	self:RegisterEvent("PLAYER_TARGET_CHANGED")
