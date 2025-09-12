@@ -477,6 +477,10 @@ function ZNP:NAME_PLATE_UNIT_ADDED(_, unit)
 		LAI.frame:UNIT_AURA(_, unit) -- force recheck nameplate auras with nameplate unitID to avoid having to mouseover. This also sets self.GUIDList[guid] from NP:UpdateElement_AurasByGUID (Auras.lua), so NP:UPDATE_MOUSEOVER_UNIT() won't fire NP.OnShow. As stated above, avoid NP.OnShow in order to preserve the tags.
 
 		OnShowHook(plate)
+
+		-- Style Filter Update
+		NP:StyleFilterUpdate(frame, "NAME_PLATE_UNIT_ADDED")
+		NP:ForEachVisiblePlate("ResetNameplateFrameLevel") --keep this after `StyleFilterUpdate`
 	end) -- Delay needed since ElvUI plate (plate.UnitFrame) is created a few frames after this event
 end
 
