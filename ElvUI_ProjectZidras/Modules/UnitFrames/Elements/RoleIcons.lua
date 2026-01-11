@@ -68,6 +68,7 @@ function ZUF:Configure_RoleIcon(frame)
 
 	if db.roleIcon.enable then
 		frame:EnableElement("UnitGroupRoleIndicator")
+		frame:DisableElement("GroupRoleIndicator") -- Disable default oUF element (avoid overlapping texture default coming from oUF enable function)
 		local attachPoint = UF:GetObjectAnchorPoint(frame, db.roleIcon.attachTo or "Health")
 
 		role:ClearAllPoints()
