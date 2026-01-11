@@ -14,7 +14,10 @@ local wipe = wipe
 L["ELVUI_PZ_DONORS"] = [[Inmortalz
 Volke
 Nap
-Dalsgaard]]
+Dalsgaard
+Wesir
+Shevros
+Greenlinenshirt]]
 
 L["ELVUI_PZ_CODERS"] = [[Apollyon
 Loaal
