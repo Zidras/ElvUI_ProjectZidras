@@ -3,9 +3,9 @@ local PZ, T, E, L, V, P, G = unpack(select(2, ...))
 --Role icons
 PZ.rolePaths = {
 	["ElvUI"] = {
-		TANK = [[Interface\AddOns\ElvUI\Media\Textures\tank]],
-		HEALER = [[Interface\AddOns\ElvUI\Media\Textures\healer]],
-		DAMAGER = [[Interface\AddOns\ElvUI\Media\Textures\dps]]
+		TANK = E.Media.Textures.Tank,
+		HEALER = E.Media.Textures.Healer,
+		DAMAGER = E.Media.Textures.DPS
 	},
 	["SupervillainUI"] = {
 		TANK = [[Interface\AddOns\ElvUI_ProjectZidras\Media\Textures\Role\svui-tank]],
