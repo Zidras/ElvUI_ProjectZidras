@@ -100,28 +100,38 @@ hooksecurefunc(UF, "Update_PlayerFrame", function(_, frame)
 	if frame and not frame.GroupRoleIndicator then
 		frame.GroupRoleIndicator = ZUF:Construct_RoleIcon(frame)
 	end
+	ZUF:Configure_RoleIcon(frame)
+	ZUF.UpdateRoleIcon(frame, "ForceUpdate")
 end)
 hooksecurefunc(UF, "Update_TargetFrame", function(_, frame)
 	dbUpdater(frame)
 	if frame and not frame.GroupRoleIndicator then
 		frame.GroupRoleIndicator = ZUF:Construct_RoleIcon(frame)
 	end
+	ZUF:Configure_RoleIcon(frame)
+	ZUF.UpdateRoleIcon(frame, "ForceUpdate")
 end)
 hooksecurefunc(UF, "Update_FocusFrame", function(_, frame)
 	dbUpdater(frame)
 	if frame and not frame.GroupRoleIndicator then
 		frame.GroupRoleIndicator = ZUF:Construct_RoleIcon(frame)
 	end
+	ZUF:Configure_RoleIcon(frame)
+	ZUF.UpdateRoleIcon(frame, "ForceUpdate")
 end)
 hooksecurefunc(UF, "Update_ArenaFrames", function(_, frame)
 	dbUpdater(frame)
 	if frame and not frame.GroupRoleIndicator then
 		frame.GroupRoleIndicator = ZUF:Construct_RoleIcon(frame)
 	end
+	ZUF:Configure_RoleIcon(frame)
+	ZUF.UpdateRoleIcon(frame, "ForceUpdate")
 end)
 hooksecurefunc(UF, "Update_Raid40Frames", function(_, frame)
 	dbUpdater(frame)
 	if frame and not frame.GroupRoleIndicator then
 		frame.GroupRoleIndicator = ZUF:Construct_RoleIcon(frame)
 	end
+	ZUF:Configure_RoleIcon(frame)
+	ZUF.UpdateRoleIcon(frame, "ForceUpdate")
 end)
