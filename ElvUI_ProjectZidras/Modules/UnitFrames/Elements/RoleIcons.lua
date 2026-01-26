@@ -95,43 +95,24 @@ UF.Construct_RoleIcon = ZUF.Construct_RoleIcon
 UF.UpdateRoleIcon = ZUF.UpdateRoleIcon
 UF.Configure_RoleIcon = ZUF.Configure_RoleIcon
 
-hooksecurefunc(UF, "Update_PlayerFrame", function(_, frame)
+-- Since ElvUI does not have Role Icons in all unit frames, we need to hook into their update functions to add our own
+local function roleUpdaterHook(_, frame)
 	dbUpdater(frame)
 	if frame and not frame.GroupRoleIndicator then
 		frame.GroupRoleIndicator = ZUF:Construct_RoleIcon(frame)
 	end
 	ZUF:Configure_RoleIcon(frame)
 	ZUF.UpdateRoleIcon(frame, "ForceUpdate")
-end)
-hooksecurefunc(UF, "Update_TargetFrame", function(_, frame)
-	dbUpdater(frame)
-	if frame and not frame.GroupRoleIndicator then
-		frame.GroupRoleIndicator = ZUF:Construct_RoleIcon(frame)
-	end
-	ZUF:Configure_RoleIcon(frame)
-	ZUF.UpdateRoleIcon(frame, "ForceUpdate")
-end)
-hooksecurefunc(UF, "Update_FocusFrame", function(_, frame)
-	dbUpdater(frame)
-	if frame and not frame.GroupRoleIndicator then
-		frame.GroupRoleIndicator = ZUF:Construct_RoleIcon(frame)
-	end
-	ZUF:Configure_RoleIcon(frame)
-	ZUF.UpdateRoleIcon(frame, "ForceUpdate")
-end)
-hooksecurefunc(UF, "Update_ArenaFrames", function(_, frame)
-	dbUpdater(frame)
-	if frame and not frame.GroupRoleIndicator then
-		frame.GroupRoleIndicator = ZUF:Construct_RoleIcon(frame)
-	end
-	ZUF:Configure_RoleIcon(frame)
-	ZUF.UpdateRoleIcon(frame, "ForceUpdate")
-end)
-hooksecurefunc(UF, "Update_Raid40Frames", function(_, frame)
-	dbUpdater(frame)
-	if frame and not frame.GroupRoleIndicator then
-		frame.GroupRoleIndicator = ZUF:Construct_RoleIcon(frame)
-	end
-	ZUF:Configure_RoleIcon(frame)
-	ZUF.UpdateRoleIcon(frame, "ForceUpdate")
-end)
+end
+
+local frameUpdateFunctions = {
+	"Update_PlayerFrame",
+	"Update_TargetFrame",
+	"Update_FocusFrame",
+	"Update_ArenaFrames",
+	"Update_Raid40Frames"
+}
+
+for _, funcName in ipairs(frameUpdateFunctions) do
+	hooksecurefunc(UF, funcName, roleUpdaterHook) -- passes (UF, frame) as arguments from ElvUI's original function
+end
