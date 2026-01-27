@@ -7,7 +7,6 @@
 
 <Script file="elements\math.lua" />
 <Script file="elements\group.lua" />
-<Script file="elements\unit.lua" />
 <Script file="elements\spec.lua" />
 <Script file="elements\statusbar.lua" />
 
