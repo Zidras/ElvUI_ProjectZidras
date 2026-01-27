@@ -12,7 +12,7 @@ tab_width = 4
 
 [*/Libraries/**.{lua,xml,toc}]
 trim_trailing_whitespace = false
-insert_final_newline = none
+insert_final_newline = false
 
 [*.{yml,gitattributes,gitignore}]
 indent_style = space
