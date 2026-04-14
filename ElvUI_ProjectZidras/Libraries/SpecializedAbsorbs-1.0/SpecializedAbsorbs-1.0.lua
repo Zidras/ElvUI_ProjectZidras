@@ -2,7 +2,7 @@
 -- SpecializedAbsorbs
 ------------------------------------------------------------------------
 
-local MAJOR, MINOR = "SpecializedAbsorbs-1.0", 4
+local MAJOR, MINOR = "SpecializedAbsorbs-1.0", 5
 local lib, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 if not lib then return end
 local Core
@@ -306,8 +306,7 @@ local function GetUnitId(guid, name)
 	end
 	if UnitGUID("target") == guid then
 		return "target"
-	end
-	if UnitGUID("focus") == guid then
+	elseif UnitGUID("focus") == guid then
 		return "focus"
 	end
 
@@ -339,6 +338,7 @@ local function GetUnitId(guid, name)
 	if UnitExists("playerpet") and UnitGUID("playerpet") == guid then
 		return "playerpet"
 	end
+	return nil
 end
 
 -- Tries to get a working unitId and calls the given UnitXXX() function
@@ -395,7 +395,11 @@ function Core.Enable()
 	Core.GUIDtoAbsorbHealSpells = {}
 	GUIDtoAbsorbHealSpells = Core.GUIDtoAbsorbHealSpells
 
+	--ZONE_CHANGED_NEW_AREA
+	--ZONE_CHANGED_INDOORS
+	--ZONE_CHANGED	--add this too or nah?
 	Core.RegisterEvent("ZONE_CHANGED_NEW_AREA")
+	Core.RegisterEvent("ZONE_CHANGED_INDOORS")
 	Events.ZONE_CHANGED_NEW_AREA()
 
 	if playerclass == "DEATHKNIGHT" then
@@ -458,7 +462,7 @@ end
 -- have accumulated. It will be called in case this library version gets
 -- replaced by a new one
 function Core.Disable()
-	for guid, effects in pairs(activeEffectsBySpell) do
+	for guid, _ in pairs(activeEffectsBySpell) do
 		callbacks:Fire("UnitCleared", guid)
 	end
 
@@ -819,7 +823,7 @@ function Core.AddCombatTrigger(target, event, func)
 		-- There is already a list of callbacks, so we just add this one
 		if funcList then
 			-- We used a direct call so far, create a list and set up a handler
-			for k, v in pairs(funcList) do
+			for _, v in pairs(funcList) do
 				if v == func then
 					return
 				end
@@ -834,7 +838,7 @@ function Core.AddCombatTrigger(target, event, func)
 			eventTriggers[listIndex] = funcList
 
 			local handler = function(...)
-				for k, v in pairs(funcList) do
+				for _, v in pairs(funcList) do
 					v(...)
 				end
 			end
@@ -862,7 +866,7 @@ function Core.RemoveCombatTrigger(target, event, func)
 			local old_funcList = DeepTableCopy(funcList)
 			wipe(funcList)
 
-			for k, v in pairs(old_funcList) do
+			for _, v in pairs(old_funcList) do
 				if v ~= func then
 					tinsert(funcList, v)
 				end
@@ -1084,6 +1088,23 @@ function Events.GROUPING_CHANGED()
 	Events.STATS_CHANGED()
 end
 
+local iccBuffBonus = {
+    -- Hellscream's Warsong
+    [73816] = "1.05",
+    [73818] = "1.1",
+    [73819] = "1.15",
+    [73820] = "1.2",
+    [73821] = "1.25",
+    [73822] = "1.3",
+    -- Strength of Wrynn
+    [73762] = "1.05",
+    [73824] = "1.1",
+    [73825] = "1.15",
+    [73826] = "1.2",
+    [73827] = "1.25",
+    [73828] = "1.3",
+}
+
 function Events.ZONE_CHANGED_NEW_AREA()
 	if UnitInBattleground("player") then
 		ZONE_MODIFIER = 1.17
@@ -1092,13 +1113,19 @@ function Events.ZONE_CHANGED_NEW_AREA()
 	elseif GetCurrentMapAreaID() == 502 then
 		ZONE_MODIFIER = 1.17
 	elseif GetCurrentMapAreaID() == 605 then
-		ZONE_MODIFIER = (UnitBuff("player", GetSpellInfo(73822)) or UnitBuff("player", GetSpellInfo(73828))) and 1.3 or 1
+		local iccBuffSpellId = select( 11, UnitBuff("player", GetSpellInfo(73828)) ) or select( 11, UnitBuff("player", GetSpellInfo(73822)) )
+		if (iccBuffSpellId and iccBuffBonus[iccBuffSpellId]) then
+			ZONE_MODIFIER = iccBuffBonus[iccBuffSpellId]
+		else
+			ZONE_MODIFIER = 1
+		end
 	else
 		ZONE_MODIFIER = 1
 	end
 
 	Core:ScheduleTimer(Events.STATS_CHANGED, 5)
 end
+Events.ZONE_CHANGED_INDOORS = Events.ZONE_CHANGED_NEW_AREA
 
 function Events.STATS_CHANGED()
 	local baseAP, plusAP, minusAP = UnitAttackPower("player")
@@ -1246,7 +1273,7 @@ function lib.RegisterAreaCallbacks(self, funcCreated, funcUpdated, funcCleared)
 end
 
 function lib.GetLowValueTolerance()
-	return LOW_VALUE_TOLERANE
+	return LOW_VALUE_TOLERANCE
 end
 
 function lib.SetLowValueTolerance(value)
@@ -1706,22 +1733,22 @@ end
 
 PRIEST_DIVINEAEGIS_SPELLID = 47753
 
--- [rank] = {spellid, level, baseValue, incValue}
+-- [rank] = {spellid, level, baseValue, incValue, maxLevel}
 local priest_PWS_Ranks = {
-	[1] = {17, 6, 44, 4},
-	[2] = {592, 12, 88, 6},
-	[3] = {600, 18, 158, 8},
-	[4] = {3747, 24, 234, 10},
-	[5] = {6065, 30, 301, 11},
-	[6] = {6066, 36, 381, 13},
-	[7] = {10898, 42, 484, 15},
-	[8] = {10899, 48, 605, 17},
-	[9] = {10900, 54, 763, 19},
-	[10] = {10901, 60, 942, 21},
-	[11] = {25217, 65, 1125, 18},
-	[12] = {25218, 70, 1265, 20},
-	[13] = {48065, 75, 1920, 30},
-	[14] = {48066, 80, 2230, 0}
+	[1] = {17, 6, 44, 4, 11},
+	[2] = {592, 12, 88, 6, 17},
+	[3] = {600, 18, 158, 8, 23},
+	[4] = {3747, 24, 234, 10, 29},
+	[5] = {6065, 30, 301, 11, 35},
+	[6] = {6066, 36, 381, 13, 41},
+	[7] = {10898, 42, 484, 15, 47},
+	[8] = {10899, 48, 605, 17, 53},
+	[9] = {10900, 54, 763, 19, 59},
+	[10] = {10901, 60, 942, 21, 65},
+	[11] = {25217, 65, 1125, 18, 69},
+	[12] = {25218, 70, 1265, 20, 74},
+	[13] = {48065, 75, 1920, 30, 79},
+	[14] = {48066, 80, 2230, 0, 84}
 }
 
 -- Public Scaling:
@@ -1729,8 +1756,8 @@ local priest_PWS_Ranks = {
 --   Divine Aegis: [47753] = healFactor
 local priest_defaultScaling = {[PRIEST_DIVINEAEGIS_SPELLID] = 0}
 do
-	for k, v in pairs(priest_PWS_Ranks) do
-		priest_defaultScaling[v[1]] = {v[3], 0.809}
+	for _, v in pairs(priest_PWS_Ranks) do
+		priest_defaultScaling[v[1]] = {v[3], 0.8068}	-- wtf is 0.809 ? default SP scaling 0.8068
 	end
 end
 
@@ -1738,12 +1765,11 @@ end
 --   Talents: "TwinDisc", "ImpPWS", "FocusedPower", "DivineAegis", "BorrowedTime", "SpiritualHealing"
 --	 Gear: "4pcRaid9", "4pcRaid10"
 --   Computed: base, sp, DA
-
 local function priest_PowerWordShield_Create(srcGUID, srcName, dstGUID, dstName, spellid, destEffects)
 	local _, sp, quality1, sourceScaling, quality2 = UnitStatsAndScaling(srcGUID, 0.1, priest_defaultScaling, 0.1)
 	sourceScaling[spellid] = sourceScaling[spellid] or priest_defaultScaling[spellid]
 	if sourceScaling[spellid] then
-		return floor((sourceScaling[spellid][1] + sp * sourceScaling[spellid][2]) * ZONE_MODIFIER), min(quality1, quality2)
+		return floor( (floor(sourceScaling[spellid][1]) + floor(sp * sourceScaling[spellid][2])) * ZONE_MODIFIER ), min(quality1, quality2)
 	end
 end
 
@@ -1807,6 +1833,9 @@ local function priest_ApplyScaling(guid, level, baseFactor, spFactor, daFactor)
 
 	local rankValue, rankSP
 
+-- priest_PWS_Ranks = {
+--		[rank] = {spellid, level, baseValue, incValue, maxLevel},
+-- }
 	for k, v in pairs(priest_PWS_Ranks) do
 		if v[2] <= level then
 			if level == 80 then
@@ -1816,31 +1845,33 @@ local function priest_ApplyScaling(guid, level, baseFactor, spFactor, daFactor)
 				rankValue = v[3]
 			end
 
-			-- Based on the assumption that the decrease in sp coefficient is linear,
-			-- only tested for level 80 though so far
-			-- Cataclysm will help us get rid of this crap again
-			if v[2] < (level - 5) then
-				if level == 80 then
-					rankSP = max(spFactor * ((v[2] * 0.045228921) - 2.381389768), 0)
-				else
-					rankSP = 0
-				end
+			--https://github.com/TrinityCore/TrinityCore/blob/3.3.5/src/server/game/Entities/Unit/Unit.cpp#L2326
+			local downcoeff
+			if (level < v[5]) then
+				downcoeff = 1
 			else
-				rankSP = spFactor
+				downcoeff = max( 0, min(1, (22 + v[5] - level)/20) )
 			end
+			rankSP = spFactor * downcoeff
 
 			guidScaling[v[1]] = {rankValue * baseFactor, rankSP}
 		end
 	end
 end
 
+--https://github.com/TrinityCore/TrinityCore/blob/3.3.5/src/server/scripts/Spells/spell_priest.cpp#L946
 local function priest_UpdatePlayerScaling()
-	privateScaling.base = ((1.0 + (privateScaling["TwinDisc"] * 0.01) + (privateScaling["FocusedPower"] * 0.02) + (privateScaling["SpiritualHealing"] * 0.02)) * (1.0 + ((privateScaling["ImpPWS"] + privateScaling["4pcRaid10"]) * 0.05)))
+	privateScaling.base = (1.0 + (privateScaling["TwinDisc"] * 0.01)) *
+	(1.0 + (privateScaling["FocusedPower"] * 0.02)) *
+	(1.0 + (privateScaling["SpiritualHealing"] * 0.02)) *
+	(1.0 + ((privateScaling["ImpPWS"] + privateScaling["4pcRaid10"]) * 0.05))
 
-	local spFactor = 0.807
-	spFactor = spFactor + (privateScaling["BorrowedTime"] * 0.08)
-	spFactor = spFactor * (1.0 + (privateScaling["TwinDisc"] * 0.01) + (privateScaling["FocusedPower"] * 0.02) + (privateScaling["SpiritualHealing"] * 0.02)) * (1.0 + ((privateScaling["ImpPWS"] + privateScaling["4pcRaid10"]) * 0.05))
-	privateScaling.sp = spFactor
+	privateScaling.sp = (0.8068 + (privateScaling["BorrowedTime"] * 0.08)) *
+	(1.0 + (privateScaling["TwinDisc"] * 0.01)) *
+	(1 + (privateScaling["FocusedPower"] * 0.02)) *
+	(1 + (privateScaling["SpiritualHealing"] * 0.02)) *
+	(1.0 + ((privateScaling["ImpPWS"] + privateScaling["4pcRaid10"]) * 0.05))
+
 	privateScaling.DA = (privateScaling["DivineAegis"] * 0.1) * (1 + (privateScaling["4pcRaid9"] * 0.03))
 	priest_ApplyScaling(playerid, UnitLevel("player"), privateScaling.base, privateScaling.sp, privateScaling.DA)
 	lib.ScheduleScalingBroadcast()
